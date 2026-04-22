@@ -30,11 +30,11 @@ struct RootView: View {
         case .sceneBuilder:
             SceneBuilderView()
         case .videoRenderer:
-            PlaceholderView(module: .videoRenderer)
+            VideoRendererView()
         case .assetLibrary:
-            PlaceholderView(module: .assetLibrary)
+            AssetLibraryView()
         case .exports:
-            PlaceholderView(module: .exports)
+            ExportsView()
         }
     }
 }

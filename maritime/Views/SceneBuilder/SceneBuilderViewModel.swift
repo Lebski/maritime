@@ -8,6 +8,8 @@ final class SceneBuilderViewModel: ObservableObject {
     @Published var generationProgress: Double = 0
     @Published var showBackgroundPicker = false
     @Published var showPropPicker = false
+    @Published var leftCollapsed = false
+    @Published var rightCollapsed = false
 
     private let store = SceneStore.shared
     private var cancellables: Set<AnyCancellable> = []
