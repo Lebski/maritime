@@ -24,7 +24,7 @@ struct RootView: View {
         case .storyForge:
             StoryForgeView()
         case .storyboard:
-            StoryboardView()
+            StoryboardComposerView()
         case .characterLab:
             CharacterLabView()
         case .sceneBuilder:

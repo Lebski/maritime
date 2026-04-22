@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */; };
+		07C78D13878C11E09A635A58 /* ThemeTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */; };
 		07F7A27D0390ED99C0C9D619 /* StoryForgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */; };
 		09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76759068CF8F2E06FCC18D90 /* SidebarView.swift */; };
 		0A25B10019A8C0BEC9BA70F5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */; };
@@ -15,47 +16,55 @@
 		0F638C7CC82E644DCDA8D262 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */; };
 		146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */; };
 		1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790CC7A590B10A287972B40D /* SceneBuilderView.swift */; };
-		20FB339740DD26BF59F2D030 /* WantVsNeedPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905F4BDBDB42EABA9C6BB8D9 /* WantVsNeedPanel.swift */; };
-		2155656647FAB763C6E14F89 /* StoryboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64D6604C8B8D1A32FDA658C /* StoryboardViewModel.swift */; };
 		38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */; };
 		3A36013CB46D6547BCA0BD5E /* CutSuggestionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A731252C8E8E5A82BCA59C1 /* CutSuggestionsList.swift */; };
 		41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */; };
 		4AECCF9BEA20FD8B8A4498B9 /* MotionControlsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 487946A99EA11ADD0391DB89 /* MotionControlsPanel.swift */; };
 		4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557F7455FFC01965AA7A316D /* Theme.swift */; };
-		4F782F133F82CBE0BB848B99 /* RhythmTimingBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE4A13E852C20AD8BF59EEA /* RhythmTimingBar.swift */; };
 		4F8044B155E5D22358C13BFC /* CharacterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */; };
+		553C7B428327C9AB418FBB3C /* StoryboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255692AA3FF39F06974AE381 /* StoryboardStore.swift */; };
 		58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */; };
-		5922A80CD82CE28A0186A7D4 /* ThemeMotifRail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645A740F6A5A97B8E77E7E52 /* ThemeMotifRail.swift */; };
 		616FF3ADDB80DA670B732060 /* VideoRendererModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */; };
+		6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */; };
 		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
 		67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */; };
 		685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9853233341AACB1CB9A71CD /* PlaceholderView.swift */; };
 		6DADB0E129F26DEE5F252D79 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202A7239C33290199AE8215 /* HomeComponents.swift */; };
+		6FC58EAB8A71A3BB01513ED7 /* SceneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53F490D26233235CF96DE56 /* SceneStore.swift */; };
 		767B0683BE78280E6F860807 /* AssetDetailPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EF76E034C4C55BC5F4DCD6 /* AssetDetailPanel.swift */; };
-		774FB8BD910B7D6B26DA602C /* StoryboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2311848715BF7F1D83C3C3 /* StoryboardView.swift */; };
 		77EC430EAAA168D6E6C64E27 /* StoryForgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */; };
-		7F38919569AE20A2C05E529B /* SequenceGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4BC2A442FA4DD984079C15 /* SequenceGridView.swift */; };
+		7C9AA5FBB9F570A879CC528F /* StoryboardComposerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */; };
 		80696CE5707EC736347F2AA0 /* VideoRendererViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265623AA8D68BC8CA43528BC /* VideoRendererViewModel.swift */; };
 		807FBBA7CD985F88EBE6A545 /* ExportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230A353C5DEF12E3E1B7E76 /* ExportsView.swift */; };
 		86B584AC8302EA5553754515 /* AssetGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9163453FD13E37DC54D80580 /* AssetGridView.swift */; };
 		86C65B51BAC127E8DC6EE615 /* AssetLibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4396AF3B65CB2C741B89C536 /* AssetLibraryViewModel.swift */; };
+		8BD77850EE9A5B52692C4859 /* StoryboardPanelCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */; };
 		9221C9080653A0D5CA7C9928 /* VideoRendererView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFA92A081040832E1DEBAFC /* VideoRendererView.swift */; };
 		9222187CA48DCAC3ED52B8FD /* ExportTargetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D42572AB4278A3CA326C1A8 /* ExportTargetCard.swift */; };
 		953AAA99DD9569F20B5C4289 /* AssetLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7F45B899AFD3BEA1B3CBC9 /* AssetLibraryModels.swift */; };
 		99B4C59FA1927C3EC94F7106 /* FinalizedCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */; };
+		9E05AC0967EEB5E4FB69F6D3 /* StoryForgePanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */; };
+		9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */; };
+		A29C5E6C224459FD10F164EE /* StoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC3B252001C630E7DDC279E /* StoryStore.swift */; };
 		A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCC80BEE94CE861EA8A4E0B /* Models.swift */; };
+		A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */; };
 		A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */; };
 		B3F24A87DD7CB8968FE50BC1 /* AssetLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7169227446C80046BF27DC59 /* AssetLibraryView.swift */; };
-		BC08B2BE9A60AFEFA1DEFEDF /* BeatSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C771D89C5C413AFCD1FF45A5 /* BeatSheetView.swift */; };
 		BC774BAB2B8908B2F9A75791 /* ExportsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F2860DA7BEBD39382CC396 /* ExportsModels.swift */; };
+		BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */; };
 		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
-		CDA36404E6959E4B846B513A /* ShotLibraryPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779E36CA9828B2690DA4F669 /* ShotLibraryPanel.swift */; };
+		CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */; };
 		CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */; };
 		D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */; };
 		D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A4530F5AB5E6DCDB635C61 /* RootView.swift */; };
 		DCE6A53FCC91BE70A12DB813 /* CollapsiblePane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531F81FCB48D80FAA0A34132 /* CollapsiblePane.swift */; };
+		DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */; };
 		E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */; };
+		E28A559FD65900D11C4675B3 /* StoryboardPanelsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */; };
 		E2E3BB5B2EDDFC9182066F62 /* ExportHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */; };
+		E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */; };
+		EEF8984FF267CBFBC95A3F60 /* StoryStructureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */; };
+		EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */; };
 		F1179E9398605BAC938947B9 /* ExportsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34AE7A5A4ED209DDEFA3324 /* ExportsViewModel.swift */; };
 		F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */; };
 /* End PBXBuildFile section */
@@ -65,39 +74,44 @@
 		0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = maritime.entitlements; sourceTree = "<group>"; };
 		0F1E4F240AF3F87FE6D8F75B /* maritime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = maritime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10F2860DA7BEBD39382CC396 /* ExportsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsModels.swift; sourceTree = "<group>"; };
-		1C2311848715BF7F1D83C3C3 /* StoryboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardView.swift; sourceTree = "<group>"; };
+		12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelCard.swift; sourceTree = "<group>"; };
+		1DC3B252001C630E7DDC279E /* StoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStore.swift; sourceTree = "<group>"; };
 		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		255692AA3FF39F06974AE381 /* StoryboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardStore.swift; sourceTree = "<group>"; };
 		265623AA8D68BC8CA43528BC /* VideoRendererViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererViewModel.swift; sourceTree = "<group>"; };
+		29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelsGridView.swift; sourceTree = "<group>"; };
 		2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCanvasView.swift; sourceTree = "<group>"; };
 		2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePanelsView.swift; sourceTree = "<group>"; };
+		3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterBuilderView.swift; sourceTree = "<group>"; };
 		3A731252C8E8E5A82BCA59C1 /* CutSuggestionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutSuggestionsList.swift; sourceTree = "<group>"; };
+		3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmPlannerView.swift; sourceTree = "<group>"; };
 		4396AF3B65CB2C741B89C536 /* AssetLibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLibraryViewModel.swift; sourceTree = "<group>"; };
 		487946A99EA11ADD0391DB89 /* MotionControlsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionControlsPanel.swift; sourceTree = "<group>"; };
 		51EF76E034C4C55BC5F4DCD6 /* AssetDetailPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailPanel.swift; sourceTree = "<group>"; };
 		531F81FCB48D80FAA0A34132 /* CollapsiblePane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsiblePane.swift; sourceTree = "<group>"; };
 		557F7455FFC01965AA7A316D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeModels.swift; sourceTree = "<group>"; };
+		5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgePanels.swift; sourceTree = "<group>"; };
 		5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabModels.swift; sourceTree = "<group>"; };
-		5CE4A13E852C20AD8BF59EEA /* RhythmTimingBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmTimingBar.swift; sourceTree = "<group>"; };
-		645A740F6A5A97B8E77E7E52 /* ThemeMotifRail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeMotifRail.swift; sourceTree = "<group>"; };
+		5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelDetailEditor.swift; sourceTree = "<group>"; };
 		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
 		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
 		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
+		6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerViewModel.swift; sourceTree = "<group>"; };
 		6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSheetView.swift; sourceTree = "<group>"; };
 		7169227446C80046BF27DC59 /* AssetLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLibraryView.swift; sourceTree = "<group>"; };
 		7230A353C5DEF12E3E1B7E76 /* ExportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsView.swift; sourceTree = "<group>"; };
 		76759068CF8F2E06FCC18D90 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
-		779E36CA9828B2690DA4F669 /* ShotLibraryPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotLibraryPanel.swift; sourceTree = "<group>"; };
 		790CC7A590B10A287972B40D /* SceneBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderView.swift; sourceTree = "<group>"; };
 		7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeViewModel.swift; sourceTree = "<group>"; };
 		7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterStore.swift; sourceTree = "<group>"; };
 		85A4530F5AB5E6DCDB635C61 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeView.swift; sourceTree = "<group>"; };
 		8C7F45B899AFD3BEA1B3CBC9 /* AssetLibraryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLibraryModels.swift; sourceTree = "<group>"; };
-		905F4BDBDB42EABA9C6BB8D9 /* WantVsNeedPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WantVsNeedPanel.swift; sourceTree = "<group>"; };
 		9163453FD13E37DC54D80580 /* AssetGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetGridView.swift; sourceTree = "<group>"; };
 		91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabViewModel.swift; sourceTree = "<group>"; };
 		9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderModels.swift; sourceTree = "<group>"; };
+		97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerView.swift; sourceTree = "<group>"; };
 		9D42572AB4278A3CA326C1A8 /* ExportTargetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTargetCard.swift; sourceTree = "<group>"; };
 		A257DD4F9E660BE9793F14FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportHistoryList.swift; sourceTree = "<group>"; };
@@ -105,15 +119,19 @@
 		ABFA92A081040832E1DEBAFC /* VideoRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererView.swift; sourceTree = "<group>"; };
 		ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderViewModel.swift; sourceTree = "<group>"; };
+		BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBreakdownView.swift; sourceTree = "<group>"; };
+		BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeTrackerView.swift; sourceTree = "<group>"; };
 		C34AE7A5A4ED209DDEFA3324 /* ExportsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsViewModel.swift; sourceTree = "<group>"; };
-		C64D6604C8B8D1A32FDA658C /* StoryboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardViewModel.swift; sourceTree = "<group>"; };
-		C771D89C5C413AFCD1FF45A5 /* BeatSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeatSheetView.swift; sourceTree = "<group>"; };
 		D202A7239C33290199AE8215 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
 		D36CCA281FE2E5C8D861703B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererModels.swift; sourceTree = "<group>"; };
 		D9853233341AACB1CB9A71CD /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
-		DF4BC2A442FA4DD984079C15 /* SequenceGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceGridView.swift; sourceTree = "<group>"; };
+		DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotLibraryView.swift; sourceTree = "<group>"; };
+		E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStructureView.swift; sourceTree = "<group>"; };
 		E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterWorkspaceView.swift; sourceTree = "<group>"; };
+		E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeHelperPanel.swift; sourceTree = "<group>"; };
+		F53F490D26233235CF96DE56 /* SceneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneStore.swift; sourceTree = "<group>"; };
+		FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardHelperPanel.swift; sourceTree = "<group>"; };
 		FFCC80BEE94CE861EA8A4E0B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -179,8 +197,11 @@
 				10F2860DA7BEBD39382CC396 /* ExportsModels.swift */,
 				FFCC80BEE94CE861EA8A4E0B /* Models.swift */,
 				9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */,
+				F53F490D26233235CF96DE56 /* SceneStore.swift */,
 				07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */,
+				255692AA3FF39F06974AE381 /* StoryboardStore.swift */,
 				59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */,
+				1DC3B252001C630E7DDC279E /* StoryStore.swift */,
 				D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */,
 			);
 			path = Models;
@@ -240,11 +261,14 @@
 		C7D138127F8C0FEE1F14DF44 /* Storyboard */ = {
 			isa = PBXGroup;
 			children = (
-				5CE4A13E852C20AD8BF59EEA /* RhythmTimingBar.swift */,
-				DF4BC2A442FA4DD984079C15 /* SequenceGridView.swift */,
-				779E36CA9828B2690DA4F669 /* ShotLibraryPanel.swift */,
-				1C2311848715BF7F1D83C3C3 /* StoryboardView.swift */,
-				C64D6604C8B8D1A32FDA658C /* StoryboardViewModel.swift */,
+				5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */,
+				3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */,
+				DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */,
+				97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */,
+				6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */,
+				FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */,
+				12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */,
+				29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */,
 			);
 			path = Storyboard;
 			sourceTree = "<group>";
@@ -252,11 +276,14 @@
 		E76C802FC833B130316E1328 /* StoryForge */ = {
 			isa = PBXGroup;
 			children = (
-				C771D89C5C413AFCD1FF45A5 /* BeatSheetView.swift */,
+				3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */,
+				BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */,
+				E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */,
+				5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */,
 				8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */,
 				7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */,
-				645A740F6A5A97B8E77E7E52 /* ThemeMotifRail.swift */,
-				905F4BDBDB42EABA9C6BB8D9 /* WantVsNeedPanel.swift */,
+				E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */,
+				BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */,
 			);
 			path = StoryForge;
 			sourceTree = "<group>";
@@ -354,7 +381,7 @@
 				953AAA99DD9569F20B5C4289 /* AssetLibraryModels.swift in Sources */,
 				B3F24A87DD7CB8968FE50BC1 /* AssetLibraryView.swift in Sources */,
 				86C65B51BAC127E8DC6EE615 /* AssetLibraryViewModel.swift in Sources */,
-				BC08B2BE9A60AFEFA1DEFEDF /* BeatSheetView.swift in Sources */,
+				9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */,
 				0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */,
 				38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */,
 				146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */,
@@ -374,31 +401,40 @@
 				4AECCF9BEA20FD8B8A4498B9 /* MotionControlsPanel.swift in Sources */,
 				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
 				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
+				CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */,
 				685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */,
 				A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */,
-				4F782F133F82CBE0BB848B99 /* RhythmTimingBar.swift in Sources */,
+				DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */,
 				D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */,
+				A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */,
 				0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */,
 				1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */,
 				CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */,
 				D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */,
 				E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */,
-				7F38919569AE20A2C05E529B /* SequenceGridView.swift in Sources */,
-				CDA36404E6959E4B846B513A /* ShotLibraryPanel.swift in Sources */,
+				6FC58EAB8A71A3BB01513ED7 /* SceneStore.swift in Sources */,
+				BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */,
 				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
+				E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */,
 				77EC430EAAA168D6E6C64E27 /* StoryForgeModels.swift in Sources */,
+				9E05AC0967EEB5E4FB69F6D3 /* StoryForgePanels.swift in Sources */,
 				07F7A27D0390ED99C0C9D619 /* StoryForgeView.swift in Sources */,
 				67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */,
+				A29C5E6C224459FD10F164EE /* StoryStore.swift in Sources */,
+				EEF8984FF267CBFBC95A3F60 /* StoryStructureView.swift in Sources */,
+				6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */,
+				7C9AA5FBB9F570A879CC528F /* StoryboardComposerViewModel.swift in Sources */,
+				EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */,
 				58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */,
-				774FB8BD910B7D6B26DA602C /* StoryboardView.swift in Sources */,
-				2155656647FAB763C6E14F89 /* StoryboardViewModel.swift in Sources */,
+				8BD77850EE9A5B52692C4859 /* StoryboardPanelCard.swift in Sources */,
+				E28A559FD65900D11C4675B3 /* StoryboardPanelsGridView.swift in Sources */,
+				553C7B428327C9AB418FBB3C /* StoryboardStore.swift in Sources */,
 				4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */,
-				5922A80CD82CE28A0186A7D4 /* ThemeMotifRail.swift in Sources */,
+				07C78D13878C11E09A635A58 /* ThemeTrackerView.swift in Sources */,
 				0F638C7CC82E644DCDA8D262 /* TimelineView.swift in Sources */,
 				616FF3ADDB80DA670B732060 /* VideoRendererModels.swift in Sources */,
 				9221C9080653A0D5CA7C9928 /* VideoRendererView.swift in Sources */,
 				80696CE5707EC736347F2AA0 /* VideoRendererViewModel.swift in Sources */,
-				20FB339740DD26BF59F2D030 /* WantVsNeedPanel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

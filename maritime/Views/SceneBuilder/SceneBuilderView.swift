@@ -2,39 +2,32 @@ import SwiftUI
 
 struct SceneBuilderView: View {
     @StateObject private var vm = SceneBuilderViewModel()
+    @State private var showHelper = false
+    @State private var showInnerSidebar = true
 
     var body: some View {
         HStack(spacing: 0) {
-            CollapsiblePane(
-                isCollapsed: $vm.leftCollapsed,
-                edge: .leading,
-                expandedWidth: 260,
-                tint: AppModule.sceneBuilder.tint,
-                icon: AppModule.sceneBuilder.icon,
-                label: "Scenes",
-                shortcut: "["
-            ) {
-                sceneList.background(Theme.bgElevated)
+            if showInnerSidebar {
+                sceneList
+                    .frame(width: 260)
+                    .background(Theme.bgElevated)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                Divider().background(Theme.stroke)
             }
-            Divider().background(Theme.stroke)
             if let scene = vm.activeScene {
                 mainWorkspace(scene: scene)
-                Divider().background(Theme.stroke)
-                CollapsiblePane(
-                    isCollapsed: $vm.rightCollapsed,
-                    edge: .trailing,
-                    expandedWidth: 320,
-                    tint: AppModule.sceneBuilder.tint,
-                    icon: "slider.horizontal.3",
-                    label: "Setup",
-                    shortcut: "]"
-                ) {
+                if showHelper {
+                    Divider().background(Theme.stroke)
                     SceneSetupPanel(scene: scene, vm: vm)
+                        .frame(width: 320)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             } else {
                 emptyState
             }
         }
+        .animation(.easeInOut(duration: 0.22), value: showHelper)
+        .animation(.easeInOut(duration: 0.22), value: showInnerSidebar)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.bg)
         .sheet(isPresented: $vm.showBackgroundPicker) {
@@ -43,6 +36,32 @@ struct SceneBuilderView: View {
         .sheet(isPresented: $vm.showPropPicker) {
             PropPickerSheet(vm: vm)
         }
+    }
+
+    private var sidebarToggle: some View {
+        Button(action: { showInnerSidebar.toggle() }) {
+            Image(systemName: "sidebar.left")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(showInnerSidebar ? Theme.accent : Theme.textTertiary)
+                .frame(width: 30, height: 30)
+                .background(showInnerSidebar ? Theme.accent.opacity(0.14) : Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .help(showInnerSidebar ? "Hide sidebar" : "Show sidebar")
+    }
+
+    private var helperToggle: some View {
+        Button(action: { showHelper.toggle() }) {
+            Image(systemName: "sidebar.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(showHelper ? Theme.accent : Theme.textTertiary)
+                .frame(width: 30, height: 30)
+                .background(showHelper ? Theme.accent.opacity(0.14) : Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .help(showHelper ? "Hide setup panel" : "Show setup panel")
     }
 
     // MARK: Scene List Sidebar
@@ -126,6 +145,7 @@ struct SceneBuilderView: View {
 
     private func workspaceHeader(scene: FilmScene) -> some View {
         HStack(spacing: 14) {
+            sidebarToggle
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Theme.accent.opacity(0.18))
@@ -152,6 +172,7 @@ struct SceneBuilderView: View {
                     .tracking(0.5)
             }
             Spacer()
+            helperToggle
             Button(action: {}) {
                 Label("Send to Renderer", systemImage: "arrow.right.circle.fill")
                     .font(.system(size: 12, weight: .semibold))
@@ -226,6 +247,12 @@ struct SceneListRow: View {
     let isActive: Bool
     let onTap: () -> Void
 
+    private var fromStoryboard: Bool {
+        StoryboardStore.shared.sequences.contains { seq in
+            seq.panels.contains { $0.promotedFilmSceneID == scene.id }
+        }
+    }
+
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 10) {
@@ -257,6 +284,14 @@ struct SceneListRow: View {
                     }
                 }
                 Spacer()
+                if fromStoryboard {
+                    Image(systemName: "square.grid.3x2.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.violet)
+                        .padding(4)
+                        .background(Theme.violet.opacity(0.14))
+                        .clipShape(Circle())
+                }
                 if scene.frameApproved {
                     Image(systemName: "checkmark.seal.fill")
                         .font(.system(size: 11))

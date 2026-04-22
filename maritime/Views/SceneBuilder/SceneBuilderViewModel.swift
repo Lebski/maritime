@@ -3,7 +3,6 @@ import Combine
 
 @MainActor
 final class SceneBuilderViewModel: ObservableObject {
-    @Published var scenes: [FilmScene] = SceneBuilderSamples.scenes
     @Published var activeSceneID: UUID?
     @Published var isGenerating = false
     @Published var generationProgress: Double = 0
@@ -12,17 +11,26 @@ final class SceneBuilderViewModel: ObservableObject {
     @Published var leftCollapsed = false
     @Published var rightCollapsed = false
 
+    private let store = SceneStore.shared
+    private var cancellables: Set<AnyCancellable> = []
+
+    var scenes: [FilmScene] { store.scenes }
+
     init() {
-        activeSceneID = scenes.first?.id
+        activeSceneID = store.scenes.first?.id
+        // Forward store changes into the VM so views re-render.
+        store.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
     }
 
     var activeScene: FilmScene? {
-        scenes.first(where: { $0.id == activeSceneID })
+        store.scenes.first(where: { $0.id == activeSceneID })
     }
 
     private func mutate(_ block: (inout FilmScene) -> Void) {
-        guard let idx = scenes.firstIndex(where: { $0.id == activeSceneID }) else { return }
-        block(&scenes[idx])
+        guard let id = activeSceneID else { return }
+        store.mutate(id: id, block)
     }
 
     func setActive(_ scene: FilmScene) {
@@ -65,7 +73,7 @@ final class SceneBuilderViewModel: ObservableObject {
     /// normalized (0-1) canvas position. Returns true on success.
     @discardableResult
     func addCharacter(from lab: LabCharacter, at position: CGPoint) -> Bool {
-        guard scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
+        guard store.scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
         // Don't add duplicates by name in the same scene
         if activeScene?.characters.contains(where: { $0.name == lab.name }) == true {
             // Move existing instead
@@ -127,7 +135,7 @@ final class SceneBuilderViewModel: ObservableObject {
     }
 
     func createNewScene() {
-        let nextNumber = (scenes.map { $0.number }.max() ?? 0) + 1
+        let nextNumber = (store.scenes.map { $0.number }.max() ?? 0) + 1
         let scene = FilmScene(
             number: nextNumber,
             title: "New Scene",
@@ -144,7 +152,7 @@ final class SceneBuilderViewModel: ObservableObject {
             frameApproved: false,
             projectTitle: "Untitled Project"
         )
-        scenes.append(scene)
+        store.add(scene)
         activeSceneID = scene.id
     }
 }
