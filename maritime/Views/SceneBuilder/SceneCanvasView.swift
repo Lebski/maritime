@@ -3,6 +3,7 @@ import SwiftUI
 struct SceneCanvasView: View {
     let scene: FilmScene
     @ObservedObject var vm: SceneBuilderViewModel
+    @EnvironmentObject var project: MovieBlazeProject
     @State private var isDropTargeted = false
 
     var body: some View {
@@ -64,7 +65,7 @@ struct SceneCanvasView: View {
             }
             .dropDestination(for: DraggableCharacter.self) { items, location in
                 guard let dropped = items.first else { return false }
-                guard let lab = CharacterStore.shared.character(id: dropped.id) else { return false }
+                guard let lab = project.character(id: dropped.id) else { return false }
                 let x = location.x / geo.size.width
                 let y = location.y / geo.size.height
                 return vm.addCharacter(from: lab, at: CGPoint(x: x, y: y))

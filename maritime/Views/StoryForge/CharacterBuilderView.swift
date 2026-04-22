@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CharacterBuilderView: View {
     @ObservedObject var vm: StoryForgeViewModel
-    @ObservedObject private var store = StoryStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
 
     var body: some View {
         HStack(spacing: 0) {

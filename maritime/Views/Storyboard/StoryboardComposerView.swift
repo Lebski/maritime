@@ -6,10 +6,44 @@ import SwiftUI
 // (header + tabs + current section), helper panel.
 
 struct StoryboardComposerView: View {
-    @StateObject private var vm = StoryboardComposerViewModel()
-    @ObservedObject private var store = StoryboardStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
+    @EnvironmentObject var navigator: AppNavigator
+    @StateObject private var vm: StoryboardComposerViewModel
     @State private var showHelper = false
     @State private var showInnerSidebar = true
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: StoryboardComposerViewModel(project: project))
+    }
+
+    // Look up the Story Forge scene breakdown this sequence was promoted
+    // from, if any. Searches across all bibles in the project.
+    private func originScene(for seq: StoryboardSequence) -> SceneBreakdown? {
+        guard let id = seq.sceneBreakdownID else { return nil }
+        for bible in project.bibles {
+            if let scene = bible.sceneBreakdowns.first(where: { $0.id == id }) {
+                return scene
+            }
+        }
+        return nil
+    }
+
+    private func goToStep(_ step: StepIndicator.Step) {
+        switch step {
+        case .storyboard:
+            break
+        case .outline:
+            if let origin = vm.activeSequence.flatMap(originScene) {
+                navigator.openStoryForge(sceneBreakdownID: origin.id)
+            } else {
+                navigator.openStoryForge()
+            }
+        case .frame:
+            navigator.go(to: .sceneBuilder)
+        case .render:
+            navigator.go(to: .videoRenderer)
+        }
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -36,6 +70,16 @@ struct StoryboardComposerView: View {
         .sheet(isPresented: $vm.showNewPanelSheet) {
             NewStoryboardPanelSheet(vm: vm)
         }
+        .onAppear { consumePendingSequenceID() }
+        .onChange(of: navigator.pendingSequenceID) { _, _ in consumePendingSequenceID() }
+    }
+
+    private func consumePendingSequenceID() {
+        guard let id = navigator.pendingSequenceID else { return }
+        if project.sequences.contains(where: { $0.id == id }) {
+            vm.setActiveSequence(id)
+        }
+        navigator.pendingSequenceID = nil
     }
 
     private var sidebarToggle: some View {
@@ -113,14 +157,14 @@ struct StoryboardComposerView: View {
                         .tracking(0.8)
                         .foregroundStyle(Theme.textTertiary)
                     Spacer()
-                    Text("\(store.sequences.count)")
+                    Text("\(project.sequences.count)")
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
                         .foregroundStyle(Theme.textTertiary)
                 }
                 .padding(.horizontal, 4)
                 .padding(.top, 10)
 
-                ForEach(store.sequences) { seq in
+                ForEach(project.sequences) { seq in
                     sequenceRow(seq)
                 }
             }
@@ -130,7 +174,7 @@ struct StoryboardComposerView: View {
     }
 
     private func sequenceRow(_ seq: StoryboardSequence) -> some View {
-        let isActive = store.activeSequenceID == seq.id
+        let isActive = project.activeSequenceID == seq.id
         return Button(action: { vm.setActiveSequence(seq.id) }) {
             HStack(spacing: 10) {
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
@@ -272,35 +316,86 @@ struct StoryboardComposerView: View {
     }
 
     private func workspaceHeader(seq: StoryboardSequence) -> some View {
-        HStack(spacing: 14) {
-            sidebarToggle
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: seq.posterColors,
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 36, height: 46)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(seq.projectTitle.uppercased())
-                    .font(.system(size: 10, weight: .bold))
-                    .tracking(0.6)
-                    .foregroundStyle(Theme.textTertiary)
-                Text(seq.title)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(Theme.textPrimary)
-                Text("\(seq.panels.count) panels · \(seq.runtimeLabel) runtime · ASL \(String(format: "%.1fs", seq.averageShotLength))")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textSecondary)
+        VStack(spacing: 12) {
+            HStack(spacing: 14) {
+                sidebarToggle
+                StepIndicator(current: .storyboard, onTap: goToStep)
+                Spacer()
+                helperToggle
+                overallCompletionBadge(value: seq.completion)
             }
-            Spacer()
-            helperToggle
-            overallCompletionBadge(value: seq.completion)
+            HStack(spacing: 12) {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: seq.posterColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 30, height: 38)
+                VStack(alignment: .leading, spacing: 4) {
+                    breadcrumb(seq: seq)
+                    HStack(spacing: 8) {
+                        if let origin = originScene(for: seq) {
+                            originPill(origin)
+                        }
+                        Text("\(seq.panels.count) panels · \(seq.runtimeLabel) runtime · ASL \(String(format: "%.1fs", seq.averageShotLength))")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                }
+                Spacer()
+            }
         }
         .padding(.horizontal, 22)
-        .padding(.vertical, 16)
+        .padding(.vertical, 14)
+    }
+
+    private func breadcrumb(seq: StoryboardSequence) -> some View {
+        HStack(spacing: 6) {
+            Button(action: { navigator.go(to: .home) }) {
+                Text(seq.projectTitle)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            .buttonStyle(.plain)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(Theme.textTertiary)
+            Text("Storyboard")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(Theme.textTertiary)
+            Text(seq.title)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+        }
+    }
+
+    private func originPill(_ scene: SceneBreakdown) -> some View {
+        Button(action: { navigator.openStoryForge(sceneBreakdownID: scene.id) }) {
+            HStack(spacing: 5) {
+                Image(systemName: "text.book.closed.fill")
+                    .font(.system(size: 9, weight: .semibold))
+                Text("From Story Forge · Scene \(scene.number) \(scene.title)")
+                    .font(.system(size: 10, weight: .semibold))
+                    .lineLimit(1)
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 8, weight: .bold))
+            }
+            .foregroundStyle(Theme.magenta)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Theme.magenta.opacity(0.12))
+            .overlay(Capsule().stroke(Theme.magenta.opacity(0.35), lineWidth: 1))
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .help("Open this scene in Story Forge")
     }
 
     private func overallCompletionBadge(value: Double) -> some View {
@@ -324,11 +419,16 @@ struct StoryboardComposerView: View {
     }
 
     private var tabRow: some View {
-        HStack(spacing: 8) {
-            ForEach(StoryboardTab.allCases) { tab in
-                storyboardTabButton(tab)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                ForEach(StoryboardTab.allCases) { tab in
+                    storyboardTabButton(tab)
+                }
+                Spacer()
             }
-            Spacer()
+            Text(vm.activeTab.subtitle)
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textTertiary)
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 12)
@@ -464,6 +564,7 @@ struct NewStoryboardPanelSheet: View {
 }
 
 #Preview {
-    StoryboardComposerView()
+    StoryboardComposerView(project: MovieBlazeProject())
+        .environmentObject(MovieBlazeProject())
         .frame(width: 1280, height: 800)
 }

@@ -11,7 +11,7 @@ import SwiftUI
 // emotion / story / rhythm). A panel can be promoted into Scene Builder as
 // a FilmScene — the stamp is kept on promotedFilmSceneID.
 
-enum CameraMovement: String, CaseIterable, Identifiable, Hashable {
+enum CameraMovement: String, CaseIterable, Identifiable, Hashable, Codable {
     case `static` = "Static"
     case pan      = "Pan"
     case tilt     = "Tilt"
@@ -63,7 +63,7 @@ enum CameraMovement: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-enum EditingPriority: String, CaseIterable, Identifiable, Hashable {
+enum EditingPriority: String, CaseIterable, Identifiable, Hashable, Codable {
     case emotion = "Emotion"
     case story   = "Story"
     case rhythm  = "Rhythm"
@@ -100,7 +100,7 @@ enum EditingPriority: String, CaseIterable, Identifiable, Hashable {
 
 // MARK: - Panel
 
-struct StoryboardPanel: Identifiable, Hashable {
+struct StoryboardPanel: Identifiable, Hashable, Codable {
     let id: UUID
     var number: Int
     var shotType: CameraShotType
@@ -161,7 +161,7 @@ struct StoryboardPanel: Identifiable, Hashable {
 
 // MARK: - Sequence
 
-struct StoryboardSequence: Identifiable, Hashable {
+struct StoryboardSequence: Identifiable, Hashable, Codable {
     let id: UUID
     var title: String
     var bibleID: UUID?

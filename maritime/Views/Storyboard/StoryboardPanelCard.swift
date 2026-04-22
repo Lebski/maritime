@@ -11,22 +11,22 @@ struct StoryboardPanelCard: View {
     let panel: StoryboardPanel
     let isSelected: Bool
     let onTap: () -> Void
+    var onReturnToScene: (() -> Void)? = nil
 
     var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 8) {
-                thumbnail
-                metaRow
-            }
-            .padding(10)
-            .background(isSelected ? Theme.violet.opacity(0.10) : Theme.card)
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(isSelected ? Theme.violet : Theme.stroke, lineWidth: isSelected ? 2 : 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        VStack(alignment: .leading, spacing: 8) {
+            thumbnail
+            metaRow
         }
-        .buttonStyle(.plain)
+        .padding(10)
+        .background(isSelected ? Theme.violet.opacity(0.10) : Theme.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(isSelected ? Theme.violet : Theme.stroke, lineWidth: isSelected ? 2 : 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onTapGesture { onTap() }
     }
 
     // MARK: Thumbnail
@@ -198,13 +198,7 @@ struct StoryboardPanelCard: View {
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
             if panel.isPromoted {
-                Image(systemName: "arrow.up.right.square.fill")
-                    .font(.system(size: 10))
-                    .foregroundStyle(Theme.teal)
-                Text("IN BUILDER")
-                    .font(.system(size: 9, weight: .bold))
-                    .tracking(0.6)
-                    .foregroundStyle(Theme.teal)
+                inBuilderChip
             } else {
                 Image(systemName: panel.timeOfDay.icon)
                     .font(.system(size: 10))
@@ -216,5 +210,34 @@ struct StoryboardPanelCard: View {
             }
         }
         .padding(.horizontal, 4)
+    }
+
+    @ViewBuilder
+    private var inBuilderChip: some View {
+        if let onReturnToScene {
+            Button(action: onReturnToScene) {
+                chipLabel
+            }
+            .buttonStyle(.plain)
+            .help("Open the matching scene in Scene Builder")
+        } else {
+            chipLabel
+        }
+    }
+
+    private var chipLabel: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "arrow.up.right.square.fill")
+                .font(.system(size: 10))
+            Text("VIEW IN BUILDER")
+                .font(.system(size: 9, weight: .bold))
+                .tracking(0.6)
+        }
+        .foregroundStyle(Theme.teal)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(Theme.teal.opacity(0.14))
+        .overlay(Capsule().stroke(Theme.teal.opacity(0.35), lineWidth: 1))
+        .clipShape(Capsule())
     }
 }

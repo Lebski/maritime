@@ -6,7 +6,7 @@ enum CharacterSource {
     case storyForge, library, new
 }
 
-enum RefinementRound: Int, CaseIterable {
+enum RefinementRound: Int, CaseIterable, Codable {
     case broad = 1, focused = 2, polish = 3
 
     var title: String {
@@ -42,7 +42,7 @@ enum RefinementRound: Int, CaseIterable {
     }
 }
 
-enum ReferenceSheetType: String, CaseIterable, Identifiable {
+enum ReferenceSheetType: String, CaseIterable, Identifiable, Codable {
     case portrait, turnaround, fullBody, expressions, actionPoses
     var id: String { rawValue }
 
@@ -77,8 +77,8 @@ enum ReferenceSheetType: String, CaseIterable, Identifiable {
     }
 }
 
-struct CharacterVariation: Identifiable, Hashable {
-    let id = UUID()
+struct CharacterVariation: Identifiable, Hashable, Codable {
+    let id: UUID
     let index: Int
     let label: String
     let age: String
@@ -86,10 +86,22 @@ struct CharacterVariation: Identifiable, Hashable {
     let accentColor: Color
     let gradientColors: [Color]
     var isSelected: Bool = false
+
+    init(id: UUID = UUID(), index: Int, label: String, age: String, style: String,
+         accentColor: Color, gradientColors: [Color], isSelected: Bool = false) {
+        self.id = id
+        self.index = index
+        self.label = label
+        self.age = age
+        self.style = style
+        self.accentColor = accentColor
+        self.gradientColors = gradientColors
+        self.isSelected = isSelected
+    }
 }
 
-struct LabCharacter: Identifiable {
-    let id = UUID()
+struct LabCharacter: Identifiable, Codable {
+    let id: UUID
     var name: String
     var description: String
     var role: String
@@ -99,6 +111,23 @@ struct LabCharacter: Identifiable {
     var isFinalized: Bool = false
     var generatedSheets: Set<ReferenceSheetType> = []
     var costumes: [String] = ["Casual", "Formal", "Combat"]
+
+    init(id: UUID = UUID(), name: String, description: String, role: String,
+         currentRound: RefinementRound = .broad, selectedVariations: [CharacterVariation] = [],
+         finalVariation: CharacterVariation? = nil, isFinalized: Bool = false,
+         generatedSheets: Set<ReferenceSheetType> = [],
+         costumes: [String] = ["Casual", "Formal", "Combat"]) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.role = role
+        self.currentRound = currentRound
+        self.selectedVariations = selectedVariations
+        self.finalVariation = finalVariation
+        self.isFinalized = isFinalized
+        self.generatedSheets = generatedSheets
+        self.costumes = costumes
+    }
 }
 
 // MARK: - Sample Variations

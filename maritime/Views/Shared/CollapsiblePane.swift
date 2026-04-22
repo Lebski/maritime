@@ -105,3 +105,140 @@ struct CollapsiblePane<Content: View>: View {
         }
     }
 }
+
+// MARK: - Step Indicator
+//
+// Four-step production pipeline indicator that lives above the Storyboard
+// workspace (and is reusable elsewhere). Past steps render as a lime check,
+// the current step uses the module tint, future steps are muted.
+
+struct StepIndicator: View {
+
+    enum Step: Int, CaseIterable, Identifiable {
+        case outline, storyboard, frame, render
+
+        var id: Int { rawValue }
+
+        var title: String {
+            switch self {
+            case .outline:    return "Outline"
+            case .storyboard: return "Storyboard"
+            case .frame:      return "Frame"
+            case .render:     return "Render"
+            }
+        }
+
+        var module: AppModule {
+            switch self {
+            case .outline:    return .storyForge
+            case .storyboard: return .storyboard
+            case .frame:      return .sceneBuilder
+            case .render:     return .videoRenderer
+            }
+        }
+    }
+
+    let current: Step
+    let onTap: (Step) -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(Array(Step.allCases.enumerated()), id: \.element.id) { idx, step in
+                stepChip(step)
+                if idx < Step.allCases.count - 1 {
+                    Rectangle()
+                        .fill(step.rawValue < current.rawValue ? Theme.lime.opacity(0.6) : Theme.stroke)
+                        .frame(width: 18, height: 1)
+                }
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Theme.card)
+        .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+        .clipShape(Capsule())
+    }
+
+    @ViewBuilder
+    private func stepChip(_ step: Step) -> some View {
+        let isCurrent = step == current
+        let isPast = step.rawValue < current.rawValue
+        Button(action: { onTap(step) }) {
+            HStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(circleFill(isCurrent: isCurrent, isPast: isPast, tint: step.module.tint))
+                        .frame(width: 18, height: 18)
+                    if isPast {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.black)
+                    } else {
+                        Text("\(step.rawValue + 1)")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(isCurrent ? .black : Theme.textTertiary)
+                    }
+                }
+                Text(step.title)
+                    .font(.system(size: 11, weight: isCurrent ? .bold : .medium))
+                    .foregroundStyle(isCurrent ? Theme.textPrimary : Theme.textSecondary)
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+        }
+        .buttonStyle(.plain)
+        .help(step.title)
+    }
+
+    private func circleFill(isCurrent: Bool, isPast: Bool, tint: Color) -> Color {
+        if isCurrent { return tint }
+        if isPast    { return Theme.lime.opacity(0.85) }
+        return Color.white.opacity(0.08)
+    }
+}
+
+// MARK: - Toast
+
+struct ToastView: View {
+    let toast: ToastContent
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Theme.lime)
+            Text(toast.message)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Theme.textPrimary)
+            if let label = toast.actionLabel, let action = toast.action {
+                Button(action: {
+                    action()
+                    onDismiss()
+                }) {
+                    Text(label)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Theme.lime)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Theme.textTertiary)
+                    .frame(width: 22, height: 22)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+        .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.35), radius: 18, y: 8)
+    }
+}

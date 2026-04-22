@@ -5,7 +5,7 @@ import SwiftUI
 struct SceneSetupPanel: View {
     let scene: FilmScene
     @ObservedObject var vm: SceneBuilderViewModel
-    @ObservedObject private var characterStore = CharacterStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
 
     var body: some View {
         ScrollView {
@@ -68,7 +68,7 @@ struct SceneSetupPanel: View {
 
     private var characterLabSection: some View {
         PanelCard(title: "Character Lab", icon: "person.crop.square.filled.and.at.rectangle.fill", tint: Theme.teal) {
-            let finalized = characterStore.finalizedCharacters
+            let finalized = project.finalizedCharacters
             if finalized.isEmpty {
                 Text("No finalized characters yet. Approve a character in Character Lab to use it here.")
                     .font(.system(size: 11))

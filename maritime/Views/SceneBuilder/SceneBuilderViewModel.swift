@@ -10,27 +10,31 @@ final class SceneBuilderViewModel: ObservableObject {
     @Published var showPropPicker = false
     @Published var leftCollapsed = false
     @Published var rightCollapsed = false
+    @Published var renderErrorMessage: String?
 
-    private let store = SceneStore.shared
+    private let project: MovieBlazeProject
+    private let imageService: ImageGenerationService
     private var cancellables: Set<AnyCancellable> = []
 
-    var scenes: [FilmScene] { store.scenes }
+    var scenes: [FilmScene] { project.scenes }
 
-    init() {
-        activeSceneID = store.scenes.first?.id
-        // Forward store changes into the VM so views re-render.
-        store.objectWillChange
+    init(project: MovieBlazeProject,
+         imageService: ImageGenerationService = StubImageGenerationService()) {
+        self.project = project
+        self.imageService = imageService
+        activeSceneID = project.scenes.first?.id
+        project.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
     }
 
     var activeScene: FilmScene? {
-        store.scenes.first(where: { $0.id == activeSceneID })
+        project.scenes.first(where: { $0.id == activeSceneID })
     }
 
     private func mutate(_ block: (inout FilmScene) -> Void) {
         guard let id = activeSceneID else { return }
-        store.mutate(id: id, block)
+        project.mutateFilmScene(id: id, block)
     }
 
     func setActive(_ scene: FilmScene) {
@@ -73,7 +77,7 @@ final class SceneBuilderViewModel: ObservableObject {
     /// normalized (0-1) canvas position. Returns true on success.
     @discardableResult
     func addCharacter(from lab: LabCharacter, at position: CGPoint) -> Bool {
-        guard store.scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
+        guard project.scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
         // Don't add duplicates by name in the same scene
         if activeScene?.characters.contains(where: { $0.name == lab.name }) == true {
             // Move existing instead
@@ -113,15 +117,50 @@ final class SceneBuilderViewModel: ObservableObject {
 
     // MARK: Generation
 
-    func generateFrame() {
+    /// Assembles the render package onto the active scene and kicks off the
+    /// image generation service. Returns `true` on success (caller can dismiss).
+    @discardableResult
+    func render(package: RenderPackage) async -> Bool {
+        renderErrorMessage = nil
+
+        if package.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            renderErrorMessage = ImageGenerationError.missingPrompt.errorDescription
+            return false
+        }
+        if package.totalReferenceImageCount > package.model.maxReferenceImages {
+            renderErrorMessage = ImageGenerationError
+                .tooManyReferenceImages(package.totalReferenceImageCount,
+                                         max: package.model.maxReferenceImages)
+                .errorDescription
+            return false
+        }
+
+        mutate { $0.renderPackage = package }
+
         isGenerating = true
         generationProgress = 0
-        Task {
-            for i in 1...12 {
-                try? await Task.sleep(nanoseconds: 90_000_000)
-                generationProgress = Double(i) / 12.0
+        let progressTask = Task { [weak self] in
+            for i in 1...20 {
+                try? await Task.sleep(nanoseconds: 80_000_000)
+                guard let self, self.isGenerating else { return }
+                self.generationProgress = min(0.95, Double(i) / 20.0)
+            }
+        }
+
+        do {
+            _ = try await imageService.generate(package: package)
+            progressTask.cancel()
+            generationProgress = 1.0
+            mutate {
+                $0.renderPackage?.lastRenderedAt = Date()
             }
             isGenerating = false
+            return true
+        } catch {
+            progressTask.cancel()
+            isGenerating = false
+            renderErrorMessage = error.localizedDescription
+            return false
         }
     }
 
@@ -131,11 +170,18 @@ final class SceneBuilderViewModel: ObservableObject {
 
     func regenerateFrame() {
         mutate { $0.frameApproved = false }
-        generateFrame()
+        Task {
+            guard let scene = activeScene else { return }
+            let package = scene.renderPackage
+                ?? RenderPackage(sceneID: scene.id,
+                                 prompt: PromptBuilder.buildPrompt(scene: scene,
+                                                                   characters: project.characters))
+            await render(package: package)
+        }
     }
 
     func createNewScene() {
-        let nextNumber = (store.scenes.map { $0.number }.max() ?? 0) + 1
+        let nextNumber = (project.scenes.map { $0.number }.max() ?? 0) + 1
         let scene = FilmScene(
             number: nextNumber,
             title: "New Scene",
@@ -150,9 +196,9 @@ final class SceneBuilderViewModel: ObservableObject {
             characters: [],
             activeGuides: [.ruleOfThirds],
             frameApproved: false,
-            projectTitle: "Untitled Project"
+            projectTitle: project.activeBible?.projectTitle ?? "Untitled Project"
         )
-        store.add(scene)
+        project.addFilmScene(scene)
         activeSceneID = scene.id
     }
 }

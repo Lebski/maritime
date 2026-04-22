@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct CharacterLabView: View {
-    @StateObject private var vm = CharacterLabViewModel()
+    @EnvironmentObject var project: MovieBlazeProject
+    @StateObject private var vm: CharacterLabViewModel
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: CharacterLabViewModel(project: project))
+    }
 
     var body: some View {
         HStack(spacing: 0) {
