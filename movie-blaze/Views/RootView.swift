@@ -28,7 +28,7 @@ struct RootView: View {
         case .characterLab:
             CharacterLabView()
         case .sceneBuilder:
-            PlaceholderView(module: .sceneBuilder)
+            SceneBuilderView()
         case .videoRenderer:
             PlaceholderView(module: .videoRenderer)
         case .assetLibrary:
