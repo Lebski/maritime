@@ -60,6 +60,9 @@ final class MovieBlazeProject: ReferenceFileDocument {
     @Published var scenes: [FilmScene]
     @Published var characters: [LabCharacter]
 
+    @Published var cutSuggestions: [CutSuggestion]
+    @Published var favoritedAssetIDs: Set<UUID>
+
     // MARK: Document type
 
     nonisolated static var readableContentTypes: [UTType] { [.movieBlazeProject] }
@@ -75,6 +78,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         var activeSequenceID: UUID?
         var scenes: [FilmScene]
         var characters: [LabCharacter]
+        var cutSuggestions: [CutSuggestion]?
+        var favoritedAssetIDs: [UUID]?
     }
 
     struct Manifest: Codable {
@@ -97,6 +102,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         self.activeSequenceID   = seed.activeSequenceID
         self.scenes             = seed.scenes
         self.characters         = seed.characters
+        self.cutSuggestions     = seed.cutSuggestions ?? []
+        self.favoritedAssetIDs  = Set(seed.favoritedAssetIDs ?? [])
     }
 
     private static func seedSnapshot() -> Snapshot {
@@ -107,6 +114,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
         let sequences = StoryboardSamples.sequences
         let scenes    = SceneBuilderSamples.scenes
         let chars     = CharacterLabSamples.libraryCharacters
+        let cuts      = VideoRendererSamples.cuts
         let activeBible = bibles.first(where: { $0.projectTitle == "The Lantern Keeper" }) ?? bibles.first
         let activeSeq   = sequences.first(where: { $0.projectTitle == "The Lantern Keeper" }) ?? sequences.first
         return Snapshot(
@@ -116,7 +124,9 @@ final class MovieBlazeProject: ReferenceFileDocument {
             sequences: sequences,
             activeSequenceID: activeSeq?.id,
             scenes: scenes,
-            characters: chars
+            characters: chars,
+            cutSuggestions: cuts,
+            favoritedAssetIDs: nil
         )
     }
 
@@ -153,6 +163,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         self.activeSequenceID   = snapshot.activeSequenceID
         self.scenes             = snapshot.scenes
         self.characters         = snapshot.characters
+        self.cutSuggestions     = snapshot.cutSuggestions ?? []
+        self.favoritedAssetIDs  = Set(snapshot.favoritedAssetIDs ?? [])
     }
 
     // MARK: Snapshot + Write
@@ -165,7 +177,9 @@ final class MovieBlazeProject: ReferenceFileDocument {
             sequences: sequences,
             activeSequenceID: activeSequenceID,
             scenes: scenes,
-            characters: characters
+            characters: characters,
+            cutSuggestions: cutSuggestions,
+            favoritedAssetIDs: Array(favoritedAssetIDs)
         )
     }
 

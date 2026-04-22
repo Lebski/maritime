@@ -1,20 +1,44 @@
 import SwiftUI
 import Combine
 
+// MARK: - Video Renderer view model
+//
+// Binds the renderer to the open MovieBlazeProject. Clip list is derived from
+// project.scenes (one FilmScene → one VideoClip), and per-clip mutations write
+// back to the FilmScene so Scene Builder and the renderer stay in lockstep.
+// Cuts live on the project document. Local-only state — selection, playhead,
+// transient render progress, panel collapse — stays on the view model.
+
 @MainActor
 final class VideoRendererViewModel: ObservableObject {
-    @Published var clips: [VideoClip] = VideoRendererSamples.clips
-    @Published var cuts: [CutSuggestion] = VideoRendererSamples.cuts
     @Published var selectedClipID: UUID?
     @Published var playheadSeconds: Double = 0
     @Published var isRendering = false
     @Published var renderProgress: Double = 0
     @Published var inspectorCollapsed = false
-    @Published var projectTitle: String = "Neon Requiem"
-    @Published var sequenceName: String = "Act I — Opening"
 
-    init() {
-        selectedClipID = clips.first?.id
+    private let project: MovieBlazeProject
+    private var cancellables: Set<AnyCancellable> = []
+
+    init(project: MovieBlazeProject) {
+        self.project = project
+        selectedClipID = project.videoClips.first?.id
+        project.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+    }
+
+    // MARK: Derived state
+
+    var clips: [VideoClip] { project.videoClips }
+    var cuts: [CutSuggestion] { project.cutSuggestions }
+
+    var projectTitle: String {
+        project.activeBible?.projectTitle ?? "Untitled Project"
+    }
+
+    var sequenceName: String {
+        project.activeSequence?.title ?? "Untitled Sequence"
     }
 
     var selectedClip: VideoClip? {
@@ -30,6 +54,8 @@ final class VideoRendererViewModel: ObservableObject {
         return Double(clips.filter(\.isApproved).count) / Double(clips.count)
     }
 
+    // MARK: Mutations
+
     func setActive(_ clip: VideoClip) {
         selectedClipID = clip.id
         // Snap playhead to clip start
@@ -41,18 +67,19 @@ final class VideoRendererViewModel: ObservableObject {
     }
 
     func setMotion(_ motion: MotionIntensity, for clip: VideoClip) {
-        guard let idx = clips.firstIndex(where: { $0.id == clip.id }) else { return }
-        clips[idx].motion = motion
+        project.setClipMotion(motion, clipID: clip.id)
+    }
+
+    func setDuration(_ duration: Double, for clip: VideoClip) {
+        project.setClipDuration(duration, clipID: clip.id)
     }
 
     func toggleApproval(_ clip: VideoClip) {
-        guard let idx = clips.firstIndex(where: { $0.id == clip.id }) else { return }
-        clips[idx].isApproved.toggle()
+        project.toggleClipApproval(clipID: clip.id)
     }
 
     func applyCut(_ cut: CutSuggestion) {
-        guard let idx = cuts.firstIndex(where: { $0.id == cut.id }) else { return }
-        cuts[idx].applied.toggle()
+        project.toggleCutApplied(cutID: cut.id)
     }
 
     func render() {
