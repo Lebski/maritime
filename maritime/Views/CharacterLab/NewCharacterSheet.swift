@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NewCharacterSheet: View {
     @ObservedObject var vm: CharacterLabViewModel
-    @ObservedObject private var storyStore = StoryStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
     @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
@@ -14,7 +14,7 @@ struct NewCharacterSheet: View {
     private let roles = ["Protagonist", "Antagonist", "Supporting", "Mentor", "Love Interest", "Comic Relief"]
 
     private var storyDrafts: [StoryCharacterDraft] {
-        storyStore.activeBible?.characterDrafts ?? []
+        project.activeBible?.characterDrafts ?? []
     }
 
     var body: some View {
@@ -103,7 +103,7 @@ struct NewCharacterSheet: View {
     private var storyForgePicker: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(storyStore.activeBible?.projectTitle.uppercased() ?? "NO ACTIVE BIBLE")
+                Text(project.activeBible?.projectTitle.uppercased() ?? "NO ACTIVE BIBLE")
                     .font(.system(size: 10, weight: .bold))
                     .tracking(0.6)
                     .foregroundStyle(Theme.textTertiary)
@@ -197,7 +197,7 @@ struct NewCharacterSheet: View {
         selectedDraftID = draft.id
         name = draft.name
         role = draft.role
-        description = storyStore.activeBible?.labDescription(for: draft) ?? ""
+        description = project.activeBible?.labDescription(for: draft) ?? ""
     }
 
     // MARK: Form

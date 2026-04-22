@@ -8,6 +8,7 @@ import UniformTypeIdentifiers
 
 struct StoryboardPanelsGridView: View {
     @ObservedObject var vm: StoryboardComposerViewModel
+    @EnvironmentObject var navigator: AppNavigator
 
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
 
@@ -36,7 +37,10 @@ struct StoryboardPanelsGridView: View {
                         StoryboardPanelCard(
                             panel: panel,
                             isSelected: vm.selectedPanelID == panel.id,
-                            onTap: { vm.selectPanel(panel.id) }
+                            onTap: { vm.selectPanel(panel.id) },
+                            onReturnToScene: panel.promotedFilmSceneID.map { sceneID in
+                                { navigator.openSceneBuilder(sceneID: sceneID) }
+                            }
                         )
                         .draggable(PanelDragPayload(panelID: panel.id, fromIndex: idx)) {
                             StoryboardPanelCard(

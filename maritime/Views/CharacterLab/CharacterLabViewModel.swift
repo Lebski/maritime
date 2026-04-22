@@ -11,6 +11,13 @@ final class CharacterLabViewModel: ObservableObject {
     @Published var generationProgress: Double = 0
     @Published var sidebarCollapsed = false
 
+    private let project: MovieBlazeProject
+
+    init(project: MovieBlazeProject) {
+        self.project = project
+        self.characters = project.characters
+    }
+
     func setActive(_ character: LabCharacter) {
         // Check both personal and library chars
         if let idx = characters.firstIndex(where: { $0.id == character.id }) {
@@ -76,7 +83,7 @@ final class CharacterLabViewModel: ObservableObject {
             isGenerating = false
             syncActive(characterID)
             // Make this character available to Scene Builder for drag-and-drop
-            CharacterStore.shared.upsert(characters[idx])
+            project.upsertCharacter(characters[idx])
         }
     }
 
@@ -103,7 +110,7 @@ final class CharacterLabViewModel: ObservableObject {
         characters[idx].isFinalized = false
         characters[idx].finalVariation = nil
         syncActive(characterID)
-        CharacterStore.shared.upsert(characters[idx])
+        project.upsertCharacter(characters[idx])
     }
 
     private func syncActive(_ id: UUID) {

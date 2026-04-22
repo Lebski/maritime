@@ -1,38 +1,17 @@
 import SwiftUI
 
-// MARK: - Storyboard Store
+// MARK: - Storyboard mutators
 //
-// Single source of truth for StoryboardSequences. Mirrors StoryStore and
-// CharacterStore. Pre-seeded with one sequence per project bible so the
-// Home dashboard's activity feed ("Storyboard updated · The Lantern Keeper
-// · 9 panels") reads as real state.
+// Extensions on MovieBlazeProject that replace the old singleton
+// StoryboardStore. All mutation still funnels through the active-sequence
+// helper so lastUpdated is refreshed automatically.
 
 @MainActor
-final class StoryboardStore: ObservableObject {
-    static let shared = StoryboardStore()
+extension MovieBlazeProject {
 
-    @Published var sequences: [StoryboardSequence]
-    @Published var activeSequenceID: UUID?
+    // MARK: Sequence helpers
 
-    private init() {
-        self.sequences = StoryboardSamples.sequences
-        // Default active: Lantern Keeper — matches the Story Forge default.
-        self.activeSequenceID = sequences.first(where: { $0.projectTitle == "The Lantern Keeper" })?.id
-            ?? sequences.first?.id
-    }
-
-    var activeSequence: StoryboardSequence? {
-        guard let id = activeSequenceID else { return nil }
-        return sequences.first(where: { $0.id == id })
-    }
-
-    func setActive(_ id: UUID) {
-        activeSequenceID = id
-    }
-
-    // MARK: Mutation
-
-    private func mutateActive(_ block: (inout StoryboardSequence) -> Void) {
+    func mutateActiveSequence(_ block: (inout StoryboardSequence) -> Void) {
         guard let id = activeSequenceID,
               let idx = sequences.firstIndex(where: { $0.id == id }) else { return }
         block(&sequences[idx])
@@ -45,10 +24,10 @@ final class StoryboardStore: ObservableObject {
         sequences[idx].lastUpdated = Date()
     }
 
-    // Panel CRUD
+    // MARK: Panel CRUD
 
     func addPanel(_ panel: StoryboardPanel) {
-        mutateActive { seq in
+        mutateActiveSequence { seq in
             var p = panel
             p.number = seq.panels.count + 1
             seq.panels.append(p)
@@ -56,14 +35,14 @@ final class StoryboardStore: ObservableObject {
     }
 
     func updatePanel(_ panel: StoryboardPanel) {
-        mutateActive { seq in
+        mutateActiveSequence { seq in
             guard let i = seq.panels.firstIndex(where: { $0.id == panel.id }) else { return }
             seq.panels[i] = panel
         }
     }
 
     func removePanel(id: UUID) {
-        mutateActive { seq in
+        mutateActiveSequence { seq in
             seq.panels.removeAll(where: { $0.id == id })
             for i in seq.panels.indices { seq.panels[i].number = i + 1 }
         }
@@ -85,13 +64,13 @@ final class StoryboardStore: ObservableObject {
     }
 
     func markPanelPromoted(panelID: UUID, filmSceneID: UUID) {
-        mutateActive { seq in
+        mutateActiveSequence { seq in
             guard let i = seq.panels.firstIndex(where: { $0.id == panelID }) else { return }
             seq.panels[i].promotedFilmSceneID = filmSceneID
         }
     }
 
-    // Sequence lifecycle
+    // MARK: Sequence lifecycle
 
     func addSequence(_ sequence: StoryboardSequence) {
         sequences.append(sequence)

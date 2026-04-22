@@ -1,10 +1,28 @@
 import SwiftUI
 
 struct StoryForgeView: View {
-    @StateObject private var vm = StoryForgeViewModel()
-    @ObservedObject private var store = StoryStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
+    @EnvironmentObject var navigator: AppNavigator
+    @StateObject private var vm: StoryForgeViewModel
     @State private var showHelper = false
     @State private var showInnerSidebar = true
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: StoryForgeViewModel(project: project))
+    }
+
+    private func consumePendingSceneBreakdownID() {
+        guard let id = navigator.pendingSceneBreakdownID else { return }
+        for bible in project.bibles where bible.sceneBreakdowns.contains(where: { $0.id == id }) {
+            if project.activeBibleID != bible.id {
+                project.setActiveBible(bible.id)
+            }
+            vm.activeSection = .scenes
+            vm.expandedSceneID = id
+            break
+        }
+        navigator.pendingSceneBreakdownID = nil
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -31,6 +49,8 @@ struct StoryForgeView: View {
         .sheet(isPresented: $vm.showNewBibleSheet) {
             NewStoryBibleSheet(vm: vm)
         }
+        .onAppear { consumePendingSceneBreakdownID() }
+        .onChange(of: navigator.pendingSceneBreakdownID) { _, _ in consumePendingSceneBreakdownID() }
     }
 
     private var sidebarToggle: some View {
@@ -64,11 +84,10 @@ struct StoryForgeView: View {
     private var sidebar: some View {
         VStack(spacing: 0) {
             sidebarHeader
-            sidebarBibleList
-            Divider().background(Theme.stroke)
             sidebarProgress
             Divider().background(Theme.stroke)
             sidebarActions
+            Spacer(minLength: 0)
         }
     }
 
@@ -97,71 +116,6 @@ struct StoryForgeView: View {
             .padding(.vertical, 16)
             Divider().background(Theme.stroke)
         }
-    }
-
-    private var sidebarBibleList: some View {
-        ScrollView {
-            VStack(spacing: 6) {
-                HStack {
-                    Text("STORY BIBLES")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(0.8)
-                        .foregroundStyle(Theme.textTertiary)
-                    Spacer()
-                    Button(action: { vm.showNewBibleSheet = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.magenta)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, 4)
-                .padding(.top, 10)
-
-                ForEach(store.bibles) { bible in
-                    bibleRow(bible)
-                }
-            }
-            .padding(10)
-        }
-        .frame(maxHeight: .infinity)
-    }
-
-    private func bibleRow(_ bible: StoryBible) -> some View {
-        let isActive = store.activeBibleID == bible.id
-        return Button(action: { vm.setActiveBible(bible.id) }) {
-            HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: bible.posterColors,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 26, height: 34)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(bible.projectTitle)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Theme.textPrimary)
-                        .lineLimit(1)
-                    Text("\(Int(bible.overallCompletion * 100))% complete")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Theme.textTertiary)
-                }
-                Spacer()
-                CompletionRing(value: bible.overallCompletion, size: 18, color: Theme.magenta)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(isActive ? Theme.magenta.opacity(0.10) : Color.clear)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isActive ? Theme.magenta.opacity(0.5) : Color.clear, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        }
-        .buttonStyle(.plain)
     }
 
     private var sidebarProgress: some View {

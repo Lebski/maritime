@@ -155,7 +155,7 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-struct StoryCharacterDraft: Identifiable, Hashable {
+struct StoryCharacterDraft: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
     var role: String
@@ -222,7 +222,7 @@ struct StoryCharacterDraft: Identifiable, Hashable {
 
 // MARK: - Structure
 
-enum StoryStructureTemplate: String, CaseIterable, Identifiable, Hashable {
+enum StoryStructureTemplate: String, CaseIterable, Identifiable, Hashable, Codable {
     case threeAct        = "Three-Act Structure"
     case saveTheCat      = "Save the Cat"
     case herosJourney    = "Hero's Journey"
@@ -258,7 +258,7 @@ enum StoryStructureTemplate: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-struct StoryBeat: Identifiable, Hashable {
+struct StoryBeat: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
     var actLabel: String
@@ -299,7 +299,7 @@ struct StoryBeat: Identifiable, Hashable {
     }
 }
 
-struct StoryStructureDraft: Hashable {
+struct StoryStructureDraft: Hashable, Codable {
     var template: StoryStructureTemplate
     var beats: [StoryBeat]
 
@@ -322,7 +322,7 @@ struct StoryStructureDraft: Hashable {
 
 // MARK: - Scene Breakdown
 
-struct SceneBreakdown: Identifiable, Hashable {
+struct SceneBreakdown: Identifiable, Hashable, Codable {
     let id: UUID
     var number: Int
     var title: String
@@ -380,7 +380,7 @@ struct SceneBreakdown: Identifiable, Hashable {
 
 // MARK: - Theme & Motifs
 
-struct VisualMotif: Identifiable, Hashable {
+struct VisualMotif: Identifiable, Hashable, Codable {
     let id: UUID
     var label: String
     var symbol: String        // SF Symbol name
@@ -396,7 +396,7 @@ struct VisualMotif: Identifiable, Hashable {
     }
 }
 
-struct ColorPaletteSwatch: Identifiable, Hashable {
+struct ColorPaletteSwatch: Identifiable, Hashable, Codable {
     let id: UUID
     var hex: String
     var color: Color
@@ -410,7 +410,7 @@ struct ColorPaletteSwatch: Identifiable, Hashable {
     }
 }
 
-struct ThemeTracker: Hashable {
+struct ThemeTracker: Hashable, Codable {
     var themeStatement: String
     var motifs: [VisualMotif]
     var palette: [ColorPaletteSwatch]
@@ -432,7 +432,7 @@ struct ThemeTracker: Hashable {
 
 // MARK: - Story Bible
 
-struct StoryBible: Identifiable, Hashable {
+struct StoryBible: Identifiable, Hashable, Codable {
     let id: UUID
     var projectTitle: String
     var logline: String

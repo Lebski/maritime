@@ -8,7 +8,8 @@ import SwiftUI
 
 struct PanelDetailEditor: View {
     @ObservedObject var vm: StoryboardComposerViewModel
-    @ObservedObject private var storyStore = StoryStore.shared
+    @EnvironmentObject var project: MovieBlazeProject
+    @EnvironmentObject var navigator: AppNavigator
 
     var body: some View {
         if let panel = vm.selectedPanel {
@@ -292,7 +293,7 @@ struct PanelDetailEditor: View {
     // MARK: Characters
 
     private func characterRow(_ panel: StoryboardPanel) -> some View {
-        let drafts = storyStore.activeBible?.characterDrafts ?? []
+        let drafts = project.activeBible?.characterDrafts ?? []
         return VStack(alignment: .leading, spacing: 8) {
             Text("CHARACTERS IN FRAME")
                 .font(.system(size: 10, weight: .bold))
@@ -360,7 +361,7 @@ struct PanelDetailEditor: View {
                 .background(Theme.teal.opacity(0.15))
                 .clipShape(Capsule())
             } else {
-                Button(action: { vm.promoteSelectedPanelToSceneBuilder() }) {
+                Button(action: { promoteAndToast() }) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.up.right.square.fill")
                             .font(.system(size: 13, weight: .semibold))
@@ -392,6 +393,19 @@ struct PanelDetailEditor: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: Promotion helper
+
+    private func promoteAndToast() {
+        guard let result = vm.promoteSelectedPanelToSceneBuilder() else { return }
+        let filmSceneID = result.filmScene.id
+        let nav = navigator
+        navigator.showToast(ToastContent(
+            message: "Sent panel #\(result.panel.number) to Scene Builder",
+            actionLabel: "View in Scene Builder",
+            action: { nav.openSceneBuilder(sceneID: filmSceneID) }
+        ))
     }
 
     // MARK: Empty state

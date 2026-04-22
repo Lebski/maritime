@@ -2,34 +2,24 @@ import SwiftUI
 import UniformTypeIdentifiers
 import CoreTransferable
 
-// MARK: - Shared Character Store
+// MARK: - Character (LabCharacter) mutators
 //
-// Single source of truth for finalized characters so Character Lab
-// and Scene Builder stay in sync. Pre-seeded with the Library characters
-// so Scene Builder has draggable characters on launch.
+// Extensions on MovieBlazeProject that replace the old singleton
+// CharacterStore. Also hosts the drag-and-drop transferable payload
+// and its UTType registration.
 
 @MainActor
-final class CharacterStore: ObservableObject {
-    static let shared = CharacterStore()
+extension MovieBlazeProject {
 
-    @Published var characters: [LabCharacter]
-
-    private init() {
-        // Seed with the library characters (Elena, Marcus) so Scene Builder
-        // has draggable finalized characters immediately.
-        self.characters = CharacterLabSamples.libraryCharacters
-    }
-
-    /// All finalized characters across personal + library
     var finalizedCharacters: [LabCharacter] {
-        characters.filter { $0.isFinalized }
+        characters.filter(\.isFinalized)
     }
 
     func character(id: UUID) -> LabCharacter? {
         characters.first(where: { $0.id == id })
     }
 
-    func upsert(_ character: LabCharacter) {
+    func upsertCharacter(_ character: LabCharacter) {
         if let idx = characters.firstIndex(where: { $0.id == character.id }) {
             characters[idx] = character
         } else {
@@ -37,15 +27,16 @@ final class CharacterStore: ObservableObject {
         }
     }
 
-    func upsertAll(_ list: [LabCharacter]) {
-        for c in list { upsert(c) }
+    func upsertAllCharacters(_ list: [LabCharacter]) {
+        for c in list { upsertCharacter(c) }
     }
 }
 
 // MARK: - Transferable Payload
 
 /// Lightweight payload used during drag-and-drop. We only serialize the
-/// UUID; the Scene Builder looks up the full character from CharacterStore.
+/// UUID; the Scene Builder looks up the full character from the active
+/// MovieBlazeProject.
 struct DraggableCharacter: Codable, Transferable {
     let id: UUID
     let name: String

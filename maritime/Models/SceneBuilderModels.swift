@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Scene Builder Models
 
-enum TimeOfDay: String, CaseIterable, Identifiable {
+enum TimeOfDay: String, CaseIterable, Identifiable, Codable {
     case dawn = "Dawn"
     case day = "Day"
     case goldenHour = "Golden Hour"
@@ -32,7 +32,7 @@ enum TimeOfDay: String, CaseIterable, Identifiable {
     }
 }
 
-enum LightingMood: String, CaseIterable, Identifiable {
+enum LightingMood: String, CaseIterable, Identifiable, Codable {
     case warm = "Warm"
     case cold = "Cold"
     case neutral = "Neutral"
@@ -50,7 +50,7 @@ enum LightingMood: String, CaseIterable, Identifiable {
     }
 }
 
-enum KeyLightDirection: String, CaseIterable, Identifiable {
+enum KeyLightDirection: String, CaseIterable, Identifiable, Codable {
     case frontal = "Frontal"
     case leftSide = "Left Side"
     case rightSide = "Right Side"
@@ -70,7 +70,7 @@ enum KeyLightDirection: String, CaseIterable, Identifiable {
     }
 }
 
-enum CameraShotType: String, CaseIterable, Identifiable {
+enum CameraShotType: String, CaseIterable, Identifiable, Codable {
     case extremeCloseUp = "Extreme Close-up"
     case closeUp = "Close-up"
     case medium = "Medium Shot"
@@ -100,7 +100,7 @@ enum CameraShotType: String, CaseIterable, Identifiable {
     }
 }
 
-enum CompositionGuide: String, CaseIterable, Identifiable {
+enum CompositionGuide: String, CaseIterable, Identifiable, Codable {
     case ruleOfThirds = "Rule of Thirds"
     case goldenRatio = "Golden Ratio"
     case leadingLines = "Leading Lines"
@@ -122,24 +122,40 @@ enum CompositionGuide: String, CaseIterable, Identifiable {
 
 // MARK: - Assets
 
-struct SceneBackground: Identifiable, Hashable {
-    let id = UUID()
+struct SceneBackground: Identifiable, Hashable, Codable {
+    let id: UUID
     let name: String
     let tag: String
     let gradientColors: [Color]
     let symbol: String
+
+    init(id: UUID = UUID(), name: String, tag: String, gradientColors: [Color], symbol: String) {
+        self.id = id
+        self.name = name
+        self.tag = tag
+        self.gradientColors = gradientColors
+        self.symbol = symbol
+    }
 }
 
-struct SceneProp: Identifiable, Hashable {
-    let id = UUID()
+struct SceneProp: Identifiable, Hashable, Codable {
+    let id: UUID
     let name: String
     let category: String
     let tint: Color
     let symbol: String
+
+    init(id: UUID = UUID(), name: String, category: String, tint: Color, symbol: String) {
+        self.id = id
+        self.name = name
+        self.category = category
+        self.tint = tint
+        self.symbol = symbol
+    }
 }
 
-struct SceneCharacterRef: Identifiable, Hashable {
-    let id = UUID()
+struct SceneCharacterRef: Identifiable, Hashable, Codable {
+    let id: UUID
     let name: String
     let role: String
     let tint: Color
@@ -147,9 +163,20 @@ struct SceneCharacterRef: Identifiable, Hashable {
     var yRatio: CGFloat
     var gazeDegrees: Double   // direction of gaze
     var depthLayer: DepthLayer
+
+    init(id: UUID = UUID(), name: String, role: String, tint: Color, xRatio: CGFloat, yRatio: CGFloat, gazeDegrees: Double, depthLayer: DepthLayer) {
+        self.id = id
+        self.name = name
+        self.role = role
+        self.tint = tint
+        self.xRatio = xRatio
+        self.yRatio = yRatio
+        self.gazeDegrees = gazeDegrees
+        self.depthLayer = depthLayer
+    }
 }
 
-enum DepthLayer: String, CaseIterable {
+enum DepthLayer: String, CaseIterable, Codable {
     case foreground = "FG"
     case midground = "MG"
     case background = "BG"
@@ -173,8 +200,8 @@ enum DepthLayer: String, CaseIterable {
 
 // MARK: - Film Scene
 
-struct FilmScene: Identifiable {
-    let id = UUID()
+struct FilmScene: Identifiable, Codable {
+    let id: UUID
     var number: Int
     var title: String
     var location: String
@@ -189,9 +216,251 @@ struct FilmScene: Identifiable {
     var activeGuides: Set<CompositionGuide>
     var frameApproved: Bool
     var projectTitle: String
+    var renderPackage: RenderPackage?
+
+    init(id: UUID = UUID(), number: Int, title: String, location: String, isInterior: Bool,
+         timeOfDay: TimeOfDay, lightingMood: LightingMood, keyLight: KeyLightDirection,
+         shotType: CameraShotType, background: SceneBackground? = nil, props: [SceneProp] = [],
+         characters: [SceneCharacterRef] = [], activeGuides: Set<CompositionGuide> = [],
+         frameApproved: Bool = false, projectTitle: String, renderPackage: RenderPackage? = nil) {
+        self.id = id
+        self.number = number
+        self.title = title
+        self.location = location
+        self.isInterior = isInterior
+        self.timeOfDay = timeOfDay
+        self.lightingMood = lightingMood
+        self.keyLight = keyLight
+        self.shotType = shotType
+        self.background = background
+        self.props = props
+        self.characters = characters
+        self.activeGuides = activeGuides
+        self.frameApproved = frameApproved
+        self.projectTitle = projectTitle
+        self.renderPackage = renderPackage
+    }
 
     var locationLabel: String {
         (isInterior ? "INT." : "EXT.") + " " + location.uppercased() + " — " + timeOfDay.rawValue.uppercased()
+    }
+}
+
+// MARK: - Render Package
+//
+// Everything Nano Banana 2 (Gemini 3 Pro Image) needs to render a final frame
+// from the composed scene: prompt text + up to 14 reference images.
+// Saved per-scene inside the project document so re-opens preserve the exact
+// prompt + selected character sheets the user last chose.
+
+enum ImageModel: String, CaseIterable, Codable, Identifiable {
+    case nanoBanana2 = "Nano Banana 2"
+    var id: String { rawValue }
+
+    var subtitle: String {
+        switch self {
+        case .nanoBanana2: return "Gemini 3 Pro Image · up to 14 refs"
+        }
+    }
+
+    var maxReferenceImages: Int {
+        switch self {
+        case .nanoBanana2: return 14
+        }
+    }
+}
+
+enum AspectRatio: String, CaseIterable, Codable, Identifiable {
+    case widescreen16x9 = "16:9"
+    case cinema21x9     = "21:9"
+    case square1x1      = "1:1"
+    case portrait9x16   = "9:16"
+    var id: String { rawValue }
+
+    var label: String { rawValue }
+}
+
+struct CharacterReference: Identifiable, Codable, Hashable {
+    let id: UUID
+    let characterID: UUID
+    var selectedSheetType: ReferenceSheetType
+    var imageData: Data?
+
+    init(id: UUID = UUID(), characterID: UUID,
+         selectedSheetType: ReferenceSheetType, imageData: Data? = nil) {
+        self.id = id
+        self.characterID = characterID
+        self.selectedSheetType = selectedSheetType
+        self.imageData = imageData
+    }
+}
+
+struct StyleReference: Identifiable, Codable, Hashable {
+    let id: UUID
+    var label: String
+    var imageData: Data
+
+    init(id: UUID = UUID(), label: String, imageData: Data) {
+        self.id = id
+        self.label = label
+        self.imageData = imageData
+    }
+}
+
+struct RenderPackage: Identifiable, Codable {
+    let id: UUID
+    let sceneID: UUID
+    var prompt: String
+    var sceneCompositionImage: Data?
+    var characterReferences: [CharacterReference]
+    var styleReferences: [StyleReference]
+    var model: ImageModel
+    var aspectRatio: AspectRatio
+    var lastRenderedAt: Date?
+
+    init(id: UUID = UUID(),
+         sceneID: UUID,
+         prompt: String = "",
+         sceneCompositionImage: Data? = nil,
+         characterReferences: [CharacterReference] = [],
+         styleReferences: [StyleReference] = [],
+         model: ImageModel = .nanoBanana2,
+         aspectRatio: AspectRatio = .widescreen16x9,
+         lastRenderedAt: Date? = nil) {
+        self.id = id
+        self.sceneID = sceneID
+        self.prompt = prompt
+        self.sceneCompositionImage = sceneCompositionImage
+        self.characterReferences = characterReferences
+        self.styleReferences = styleReferences
+        self.model = model
+        self.aspectRatio = aspectRatio
+        self.lastRenderedAt = lastRenderedAt
+    }
+
+    var totalReferenceImageCount: Int {
+        (sceneCompositionImage == nil ? 0 : 1)
+        + characterReferences.count
+        + styleReferences.count
+    }
+
+    var remainingReferenceSlots: Int {
+        max(0, model.maxReferenceImages - totalReferenceImageCount)
+    }
+}
+
+// MARK: - Prompt Builder
+//
+// Pure, deterministic function that composes a Nano Banana 2 prompt from the
+// current scene + project character roster. Users get a seeded prompt they can
+// freely edit; hitting "Re-seed from scene" recomposes.
+
+enum PromptBuilder {
+    static func buildPrompt(scene: FilmScene, characters: [LabCharacter]) -> String {
+        var lines: [String] = []
+
+        // Scene establishing line
+        let venue = scene.isInterior ? "interior" : "exterior"
+        lines.append("A cinematic \(scene.shotType.rawValue.lowercased()) of a \(venue) scene at \(scene.location.lowercased()), \(scene.timeOfDay.rawValue.lowercased()).")
+
+        // Mood & lighting
+        let moodLine = "\(scene.lightingMood.rawValue.lowercased()) lighting with key light from \(scene.keyLight.rawValue.lowercased())"
+        lines.append(moodLine + ".")
+
+        // Background mood
+        if let bg = scene.background {
+            lines.append("Setting: \(bg.name) — \(bg.tag).")
+        }
+
+        // Characters
+        if !scene.characters.isEmpty {
+            let charLines = scene.characters.compactMap { ref -> String? in
+                let labMatch = characters.first(where: { $0.name == ref.name })
+                let descriptor = labMatch?.description ?? ref.role
+                let position = positionLabel(xRatio: ref.xRatio, yRatio: ref.yRatio)
+                let depth = depthLabel(ref.depthLayer)
+                return "\(ref.name) (\(descriptor)) in \(depth) \(position)"
+            }
+            lines.append("Cast: " + charLines.joined(separator: "; ") + ".")
+        }
+
+        // Props
+        if !scene.props.isEmpty {
+            let propNames = scene.props.map { $0.name.lowercased() }.joined(separator: ", ")
+            lines.append("Props: \(propNames).")
+        }
+
+        // Composition hints
+        if !scene.activeGuides.isEmpty {
+            let guides = scene.activeGuides
+                .map { $0.rawValue.lowercased() }
+                .sorted()
+                .joined(separator: ", ")
+            lines.append("Composition: \(guides).")
+        }
+
+        // Finishing cinematic cues
+        lines.append("35mm anamorphic look, film grain, balanced exposure, sharp focus on primary subject, production-quality framing.")
+
+        return lines.joined(separator: " ")
+    }
+
+    private static func positionLabel(xRatio: CGFloat, yRatio: CGFloat) -> String {
+        let horizontal: String
+        switch xRatio {
+        case ..<0.33: horizontal = "frame left"
+        case 0.33..<0.66: horizontal = "center frame"
+        default: horizontal = "frame right"
+        }
+        let vertical: String
+        switch yRatio {
+        case ..<0.33: vertical = "upper"
+        case 0.33..<0.66: vertical = ""
+        default: vertical = "lower"
+        }
+        return vertical.isEmpty ? horizontal : "\(vertical) \(horizontal)"
+    }
+
+    private static func depthLabel(_ layer: DepthLayer) -> String {
+        switch layer {
+        case .foreground: return "foreground"
+        case .midground: return "midground"
+        case .background: return "background"
+        }
+    }
+}
+
+// MARK: - Image Generation Service
+//
+// Protocol so the UI depends on an abstraction, not on Gemini directly.
+// `StubImageGenerationService` simulates the remote call for development —
+// real Nano Banana 2 wiring lands in a follow-up PR.
+
+protocol ImageGenerationService: Sendable {
+    func generate(package: RenderPackage) async throws -> Data
+}
+
+struct StubImageGenerationService: ImageGenerationService {
+    var simulatedLatencySeconds: Double = 2.0
+
+    func generate(package: RenderPackage) async throws -> Data {
+        try await Task.sleep(nanoseconds: UInt64(simulatedLatencySeconds * 1_000_000_000))
+        // Return an empty PNG-like placeholder; Scene Builder shows the existing
+        // programmatic canvas while the stub is in place.
+        return Data()
+    }
+}
+
+enum ImageGenerationError: LocalizedError {
+    case missingPrompt
+    case tooManyReferenceImages(Int, max: Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingPrompt: return "Prompt is empty — add a description before rendering."
+        case .tooManyReferenceImages(let count, let max):
+            return "Reference images (\(count)) exceed the model's cap of \(max)."
+        }
     }
 }
 

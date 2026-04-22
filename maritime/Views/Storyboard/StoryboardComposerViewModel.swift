@@ -3,7 +3,7 @@ import Combine
 
 // MARK: - Storyboard Composer ViewModel
 //
-// Transient UI state only. Persistent data lives in StoryboardStore.
+// Transient UI state only. Persistent data lives on the document.
 
 enum StoryboardTab: String, CaseIterable, Identifiable, Hashable {
     case panels, rhythm, library
@@ -13,8 +13,16 @@ enum StoryboardTab: String, CaseIterable, Identifiable, Hashable {
     var title: String {
         switch self {
         case .panels:  return "Panels"
-        case .rhythm:  return "Rhythm & Timing"
-        case .library: return "Shot Library"
+        case .rhythm:  return "Pacing Check"
+        case .library: return "Shot Reference"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .panels:  return "Compose and order your shots."
+        case .rhythm:  return "Verify shot lengths before Scene Builder."
+        case .library: return "Shot-type cheat sheet with film examples."
         }
     }
 
@@ -38,28 +46,33 @@ final class StoryboardComposerViewModel: ObservableObject {
     @Published var focusedField: PanelField?
     @Published var showNewPanelSheet = false
 
-    private let store = StoryboardStore.shared
+    private let project: MovieBlazeProject
     private var cancellables: Set<AnyCancellable> = []
 
-    init() {
-        let seq = store.activeSequence
+    init(project: MovieBlazeProject) {
+        self.project = project
+        let seq = project.activeSequence
         selectedPanelID = seq?.panels.first?.id
 
-        store.$activeSequenceID
+        project.$activeSequenceID
             .sink { [weak self] _ in
                 Task { @MainActor in
                     guard let self else { return }
-                    let seq = self.store.activeSequence
+                    let seq = self.project.activeSequence
                     self.selectedPanelID = seq?.panels.first?.id
                     self.focusedField = nil
                 }
             }
             .store(in: &cancellables)
+
+        project.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
     }
 
     // MARK: Lookups
 
-    var activeSequence: StoryboardSequence? { store.activeSequence }
+    var activeSequence: StoryboardSequence? { project.activeSequence }
 
     var selectedPanel: StoryboardPanel? {
         guard let id = selectedPanelID else { return nil }
@@ -86,7 +99,7 @@ final class StoryboardComposerViewModel: ObservableObject {
     }
 
     func setActiveSequence(_ id: UUID) {
-        store.setActive(id)
+        project.setActiveSequence(id)
     }
 
     // MARK: Panel CRUD
@@ -105,19 +118,19 @@ final class StoryboardComposerViewModel: ObservableObject {
             thumbnailSymbol: base?.thumbnailSymbol ?? "square.grid.3x2",
             thumbnailColors: base?.thumbnailColors ?? seq.posterColors
         )
-        store.addPanel(panel)
+        project.addPanel(panel)
         selectedPanelID = panel.id
     }
 
     func updatePanel(_ panel: StoryboardPanel) {
-        store.updatePanel(panel)
+        project.updatePanel(panel)
     }
 
     func removeSelectedPanel() {
         guard let panel = selectedPanel else { return }
         let panels = activeSequence?.panels ?? []
         let nextIndex = (panels.firstIndex(where: { $0.id == panel.id }) ?? 0) - 1
-        store.removePanel(id: panel.id)
+        project.removePanel(id: panel.id)
         let updated = activeSequence?.panels ?? []
         if updated.isEmpty {
             selectedPanelID = nil
@@ -129,20 +142,21 @@ final class StoryboardComposerViewModel: ObservableObject {
     func applyShotType(_ type: CameraShotType) {
         guard var panel = selectedPanel else { return }
         panel.shotType = type
-        store.updatePanel(panel)
+        project.updatePanel(panel)
     }
 
     func reorderPanels(from sourceIndex: Int, to destinationIndex: Int) {
-        store.reorderActivePanels(from: sourceIndex, to: destinationIndex)
+        project.reorderActivePanels(from: sourceIndex, to: destinationIndex)
     }
 
     // MARK: Promotion → Scene Builder
 
-    func promoteSelectedPanelToSceneBuilder() {
+    @discardableResult
+    func promoteSelectedPanelToSceneBuilder() -> (panel: StoryboardPanel, filmScene: FilmScene)? {
         guard let seq = activeSequence,
               let panel = selectedPanel,
-              !panel.isPromoted else { return }
-        let number = (SceneStore.shared.scenes.map(\.number).max() ?? 0) + 1
+              !panel.isPromoted else { return nil }
+        let number = (project.scenes.map(\.number).max() ?? 0) + 1
         let filmScene = FilmScene(
             number: number,
             title: "\(seq.projectTitle) · Panel \(panel.number)",
@@ -159,7 +173,8 @@ final class StoryboardComposerViewModel: ObservableObject {
             frameApproved: false,
             projectTitle: seq.projectTitle
         )
-        SceneStore.shared.add(filmScene)
-        store.markPanelPromoted(panelID: panel.id, filmSceneID: filmScene.id)
+        project.addFilmScene(filmScene)
+        project.markPanelPromoted(panelID: panel.id, filmSceneID: filmScene.id)
+        return (panel, filmScene)
     }
 }
