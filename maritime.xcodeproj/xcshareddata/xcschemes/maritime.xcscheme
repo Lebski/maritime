@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9454B4B8B0B4BB0C64A0873B"
-               BuildableName = "movie-blaze.app"
-               BlueprintName = "movie-blaze"
-               ReferencedContainer = "container:movie-blaze.xcodeproj">
+               BlueprintIdentifier = "A773161BFE77653571A253DF"
+               BuildableName = "maritime.app"
+               BlueprintName = "maritime"
+               ReferencedContainer = "container:maritime.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9454B4B8B0B4BB0C64A0873B"
-            BuildableName = "movie-blaze.app"
-            BlueprintName = "movie-blaze"
-            ReferencedContainer = "container:movie-blaze.xcodeproj">
+            BlueprintIdentifier = "A773161BFE77653571A253DF"
+            BuildableName = "maritime.app"
+            BlueprintName = "maritime"
+            ReferencedContainer = "container:maritime.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -55,10 +55,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9454B4B8B0B4BB0C64A0873B"
-            BuildableName = "movie-blaze.app"
-            BlueprintName = "movie-blaze"
-            ReferencedContainer = "container:movie-blaze.xcodeproj">
+            BlueprintIdentifier = "A773161BFE77653571A253DF"
+            BuildableName = "maritime.app"
+            BlueprintName = "maritime"
+            ReferencedContainer = "container:maritime.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -74,10 +74,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9454B4B8B0B4BB0C64A0873B"
-            BuildableName = "movie-blaze.app"
-            BlueprintName = "movie-blaze"
-            ReferencedContainer = "container:movie-blaze.xcodeproj">
+            BlueprintIdentifier = "A773161BFE77653571A253DF"
+            BuildableName = "maritime.app"
+            BlueprintName = "maritime"
+            ReferencedContainer = "container:maritime.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

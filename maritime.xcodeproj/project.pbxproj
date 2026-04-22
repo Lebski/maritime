@@ -1,0 +1,316 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */; };
+		09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76759068CF8F2E06FCC18D90 /* SidebarView.swift */; };
+		0A25B10019A8C0BEC9BA70F5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */; };
+		0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */; };
+		146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */; };
+		1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790CC7A590B10A287972B40D /* SceneBuilderView.swift */; };
+		38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */; };
+		41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */; };
+		4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557F7455FFC01965AA7A316D /* Theme.swift */; };
+		4F8044B155E5D22358C13BFC /* CharacterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */; };
+		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
+		685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9853233341AACB1CB9A71CD /* PlaceholderView.swift */; };
+		6DADB0E129F26DEE5F252D79 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202A7239C33290199AE8215 /* HomeComponents.swift */; };
+		99B4C59FA1927C3EC94F7106 /* FinalizedCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */; };
+		A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCC80BEE94CE861EA8A4E0B /* Models.swift */; };
+		A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */; };
+		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
+		CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */; };
+		D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */; };
+		D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A4530F5AB5E6DCDB635C61 /* RootView.swift */; };
+		E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */; };
+		F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = maritime.entitlements; sourceTree = "<group>"; };
+		0F1E4F240AF3F87FE6D8F75B /* maritime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = maritime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCanvasView.swift; sourceTree = "<group>"; };
+		2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePanelsView.swift; sourceTree = "<group>"; };
+		557F7455FFC01965AA7A316D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabModels.swift; sourceTree = "<group>"; };
+		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
+		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
+		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
+		6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSheetView.swift; sourceTree = "<group>"; };
+		76759068CF8F2E06FCC18D90 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		790CC7A590B10A287972B40D /* SceneBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderView.swift; sourceTree = "<group>"; };
+		7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterStore.swift; sourceTree = "<group>"; };
+		85A4530F5AB5E6DCDB635C61 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabViewModel.swift; sourceTree = "<group>"; };
+		9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderModels.swift; sourceTree = "<group>"; };
+		A257DD4F9E660BE9793F14FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
+		BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderViewModel.swift; sourceTree = "<group>"; };
+		D202A7239C33290199AE8215 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
+		D36CCA281FE2E5C8D861703B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D9853233341AACB1CB9A71CD /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
+		E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterWorkspaceView.swift; sourceTree = "<group>"; };
+		FFCC80BEE94CE861EA8A4E0B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		02270A4D612B10E3877B5662 /* CharacterLab */ = {
+			isa = PBXGroup;
+			children = (
+				6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */,
+				91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */,
+				E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */,
+				A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */,
+				69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */,
+				6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */,
+			);
+			path = CharacterLab;
+			sourceTree = "<group>";
+		};
+		52FD87BA54D152C397EFE83C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0F1E4F240AF3F87FE6D8F75B /* maritime.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7C3F7399FCD5A46F337D3773 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */,
+				7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */,
+				FFCC80BEE94CE861EA8A4E0B /* Models.swift */,
+				9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		7D59425C2C354F9FE3CBB10D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */,
+				557F7455FFC01965AA7A316D /* Theme.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A87EAB47587EAC8319611EBF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D202A7239C33290199AE8215 /* HomeComponents.swift */,
+				1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */,
+				D9853233341AACB1CB9A71CD /* PlaceholderView.swift */,
+				85A4530F5AB5E6DCDB635C61 /* RootView.swift */,
+				76759068CF8F2E06FCC18D90 /* SidebarView.swift */,
+				02270A4D612B10E3877B5662 /* CharacterLab */,
+				BA10AC88B50F3DC2144B5155 /* SceneBuilder */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BA10AC88B50F3DC2144B5155 /* SceneBuilder */ = {
+			isa = PBXGroup;
+			children = (
+				790CC7A590B10A287972B40D /* SceneBuilderView.swift */,
+				BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */,
+				2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */,
+				2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */,
+			);
+			path = SceneBuilder;
+			sourceTree = "<group>";
+		};
+		FC345D58CE90335EDD800C3D = {
+			isa = PBXGroup;
+			children = (
+				FF56045B3DB77EB6A910D115 /* maritime */,
+				52FD87BA54D152C397EFE83C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF56045B3DB77EB6A910D115 /* maritime */ = {
+			isa = PBXGroup;
+			children = (
+				A257DD4F9E660BE9793F14FE /* Assets.xcassets */,
+				D36CCA281FE2E5C8D861703B /* Info.plist */,
+				0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */,
+				7D59425C2C354F9FE3CBB10D /* App */,
+				7C3F7399FCD5A46F337D3773 /* Models */,
+				A87EAB47587EAC8319611EBF /* Views */,
+			);
+			path = maritime;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A773161BFE77653571A253DF /* maritime */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A51A2A7CFA1B4601EF302B5D /* Build configuration list for PBXNativeTarget "maritime" */;
+			buildPhases = (
+				8EE5724EE1C987B998E07185 /* Sources */,
+				3D0F69F897DC563313DB8621 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = maritime;
+			packageProductDependencies = (
+			);
+			productName = maritime;
+			productReference = 0F1E4F240AF3F87FE6D8F75B /* maritime.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		083212E02C08537B0B070DE4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 752241947350EBF2C1959977 /* Build configuration list for PBXProject "maritime" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FC345D58CE90335EDD800C3D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A773161BFE77653571A253DF /* maritime */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3D0F69F897DC563313DB8621 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8EE5724EE1C987B998E07185 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */,
+				38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */,
+				146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */,
+				4F8044B155E5D22358C13BFC /* CharacterStore.swift in Sources */,
+				F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */,
+				99B4C59FA1927C3EC94F7106 /* FinalizedCharacterView.swift in Sources */,
+				6DADB0E129F26DEE5F252D79 /* HomeComponents.swift in Sources */,
+				0A25B10019A8C0BEC9BA70F5 /* HomeView.swift in Sources */,
+				A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */,
+				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
+				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
+				685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */,
+				A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */,
+				D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */,
+				0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */,
+				1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */,
+				CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */,
+				D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */,
+				E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */,
+				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
+				4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		08FDFCC180A2AE8A820974C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.maritime;
+				PRODUCT_NAME = maritime;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		2811BA27F37A39CC59CDECC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = maritime/maritime.entitlements;
+				INFOPLIST_FILE = maritime/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+			};
+			name = Release;
+		};
+		900B97C948D3BA970592F62D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = maritime/maritime.entitlements;
+				INFOPLIST_FILE = maritime/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+			};
+			name = Debug;
+		};
+		E0469E795E3E9C62F6EACC57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.maritime;
+				PRODUCT_NAME = maritime;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		752241947350EBF2C1959977 /* Build configuration list for PBXProject "maritime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0469E795E3E9C62F6EACC57 /* Debug */,
+				08FDFCC180A2AE8A820974C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A51A2A7CFA1B4601EF302B5D /* Build configuration list for PBXNativeTarget "maritime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900B97C948D3BA970592F62D /* Debug */,
+				2811BA27F37A39CC59CDECC7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 083212E02C08537B0B070DE4 /* Project object */;
+}

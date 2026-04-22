@@ -1,12 +1,12 @@
-name: movie-blaze
+name: maritime
 options:
   bundleIdPrefix: com.example
   developmentLanguage: en
 
 settings:
   base:
-    PRODUCT_BUNDLE_IDENTIFIER: com.example.movieblaze
-    PRODUCT_NAME: movie-blaze
+    PRODUCT_BUNDLE_IDENTIFIER: com.example.maritime
+    PRODUCT_NAME: maritime
     SWIFT_VERSION: 5.0
     MARKETING_VERSION: 1.0
     CURRENT_PROJECT_VERSION: 1
@@ -16,19 +16,19 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: 14.0
 
 targets:
-  movie-blaze:
+  maritime:
     type: application
     platform: macOS
     deploymentTarget: '14.0'
     sources:
-      - path: movie-blaze
+      - path: maritime
     entitlements:
-      path: movie-blaze/movie-blaze.entitlements
+      path: maritime/maritime.entitlements
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.network.client: true
     info:
-      path: movie-blaze/Info.plist
+      path: maritime/Info.plist
       properties:
         CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
         CFBundleDisplayName: $(PRODUCT_NAME)
@@ -46,10 +46,10 @@ targets:
         NSMainStoryboardFile: ''
 
 schemes:
-  movie-blaze:
+  maritime:
     build:
       targets:
-        movie-blaze: all
+        maritime: all
     run:
       config: Debug
     archive:
