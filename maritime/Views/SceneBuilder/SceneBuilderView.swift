@@ -5,15 +5,32 @@ struct SceneBuilderView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            sceneList
-                .frame(width: 260)
-                .background(Theme.bgElevated)
+            CollapsiblePane(
+                isCollapsed: $vm.leftCollapsed,
+                edge: .leading,
+                expandedWidth: 260,
+                tint: AppModule.sceneBuilder.tint,
+                icon: AppModule.sceneBuilder.icon,
+                label: "Scenes",
+                shortcut: "["
+            ) {
+                sceneList.background(Theme.bgElevated)
+            }
             Divider().background(Theme.stroke)
             if let scene = vm.activeScene {
                 mainWorkspace(scene: scene)
                 Divider().background(Theme.stroke)
-                SceneSetupPanel(scene: scene, vm: vm)
-                    .frame(width: 320)
+                CollapsiblePane(
+                    isCollapsed: $vm.rightCollapsed,
+                    edge: .trailing,
+                    expandedWidth: 320,
+                    tint: AppModule.sceneBuilder.tint,
+                    icon: "slider.horizontal.3",
+                    label: "Setup",
+                    shortcut: "]"
+                ) {
+                    SceneSetupPanel(scene: scene, vm: vm)
+                }
             } else {
                 emptyState
             }

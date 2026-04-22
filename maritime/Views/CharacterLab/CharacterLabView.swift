@@ -5,9 +5,17 @@ struct CharacterLabView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            sidebar
-                .frame(width: 280)
-                .background(Theme.bgElevated)
+            CollapsiblePane(
+                isCollapsed: $vm.sidebarCollapsed,
+                edge: .leading,
+                expandedWidth: 280,
+                tint: AppModule.characterLab.tint,
+                icon: AppModule.characterLab.icon,
+                label: "Characters",
+                shortcut: "["
+            ) {
+                sidebar.background(Theme.bgElevated)
+            }
             Divider().background(Theme.stroke)
             content
         }

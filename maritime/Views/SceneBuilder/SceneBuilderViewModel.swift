@@ -9,6 +9,8 @@ final class SceneBuilderViewModel: ObservableObject {
     @Published var generationProgress: Double = 0
     @Published var showBackgroundPicker = false
     @Published var showPropPicker = false
+    @Published var leftCollapsed = false
+    @Published var rightCollapsed = false
 
     init() {
         activeSceneID = scenes.first?.id

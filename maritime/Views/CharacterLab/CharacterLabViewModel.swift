@@ -9,6 +9,7 @@ final class CharacterLabViewModel: ObservableObject {
     @Published var showReferenceSheet = false
     @Published var isGenerating = false
     @Published var generationProgress: Double = 0
+    @Published var sidebarCollapsed = false
 
     func setActive(_ character: LabCharacter) {
         // Check both personal and library chars
