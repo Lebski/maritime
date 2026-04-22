@@ -22,9 +22,9 @@ struct RootView: View {
         case .home:
             HomeView(onNavigate: { selection = $0 })
         case .storyForge:
-            PlaceholderView(module: .storyForge)
+            StoryForgeView()
         case .storyboard:
-            PlaceholderView(module: .storyboard)
+            StoryboardComposerView()
         case .characterLab:
             CharacterLabView()
         case .sceneBuilder:
