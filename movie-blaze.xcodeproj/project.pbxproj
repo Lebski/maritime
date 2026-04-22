@@ -12,6 +12,7 @@
 		2810D30AC3F9AC1080886EEC /* SceneCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8AA6B116B433209C649F87 /* SceneCanvasView.swift */; };
 		3055AC85B03F69D729880D5A /* FinalizedCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC037045C80662CED83FC23 /* FinalizedCharacterView.swift */; };
 		35CE7F86D1963F85A41DD3EE /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC20ED3919D5336F9CE03A8B /* ReferenceSheetView.swift */; };
+		3AB524012B0E873DF3BBD6E9 /* CharacterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EE6937A85948D77C142EAD /* CharacterStore.swift */; };
 		5622E5524A9A99CAAD189605 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1E9B565DD371505A805872 /* SidebarView.swift */; };
 		5D32918F829F4A26D7B0D7FC /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89878B8F5128674B8FFA90F1 /* SceneBuilderView.swift */; };
 		605C41DEE1FD8CB8B3AC7DD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8305671841AC8913E13F91F /* Assets.xcassets */; };
@@ -54,6 +55,7 @@
 		EDD0D29554CA4F77B528A331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		EEC037045C80662CED83FC23 /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
 		F482A64C663FFCB6E7B63F35 /* movie-blaze.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "movie-blaze.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9EE6937A85948D77C142EAD /* CharacterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterStore.swift; sourceTree = "<group>"; };
 		FB1E9B565DD371505A805872 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -71,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				8272529C9C71948D8B57F865 /* CharacterLabModels.swift */,
+				F9EE6937A85948D77C142EAD /* CharacterStore.swift */,
 				9F2A5BFABCB24A4C64B48146 /* Models.swift */,
 				10F553B4970DB4156192F10B /* SceneBuilderModels.swift */,
 			);
@@ -212,6 +215,7 @@
 				82BE1A3E80F4D8897E556CDA /* CharacterLabModels.swift in Sources */,
 				9C025C5422B2BFFBABE0ACF9 /* CharacterLabView.swift in Sources */,
 				214A26ACC2A5F743311B18F1 /* CharacterLabViewModel.swift in Sources */,
+				3AB524012B0E873DF3BBD6E9 /* CharacterStore.swift in Sources */,
 				2036547C13C7C6720E751EDF /* CharacterWorkspaceView.swift in Sources */,
 				3055AC85B03F69D729880D5A /* FinalizedCharacterView.swift in Sources */,
 				FAA509018690A5F086821B72 /* HomeComponents.swift in Sources */,

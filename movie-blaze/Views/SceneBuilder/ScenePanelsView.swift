@@ -5,11 +5,13 @@ import SwiftUI
 struct SceneSetupPanel: View {
     let scene: FilmScene
     @ObservedObject var vm: SceneBuilderViewModel
+    @ObservedObject private var characterStore = CharacterStore.shared
 
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
                 backgroundSection
+                characterLabSection
                 propsSection
                 charactersSection
                 lightingSection
@@ -59,6 +61,42 @@ struct SceneSetupPanel: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: Character Lab (draggable roster)
+
+    private var characterLabSection: some View {
+        PanelCard(title: "Character Lab", icon: "person.crop.square.filled.and.at.rectangle.fill", tint: Theme.teal) {
+            let finalized = characterStore.finalizedCharacters
+            if finalized.isEmpty {
+                Text("No finalized characters yet. Approve a character in Character Lab to use it here.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                VStack(spacing: 6) {
+                    ForEach(finalized) { lab in
+                        LabCharacterDragChip(
+                            lab: lab,
+                            isInScene: scene.characters.contains(where: { $0.name == lab.name })
+                        ) {
+                            // Fallback "add" button drops at default center-right
+                            let pos = CGPoint(x: 0.5, y: 0.6)
+                            _ = vm.addCharacter(from: lab, at: pos)
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Image(systemName: "hand.draw.fill")
+                        .font(.system(size: 9))
+                    Text("Drag a character onto the canvas")
+                        .font(.system(size: 9, weight: .semibold))
+                }
+                .foregroundStyle(Theme.teal)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 2)
+            }
         }
     }
 
@@ -128,11 +166,12 @@ struct SceneSetupPanel: View {
     // MARK: Characters
 
     private var charactersSection: some View {
-        PanelCard(title: "Characters", icon: "person.2.fill", tint: Theme.magenta) {
+        PanelCard(title: "In Scene", icon: "person.2.fill", tint: Theme.magenta) {
             if scene.characters.isEmpty {
-                Text("Drag from Character Lab to add")
+                Text("Drag from Character Lab above onto the canvas")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             } else {
                 VStack(spacing: 6) {
                     ForEach(scene.characters) { ch in
@@ -156,6 +195,15 @@ struct SceneSetupPanel: View {
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(ch.tint.opacity(0.15))
                                 .clipShape(Capsule())
+                            Button(action: { vm.removeCharacter(id: ch.id) }) {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundStyle(Theme.textTertiary)
+                                    .padding(4)
+                                    .background(Color.white.opacity(0.06))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -363,6 +411,97 @@ struct WrappedChips<T: Hashable & Identifiable, Content: View>: View {
                 }
                 .buttonStyle(.plain)
             }
+        }
+    }
+}
+
+// MARK: - Draggable Lab Character Chip
+
+struct LabCharacterDragChip: View {
+    let lab: LabCharacter
+    let isInScene: Bool
+    let onQuickAdd: () -> Void
+
+    private var accent: Color { lab.finalVariation?.accentColor ?? Theme.teal }
+    private var gradient: [Color] { lab.finalVariation?.gradientColors ?? [Theme.card, Theme.teal] }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+                Image(systemName: "person.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            .frame(width: 32, height: 32)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(lab.name)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(Theme.lime)
+                    Text(lab.role)
+                        .font(.system(size: 9))
+                        .foregroundStyle(Theme.textTertiary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer(minLength: 4)
+            if isInScene {
+                Text("IN SCENE")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(Theme.lime)
+                    .padding(.horizontal, 5).padding(.vertical, 2)
+                    .background(Theme.lime.opacity(0.15))
+                    .clipShape(Capsule())
+            } else {
+                Button(action: onQuickAdd) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(accent)
+                        .padding(5)
+                        .background(accent.opacity(0.18))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .help("Add to scene")
+            }
+            Image(systemName: "line.3.horizontal")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Theme.textTertiary)
+        }
+        .padding(.horizontal, 8).padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .draggable(DraggableCharacter(id: lab.id, name: lab.name)) {
+            // Drag preview
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(accent)
+                    .frame(width: 24, height: 24)
+                    .overlay(
+                        Text(String(lab.name.prefix(1)))
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                    )
+                Text(lab.name)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            .padding(.horizontal, 10).padding(.vertical, 6)
+            .background(.black.opacity(0.7))
+            .clipShape(Capsule())
         }
     }
 }

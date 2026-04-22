@@ -74,6 +74,8 @@ final class CharacterLabViewModel: ObservableObject {
             characters[idx].isFinalized = true
             isGenerating = false
             syncActive(characterID)
+            // Make this character available to Scene Builder for drag-and-drop
+            CharacterStore.shared.upsert(characters[idx])
         }
     }
 
@@ -100,6 +102,7 @@ final class CharacterLabViewModel: ObservableObject {
         characters[idx].isFinalized = false
         characters[idx].finalVariation = nil
         syncActive(characterID)
+        CharacterStore.shared.upsert(characters[idx])
     }
 
     private func syncActive(_ id: UUID) {

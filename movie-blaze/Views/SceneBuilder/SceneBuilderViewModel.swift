@@ -59,6 +59,37 @@ final class SceneBuilderViewModel: ObservableObject {
         }
     }
 
+    /// Adds a finalized LabCharacter to the active scene at the given
+    /// normalized (0-1) canvas position. Returns true on success.
+    @discardableResult
+    func addCharacter(from lab: LabCharacter, at position: CGPoint) -> Bool {
+        guard scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
+        // Don't add duplicates by name in the same scene
+        if activeScene?.characters.contains(where: { $0.name == lab.name }) == true {
+            // Move existing instead
+            if let existing = activeScene?.characters.first(where: { $0.name == lab.name }) {
+                moveCharacter(id: existing.id, x: position.x, y: position.y)
+            }
+            return false
+        }
+        let tint = lab.finalVariation?.accentColor ?? Theme.magenta
+        let ref = SceneCharacterRef(
+            name: lab.name,
+            role: lab.role,
+            tint: tint,
+            xRatio: max(0.05, min(0.95, position.x)),
+            yRatio: max(0.1, min(0.9, position.y)),
+            gazeDegrees: position.x < 0.5 ? 10 : -170,
+            depthLayer: .foreground
+        )
+        mutate { $0.characters.append(ref) }
+        return true
+    }
+
+    func removeCharacter(id: UUID) {
+        mutate { $0.characters.removeAll(where: { $0.id == id }) }
+    }
+
     func cycleDepth(id: UUID) {
         mutate {
             if let i = $0.characters.firstIndex(where: { $0.id == id }) {

@@ -53,6 +53,14 @@ struct FinalizedCharacterView: View {
                     Text("Production Ready")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Theme.teal)
+                    Text("·")
+                        .foregroundStyle(Theme.textTertiary)
+                    Image(systemName: "hand.draw.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.magenta)
+                    Text("Drag to Scene Builder")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.magenta)
                 }
                 .padding(.top, 4)
             }
@@ -87,6 +95,24 @@ struct FinalizedCharacterView: View {
         }
         .padding(20)
         .cardStyle()
+        .draggable(DraggableCharacter(id: character.id, name: character.name)) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(character.finalVariation?.accentColor ?? Theme.teal)
+                    .frame(width: 24, height: 24)
+                    .overlay(
+                        Text(String(character.name.prefix(1)))
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                    )
+                Text(character.name)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            .padding(.horizontal, 10).padding(.vertical, 6)
+            .background(.black.opacity(0.7))
+            .clipShape(Capsule())
+        }
     }
 
     // MARK: Reference Sheets

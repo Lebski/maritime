@@ -3,6 +3,7 @@ import SwiftUI
 struct SceneCanvasView: View {
     let scene: FilmScene
     @ObservedObject var vm: SceneBuilderViewModel
+    @State private var isDropTargeted = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -47,11 +48,13 @@ struct SceneCanvasView: View {
                 charactersLayer(size: geo.size)
                 guideOverlays(size: geo.size)
                 topBadges
+                dropHintOverlay
             }
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(Theme.stroke, lineWidth: 1)
+                    .stroke(isDropTargeted ? Theme.teal : Theme.stroke,
+                            lineWidth: isDropTargeted ? 2 : 1)
             )
             .overlay {
                 if vm.isGenerating {
@@ -59,9 +62,52 @@ struct SceneCanvasView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
             }
+            .dropDestination(for: DraggableCharacter.self) { items, location in
+                guard let dropped = items.first else { return false }
+                guard let lab = CharacterStore.shared.character(id: dropped.id) else { return false }
+                let x = location.x / geo.size.width
+                let y = location.y / geo.size.height
+                return vm.addCharacter(from: lab, at: CGPoint(x: x, y: y))
+            } isTargeted: { targeted in
+                withAnimation(.easeInOut(duration: 0.15)) { isDropTargeted = targeted }
+            }
         }
         .aspectRatio(16/9, contentMode: .fit)
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private var dropHintOverlay: some View {
+        if isDropTargeted {
+            ZStack {
+                Theme.teal.opacity(0.10)
+                VStack(spacing: 8) {
+                    Image(systemName: "person.fill.badge.plus")
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(Theme.teal)
+                    Text("Drop to place character")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.teal)
+                }
+                .padding(.horizontal, 20).padding(.vertical, 14)
+                .background(.black.opacity(0.55))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .transition(.opacity)
+        } else if scene.characters.isEmpty && !vm.isGenerating {
+            VStack(spacing: 6) {
+                Image(systemName: "arrow.down.forward.and.arrow.up.backward")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(Theme.teal)
+                Text("Drag a character from the panel →")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            .padding(.horizontal, 14).padding(.vertical, 10)
+            .background(.black.opacity(0.45))
+            .clipShape(Capsule())
+            .allowsHitTesting(false)
+        }
     }
 
     @ViewBuilder
