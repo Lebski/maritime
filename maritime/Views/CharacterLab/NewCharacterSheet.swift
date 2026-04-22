@@ -2,14 +2,20 @@ import SwiftUI
 
 struct NewCharacterSheet: View {
     @ObservedObject var vm: CharacterLabViewModel
+    @ObservedObject private var storyStore = StoryStore.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
     @State private var description = ""
     @State private var role = "Protagonist"
     @State private var source: CharacterSource = .new
+    @State private var selectedDraftID: UUID?
 
     private let roles = ["Protagonist", "Antagonist", "Supporting", "Mentor", "Love Interest", "Comic Relief"]
+
+    private var storyDrafts: [StoryCharacterDraft] {
+        storyStore.activeBible?.characterDrafts ?? []
+    }
 
     var body: some View {
         NavigationStack {
@@ -18,7 +24,8 @@ struct NewCharacterSheet: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         sourceSelector
-                        if source == .new { form }
+                        if source == .storyForge { storyForgePicker }
+                        if source == .new || (source == .storyForge && selectedDraftID != nil) { form }
                     }
                     .padding(28)
                 }
@@ -89,6 +96,108 @@ struct NewCharacterSheet: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: Story Forge Picker
+
+    private var storyForgePicker: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text(storyStore.activeBible?.projectTitle.uppercased() ?? "NO ACTIVE BIBLE")
+                    .font(.system(size: 10, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundStyle(Theme.textTertiary)
+                Spacer()
+                if !storyDrafts.isEmpty {
+                    Text("\(storyDrafts.filter { !$0.isPromoted }.count) unpromoted")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+            }
+            if storyDrafts.isEmpty {
+                storyForgeEmptyState
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(storyDrafts) { draft in
+                        draftPickerRow(draft)
+                    }
+                }
+            }
+        }
+    }
+
+    private func draftPickerRow(_ draft: StoryCharacterDraft) -> some View {
+        let isSelected = selectedDraftID == draft.id
+        return Button(action: { applyDraft(draft) }) {
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(draft.isPromoted ? Theme.textTertiary.opacity(0.6) : Theme.magenta)
+                    .frame(width: 8, height: 8)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(draft.name)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                        if draft.isPromoted {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 10))
+                                .foregroundStyle(Theme.teal)
+                        }
+                    }
+                    Text(draft.role.uppercased())
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.6)
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                Spacer()
+                CompletionRing(value: draft.completion, size: 16, color: Theme.magenta)
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Theme.teal)
+                }
+            }
+            .padding(14)
+            .background(isSelected ? Theme.teal.opacity(0.10) : Theme.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isSelected ? Theme.teal.opacity(0.4) : Theme.stroke, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(draft.isPromoted)
+        .opacity(draft.isPromoted ? 0.55 : 1)
+    }
+
+    private var storyForgeEmptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "text.book.closed")
+                .font(.system(size: 22))
+                .foregroundStyle(Theme.magenta.opacity(0.6))
+            Text("No character drafts yet")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+            Text("Create drafts in Story Forge → Character Builder first.")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .background(Theme.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func applyDraft(_ draft: StoryCharacterDraft) {
+        guard !draft.isPromoted else { return }
+        selectedDraftID = draft.id
+        name = draft.name
+        role = draft.role
+        description = storyStore.activeBible?.labDescription(for: draft) ?? ""
     }
 
     // MARK: Form

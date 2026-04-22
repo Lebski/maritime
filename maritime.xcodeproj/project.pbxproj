@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */; };
+		07C78D13878C11E09A635A58 /* ThemeTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */; };
+		07F7A27D0390ED99C0C9D619 /* StoryForgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */; };
 		09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76759068CF8F2E06FCC18D90 /* SidebarView.swift */; };
 		0A25B10019A8C0BEC9BA70F5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */; };
 		0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */; };
@@ -17,45 +19,85 @@
 		41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */; };
 		4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557F7455FFC01965AA7A316D /* Theme.swift */; };
 		4F8044B155E5D22358C13BFC /* CharacterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */; };
+		553C7B428327C9AB418FBB3C /* StoryboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255692AA3FF39F06974AE381 /* StoryboardStore.swift */; };
+		58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */; };
+		6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */; };
 		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
+		67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */; };
 		685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9853233341AACB1CB9A71CD /* PlaceholderView.swift */; };
 		6DADB0E129F26DEE5F252D79 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202A7239C33290199AE8215 /* HomeComponents.swift */; };
+		6FC58EAB8A71A3BB01513ED7 /* SceneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53F490D26233235CF96DE56 /* SceneStore.swift */; };
+		77EC430EAAA168D6E6C64E27 /* StoryForgeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */; };
+		7C9AA5FBB9F570A879CC528F /* StoryboardComposerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */; };
+		8BD77850EE9A5B52692C4859 /* StoryboardPanelCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */; };
 		99B4C59FA1927C3EC94F7106 /* FinalizedCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */; };
+		9E05AC0967EEB5E4FB69F6D3 /* StoryForgePanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */; };
+		9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */; };
+		A29C5E6C224459FD10F164EE /* StoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC3B252001C630E7DDC279E /* StoryStore.swift */; };
 		A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCC80BEE94CE861EA8A4E0B /* Models.swift */; };
+		A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */; };
 		A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */; };
+		BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */; };
 		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
+		CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */; };
 		CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */; };
 		D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */; };
 		D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A4530F5AB5E6DCDB635C61 /* RootView.swift */; };
+		DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */; };
 		E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */; };
+		E28A559FD65900D11C4675B3 /* StoryboardPanelsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */; };
+		E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */; };
+		EEF8984FF267CBFBC95A3F60 /* StoryStructureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */; };
+		EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */; };
 		F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardModels.swift; sourceTree = "<group>"; };
 		0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = maritime.entitlements; sourceTree = "<group>"; };
 		0F1E4F240AF3F87FE6D8F75B /* maritime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = maritime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelCard.swift; sourceTree = "<group>"; };
+		1DC3B252001C630E7DDC279E /* StoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStore.swift; sourceTree = "<group>"; };
 		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		255692AA3FF39F06974AE381 /* StoryboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardStore.swift; sourceTree = "<group>"; };
+		29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelsGridView.swift; sourceTree = "<group>"; };
 		2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCanvasView.swift; sourceTree = "<group>"; };
 		2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePanelsView.swift; sourceTree = "<group>"; };
+		3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterBuilderView.swift; sourceTree = "<group>"; };
+		3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmPlannerView.swift; sourceTree = "<group>"; };
 		557F7455FFC01965AA7A316D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeModels.swift; sourceTree = "<group>"; };
+		5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgePanels.swift; sourceTree = "<group>"; };
 		5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabModels.swift; sourceTree = "<group>"; };
+		5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelDetailEditor.swift; sourceTree = "<group>"; };
 		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
 		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
 		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
+		6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerViewModel.swift; sourceTree = "<group>"; };
 		6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSheetView.swift; sourceTree = "<group>"; };
 		76759068CF8F2E06FCC18D90 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		790CC7A590B10A287972B40D /* SceneBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderView.swift; sourceTree = "<group>"; };
+		7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeViewModel.swift; sourceTree = "<group>"; };
 		7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterStore.swift; sourceTree = "<group>"; };
 		85A4530F5AB5E6DCDB635C61 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeView.swift; sourceTree = "<group>"; };
 		91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabViewModel.swift; sourceTree = "<group>"; };
 		9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderModels.swift; sourceTree = "<group>"; };
+		97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerView.swift; sourceTree = "<group>"; };
 		A257DD4F9E660BE9793F14FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
 		BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderViewModel.swift; sourceTree = "<group>"; };
+		BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBreakdownView.swift; sourceTree = "<group>"; };
+		BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeTrackerView.swift; sourceTree = "<group>"; };
 		D202A7239C33290199AE8215 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
 		D36CCA281FE2E5C8D861703B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D9853233341AACB1CB9A71CD /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
+		DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotLibraryView.swift; sourceTree = "<group>"; };
+		E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStructureView.swift; sourceTree = "<group>"; };
 		E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterWorkspaceView.swift; sourceTree = "<group>"; };
+		E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeHelperPanel.swift; sourceTree = "<group>"; };
+		F53F490D26233235CF96DE56 /* SceneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneStore.swift; sourceTree = "<group>"; };
+		FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardHelperPanel.swift; sourceTree = "<group>"; };
 		FFCC80BEE94CE861EA8A4E0B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +130,11 @@
 				7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */,
 				FFCC80BEE94CE861EA8A4E0B /* Models.swift */,
 				9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */,
+				F53F490D26233235CF96DE56 /* SceneStore.swift */,
+				07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */,
+				255692AA3FF39F06974AE381 /* StoryboardStore.swift */,
+				59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */,
+				1DC3B252001C630E7DDC279E /* StoryStore.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -111,6 +158,8 @@
 				76759068CF8F2E06FCC18D90 /* SidebarView.swift */,
 				02270A4D612B10E3877B5662 /* CharacterLab */,
 				BA10AC88B50F3DC2144B5155 /* SceneBuilder */,
+				C7D138127F8C0FEE1F14DF44 /* Storyboard */,
+				E76C802FC833B130316E1328 /* StoryForge */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -124,6 +173,36 @@
 				2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */,
 			);
 			path = SceneBuilder;
+			sourceTree = "<group>";
+		};
+		C7D138127F8C0FEE1F14DF44 /* Storyboard */ = {
+			isa = PBXGroup;
+			children = (
+				5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */,
+				3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */,
+				DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */,
+				97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */,
+				6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */,
+				FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */,
+				12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */,
+				29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */,
+			);
+			path = Storyboard;
+			sourceTree = "<group>";
+		};
+		E76C802FC833B130316E1328 /* StoryForge */ = {
+			isa = PBXGroup;
+			children = (
+				3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */,
+				BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */,
+				E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */,
+				5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */,
+				8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */,
+				7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */,
+				E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */,
+				BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */,
+			);
+			path = StoryForge;
 			sourceTree = "<group>";
 		};
 		FC345D58CE90335EDD800C3D = {
@@ -176,9 +255,10 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 752241947350EBF2C1959977 /* Build configuration list for PBXProject "maritime" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -188,6 +268,7 @@
 			mainGroup = FC345D58CE90335EDD800C3D;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 52FD87BA54D152C397EFE83C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -212,6 +293,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */,
 				0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */,
 				38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */,
 				146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */,
@@ -223,16 +305,36 @@
 				A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */,
 				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
 				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
+				CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */,
 				685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */,
 				A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */,
+				DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */,
 				D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */,
+				A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */,
 				0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */,
 				1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */,
 				CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */,
 				D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */,
 				E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */,
+				6FC58EAB8A71A3BB01513ED7 /* SceneStore.swift in Sources */,
+				BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */,
 				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
+				E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */,
+				77EC430EAAA168D6E6C64E27 /* StoryForgeModels.swift in Sources */,
+				9E05AC0967EEB5E4FB69F6D3 /* StoryForgePanels.swift in Sources */,
+				07F7A27D0390ED99C0C9D619 /* StoryForgeView.swift in Sources */,
+				67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */,
+				A29C5E6C224459FD10F164EE /* StoryStore.swift in Sources */,
+				EEF8984FF267CBFBC95A3F60 /* StoryStructureView.swift in Sources */,
+				6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */,
+				7C9AA5FBB9F570A879CC528F /* StoryboardComposerViewModel.swift in Sources */,
+				EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */,
+				58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */,
+				8BD77850EE9A5B52692C4859 /* StoryboardPanelCard.swift in Sources */,
+				E28A559FD65900D11C4675B3 /* StoryboardPanelsGridView.swift in Sources */,
+				553C7B428327C9AB418FBB3C /* StoryboardStore.swift in Sources */,
 				4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */,
+				07C78D13878C11E09A635A58 /* ThemeTrackerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,13 +346,58 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.maritime;
 				PRODUCT_NAME = maritime;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -258,18 +405,32 @@
 		2811BA27F37A39CC59CDECC7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = maritime/maritime.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = maritime/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		900B97C948D3BA970592F62D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = maritime/maritime.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = maritime/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -278,13 +439,65 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.maritime;
 				PRODUCT_NAME = maritime;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;

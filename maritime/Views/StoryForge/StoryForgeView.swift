@@ -1,0 +1,448 @@
+import SwiftUI
+
+struct StoryForgeView: View {
+    @StateObject private var vm = StoryForgeViewModel()
+    @ObservedObject private var store = StoryStore.shared
+    @State private var showHelper = false
+    @State private var showInnerSidebar = true
+
+    var body: some View {
+        HStack(spacing: 0) {
+            if showInnerSidebar {
+                sidebar
+                    .frame(width: 260)
+                    .background(Theme.bgElevated)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                Divider().background(Theme.stroke)
+            }
+            workspace
+                .frame(maxWidth: .infinity)
+            if showHelper {
+                Divider().background(Theme.stroke)
+                StoryForgeHelperPanel(vm: vm)
+                    .frame(width: 320)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.22), value: showHelper)
+        .animation(.easeInOut(duration: 0.22), value: showInnerSidebar)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.bg)
+        .sheet(isPresented: $vm.showNewBibleSheet) {
+            NewStoryBibleSheet(vm: vm)
+        }
+    }
+
+    private var sidebarToggle: some View {
+        Button(action: { showInnerSidebar.toggle() }) {
+            Image(systemName: "sidebar.left")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(showInnerSidebar ? Theme.magenta : Theme.textTertiary)
+                .frame(width: 30, height: 30)
+                .background(showInnerSidebar ? Theme.magenta.opacity(0.14) : Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .help(showInnerSidebar ? "Hide sidebar" : "Show sidebar")
+    }
+
+    private var helperToggle: some View {
+        Button(action: { showHelper.toggle() }) {
+            Image(systemName: "sidebar.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(showHelper ? Theme.magenta : Theme.textTertiary)
+                .frame(width: 30, height: 30)
+                .background(showHelper ? Theme.magenta.opacity(0.14) : Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .help(showHelper ? "Hide helper panel" : "Show helper panel")
+    }
+
+    // MARK: Sidebar
+
+    private var sidebar: some View {
+        VStack(spacing: 0) {
+            sidebarHeader
+            sidebarBibleList
+            Divider().background(Theme.stroke)
+            sidebarProgress
+            Divider().background(Theme.stroke)
+            sidebarActions
+        }
+    }
+
+    private var sidebarHeader: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Theme.magenta.opacity(0.18))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: "text.book.closed.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Theme.magenta)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Story Forge")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Your story bible")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
+            Divider().background(Theme.stroke)
+        }
+    }
+
+    private var sidebarBibleList: some View {
+        ScrollView {
+            VStack(spacing: 6) {
+                HStack {
+                    Text("STORY BIBLES")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.8)
+                        .foregroundStyle(Theme.textTertiary)
+                    Spacer()
+                    Button(action: { vm.showNewBibleSheet = true }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.magenta)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 4)
+                .padding(.top, 10)
+
+                ForEach(store.bibles) { bible in
+                    bibleRow(bible)
+                }
+            }
+            .padding(10)
+        }
+        .frame(maxHeight: .infinity)
+    }
+
+    private func bibleRow(_ bible: StoryBible) -> some View {
+        let isActive = store.activeBibleID == bible.id
+        return Button(action: { vm.setActiveBible(bible.id) }) {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: bible.posterColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 26, height: 34)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(bible.projectTitle)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    Text("\(Int(bible.overallCompletion * 100))% complete")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                Spacer()
+                CompletionRing(value: bible.overallCompletion, size: 18, color: Theme.magenta)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(isActive ? Theme.magenta.opacity(0.10) : Color.clear)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(isActive ? Theme.magenta.opacity(0.5) : Color.clear, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var sidebarProgress: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("SECTION PROGRESS")
+                .font(.system(size: 10, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(Theme.textTertiary)
+            ForEach(StoryForgeSection.allCases) { section in
+                progressRow(section: section)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
+    }
+
+    private func progressRow(section: StoryForgeSection) -> some View {
+        let value = vm.activeBible?.completion(for: section) ?? 0
+        let isActive = vm.activeSection == section
+        return Button(action: { vm.selectSection(section) }) {
+            HStack(spacing: 10) {
+                Image(systemName: section.icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(isActive ? Theme.magenta : Theme.textSecondary)
+                    .frame(width: 16)
+                Text(section.shortTitle)
+                    .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+                    .foregroundStyle(isActive ? Theme.textPrimary : Theme.textSecondary)
+                Spacer()
+                CompletionRing(value: value, size: 16, color: Theme.magenta)
+                Text("\(Int(value * 100))%")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(isActive ? Theme.magenta.opacity(0.08) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var sidebarActions: some View {
+        VStack(spacing: 8) {
+            Text("PROMOTE")
+                .font(.system(size: 10, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(Theme.textTertiary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            promoteButton(
+                icon: "person.crop.artframe",
+                label: "Send to Character Lab",
+                tint: Theme.teal,
+                count: unpromotedDrafts
+            ) {
+                vm.activeSection = .characters
+            }
+            promoteButton(
+                icon: "photo.stack.fill",
+                label: "Send to Scene Builder",
+                tint: Theme.accent,
+                count: unpromotedScenes
+            ) {
+                vm.activeSection = .scenes
+            }
+        }
+        .padding(14)
+    }
+
+    private var unpromotedDrafts: Int {
+        (vm.activeBible?.characterDrafts ?? []).filter { !$0.isPromoted }.count
+    }
+
+    private var unpromotedScenes: Int {
+        (vm.activeBible?.sceneBreakdowns ?? []).filter { !$0.isPromoted }.count
+    }
+
+    private func promoteButton(icon: String, label: String, tint: Color, count: Int, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 12))
+                    .foregroundStyle(tint)
+                Text(label)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Spacer()
+                if count > 0 {
+                    Text("\(count)")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(tint)
+                        .clipShape(Capsule())
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(tint.opacity(0.08))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(tint.opacity(0.25), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: Workspace
+
+    @ViewBuilder
+    private var workspace: some View {
+        if let bible = vm.activeBible {
+            VStack(spacing: 0) {
+                workspaceHeader(bible: bible)
+                Divider().background(Theme.stroke)
+                tabRow(bible: bible)
+                Divider().background(Theme.stroke)
+                sectionContent
+            }
+        } else {
+            emptyWorkspace
+        }
+    }
+
+    private func workspaceHeader(bible: StoryBible) -> some View {
+        HStack(spacing: 14) {
+            sidebarToggle
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: bible.posterColors,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 36, height: 46)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(bible.projectTitle)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(Theme.textPrimary)
+                if bible.logline.isEmpty {
+                    Text("No logline yet — every story needs one sentence.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textTertiary)
+                        .italic()
+                } else {
+                    Text(bible.logline)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(2)
+                }
+            }
+            Spacer()
+            helperToggle
+            overallCompletionBadge(value: bible.overallCompletion)
+        }
+        .padding(.horizontal, 22)
+        .padding(.vertical, 16)
+    }
+
+    private func overallCompletionBadge(value: Double) -> some View {
+        HStack(spacing: 8) {
+            CompletionRing(value: value, size: 28, color: Theme.magenta, showLabel: true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("OVERALL")
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundStyle(Theme.textTertiary)
+                Text("\(Int(value * 100))% complete")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Theme.card)
+        .overlay(
+            Capsule().stroke(Theme.stroke, lineWidth: 1)
+        )
+        .clipShape(Capsule())
+    }
+
+    private func tabRow(bible: StoryBible) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(StoryForgeSection.allCases) { section in
+                    SectionTabButton(
+                        section: section,
+                        isActive: vm.activeSection == section,
+                        completion: bible.completion(for: section)
+                    ) {
+                        vm.selectSection(section)
+                    }
+                }
+            }
+            .padding(.horizontal, 22)
+            .padding(.vertical, 12)
+        }
+    }
+
+    @ViewBuilder
+    private var sectionContent: some View {
+        switch vm.activeSection {
+        case .characters:
+            CharacterBuilderView(vm: vm)
+        case .structure:
+            StoryStructureView(vm: vm)
+        case .scenes:
+            SceneBreakdownView(vm: vm)
+        case .theme:
+            ThemeTrackerView(vm: vm)
+        }
+    }
+
+    private var emptyWorkspace: some View {
+        VStack(spacing: 18) {
+            Image(systemName: "text.book.closed")
+                .font(.system(size: 42))
+                .foregroundStyle(Theme.magenta.opacity(0.6))
+            Text("No Story Bible selected")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+            Text("Pick one from the sidebar, or start a new one.")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.textSecondary)
+            Button(action: { vm.showNewBibleSheet = true }) {
+                Label("New Story Bible", systemImage: "plus")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 9)
+                    .background(Theme.magenta)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - New Story Bible Sheet
+
+struct NewStoryBibleSheet: View {
+    @ObservedObject var vm: StoryForgeViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var title = ""
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Theme.bg.ignoresSafeArea()
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("PROJECT TITLE")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.6)
+                        .foregroundStyle(Theme.textTertiary)
+                    StyledTextField(placeholder: "e.g. The Lantern Keeper", text: $title)
+                    Text("You'll pick a structure template, draft characters, and map scenes in the workspace.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                    Spacer()
+                }
+                .padding(24)
+            }
+            .navigationTitle("New Story Bible")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }.foregroundStyle(Theme.textSecondary)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") {
+                        vm.createNewBible(title: title)
+                        dismiss()
+                    }
+                    .foregroundStyle(title.isEmpty ? Theme.textTertiary : Theme.magenta)
+                    .disabled(title.isEmpty)
+                }
+            }
+        }
+        .frame(minWidth: 420, minHeight: 260)
+    }
+}
