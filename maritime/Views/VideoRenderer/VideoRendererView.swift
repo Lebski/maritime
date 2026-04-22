@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct VideoRendererView: View {
-    @StateObject private var vm = VideoRendererViewModel()
+    @StateObject private var vm: VideoRendererViewModel
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: VideoRendererViewModel(project: project))
+    }
 
     var body: some View {
         HStack(spacing: 0) {

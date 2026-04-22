@@ -116,11 +116,11 @@ struct RootView: View {
         case .sceneBuilder:
             SceneBuilderView(project: project)
         case .videoRenderer:
-            VideoRendererView()
+            VideoRendererView(project: project)
         case .assetLibrary:
-            AssetLibraryView()
+            AssetLibraryView(project: project)
         case .exports:
-            ExportsView()
+            ExportsView(project: project)
         }
     }
 }

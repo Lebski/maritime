@@ -73,14 +73,3 @@ struct ExportJob: Identifiable {
     var status: ExportJobStatus
 }
 
-// MARK: - Samples
-
-enum ExportSamples {
-    static let history: [ExportJob] = [
-        .init(format: .premiereXML, projectTitle: "Tide & Bone", status: .done(timestamp: "Yesterday 5:12 PM")),
-        .init(format: .cutCSV, projectTitle: "Tide & Bone", status: .done(timestamp: "Yesterday 5:12 PM")),
-        .init(format: .psdExchange, projectTitle: "Neon Requiem", status: .done(timestamp: "2 days ago")),
-        .init(format: .rawFootage, projectTitle: "The Lantern Keeper", status: .done(timestamp: "Last week")),
-        .init(format: .premiereXML, projectTitle: "Neon Requiem", status: .failed(reason: "2 clips missing approval."))
-    ]
-}

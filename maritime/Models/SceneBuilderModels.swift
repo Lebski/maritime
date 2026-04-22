@@ -217,12 +217,17 @@ struct FilmScene: Identifiable, Codable {
     var frameApproved: Bool
     var projectTitle: String
     var renderPackage: RenderPackage?
+    // Video Renderer state — the same scene carries its motion cue and clip length,
+    // so the Renderer timeline is a strict projection of project.scenes.
+    var clipDuration: Double
+    var clipMotion: MotionIntensity
 
     init(id: UUID = UUID(), number: Int, title: String, location: String, isInterior: Bool,
          timeOfDay: TimeOfDay, lightingMood: LightingMood, keyLight: KeyLightDirection,
          shotType: CameraShotType, background: SceneBackground? = nil, props: [SceneProp] = [],
          characters: [SceneCharacterRef] = [], activeGuides: Set<CompositionGuide> = [],
-         frameApproved: Bool = false, projectTitle: String, renderPackage: RenderPackage? = nil) {
+         frameApproved: Bool = false, projectTitle: String, renderPackage: RenderPackage? = nil,
+         clipDuration: Double = 3.0, clipMotion: MotionIntensity = .subtle) {
         self.id = id
         self.number = number
         self.title = title
@@ -239,6 +244,59 @@ struct FilmScene: Identifiable, Codable {
         self.frameApproved = frameApproved
         self.projectTitle = projectTitle
         self.renderPackage = renderPackage
+        self.clipDuration = clipDuration
+        self.clipMotion = clipMotion
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, number, title, location, isInterior, timeOfDay, lightingMood
+        case keyLight, shotType, background, props, characters, activeGuides
+        case frameApproved, projectTitle, renderPackage, clipDuration, clipMotion
+    }
+
+    // Older .mblaze files predate clipDuration/clipMotion — decode them with defaults.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decode(UUID.self, forKey: .id)
+        self.number = try c.decode(Int.self, forKey: .number)
+        self.title = try c.decode(String.self, forKey: .title)
+        self.location = try c.decode(String.self, forKey: .location)
+        self.isInterior = try c.decode(Bool.self, forKey: .isInterior)
+        self.timeOfDay = try c.decode(TimeOfDay.self, forKey: .timeOfDay)
+        self.lightingMood = try c.decode(LightingMood.self, forKey: .lightingMood)
+        self.keyLight = try c.decode(KeyLightDirection.self, forKey: .keyLight)
+        self.shotType = try c.decode(CameraShotType.self, forKey: .shotType)
+        self.background = try c.decodeIfPresent(SceneBackground.self, forKey: .background)
+        self.props = try c.decode([SceneProp].self, forKey: .props)
+        self.characters = try c.decode([SceneCharacterRef].self, forKey: .characters)
+        self.activeGuides = try c.decode(Set<CompositionGuide>.self, forKey: .activeGuides)
+        self.frameApproved = try c.decode(Bool.self, forKey: .frameApproved)
+        self.projectTitle = try c.decode(String.self, forKey: .projectTitle)
+        self.renderPackage = try c.decodeIfPresent(RenderPackage.self, forKey: .renderPackage)
+        self.clipDuration = try c.decodeIfPresent(Double.self, forKey: .clipDuration) ?? 3.0
+        self.clipMotion = try c.decodeIfPresent(MotionIntensity.self, forKey: .clipMotion) ?? .subtle
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(number, forKey: .number)
+        try c.encode(title, forKey: .title)
+        try c.encode(location, forKey: .location)
+        try c.encode(isInterior, forKey: .isInterior)
+        try c.encode(timeOfDay, forKey: .timeOfDay)
+        try c.encode(lightingMood, forKey: .lightingMood)
+        try c.encode(keyLight, forKey: .keyLight)
+        try c.encode(shotType, forKey: .shotType)
+        try c.encodeIfPresent(background, forKey: .background)
+        try c.encode(props, forKey: .props)
+        try c.encode(characters, forKey: .characters)
+        try c.encode(activeGuides, forKey: .activeGuides)
+        try c.encode(frameApproved, forKey: .frameApproved)
+        try c.encode(projectTitle, forKey: .projectTitle)
+        try c.encodeIfPresent(renderPackage, forKey: .renderPackage)
+        try c.encode(clipDuration, forKey: .clipDuration)
+        try c.encode(clipMotion, forKey: .clipMotion)
     }
 
     var locationLabel: String {

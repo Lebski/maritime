@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Motion
 
-enum MotionIntensity: String, CaseIterable, Identifiable {
+enum MotionIntensity: String, CaseIterable, Identifiable, Codable {
     case locked = "Locked"
     case subtle = "Subtle"
     case dynamic = "Dynamic"
@@ -30,7 +30,7 @@ enum MotionIntensity: String, CaseIterable, Identifiable {
 // MARK: - Clip
 
 struct VideoClip: Identifiable, Hashable {
-    let id = UUID()
+    let id: UUID
     var number: Int
     var title: String
     var sceneNumber: Int
@@ -38,6 +38,18 @@ struct VideoClip: Identifiable, Hashable {
     var motion: MotionIntensity
     var gradientSeed: Int
     var isApproved: Bool
+
+    init(id: UUID = UUID(), number: Int, title: String, sceneNumber: Int,
+         duration: Double, motion: MotionIntensity, gradientSeed: Int, isApproved: Bool) {
+        self.id = id
+        self.number = number
+        self.title = title
+        self.sceneNumber = sceneNumber
+        self.duration = duration
+        self.motion = motion
+        self.gradientSeed = gradientSeed
+        self.isApproved = isApproved
+    }
 
     var gradientColors: [Color] {
         let palette: [[Color]] = [
@@ -53,7 +65,7 @@ struct VideoClip: Identifiable, Hashable {
 
 // MARK: - Cut Suggestion (Rule of Six)
 
-enum CutPriority: String, CaseIterable {
+enum CutPriority: String, CaseIterable, Codable {
     case emotion = "Emotion"
     case story = "Story"
     case rhythm = "Rhythm"
@@ -84,12 +96,21 @@ enum CutPriority: String, CaseIterable {
     }
 }
 
-struct CutSuggestion: Identifiable, Hashable {
-    let id = UUID()
+struct CutSuggestion: Identifiable, Hashable, Codable {
+    let id: UUID
     var afterClipNumber: Int
     var priority: CutPriority
     var rationale: String
-    var applied: Bool = false
+    var applied: Bool
+
+    init(id: UUID = UUID(), afterClipNumber: Int, priority: CutPriority,
+         rationale: String, applied: Bool = false) {
+        self.id = id
+        self.afterClipNumber = afterClipNumber
+        self.priority = priority
+        self.rationale = rationale
+        self.applied = applied
+    }
 }
 
 // MARK: - Samples

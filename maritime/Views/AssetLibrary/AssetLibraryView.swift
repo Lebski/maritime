@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct AssetLibraryView: View {
-    @StateObject private var vm = AssetLibraryViewModel()
+    @StateObject private var vm: AssetLibraryViewModel
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: AssetLibraryViewModel(project: project))
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -81,7 +85,7 @@ struct AssetLibraryView: View {
         VStack(alignment: .leading, spacing: 6) {
             sectionHeader("Collections", icon: "rectangle.stack.fill")
             ForEach(vm.collections) { col in
-                Button(action: { vm.selectedCollection = col }) {
+                Button(action: { vm.setActiveCollection(col) }) {
                     HStack(spacing: 10) {
                         Circle()
                             .fill(col.tint)

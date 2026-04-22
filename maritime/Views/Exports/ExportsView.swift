@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct ExportsView: View {
-    @StateObject private var vm = ExportsViewModel()
+    @StateObject private var vm: ExportsViewModel
+
+    init(project: MovieBlazeProject) {
+        _vm = StateObject(wrappedValue: ExportsViewModel(project: project))
+    }
 
     private let columns = [GridItem(.adaptive(minimum: 260, maximum: 340), spacing: 14)]
 
@@ -69,15 +73,12 @@ struct ExportsView: View {
     private var projectPicker: some View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader("Project", icon: "film.fill")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(vm.projects) { project in
-                        ProjectChip(project: project,
-                                    isActive: vm.selectedProjectID == project.id) {
-                            vm.setActive(project)
-                        }
-                    }
-                }
+            if let project = vm.currentProject {
+                ProjectChip(project: project, isActive: true, onTap: {})
+            } else {
+                Text("No project loaded.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
             }
         }
     }
