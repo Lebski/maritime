@@ -111,7 +111,7 @@ struct CharacterLabView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 14)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -155,7 +155,7 @@ struct CharacterLabView: View {
                     .background(Theme.teal)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -219,7 +219,7 @@ struct CharacterRowView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var avatarColor: Color {

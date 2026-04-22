@@ -84,7 +84,7 @@ private struct HistoryRow: View {
                     .background(Color.white.opacity(0.06))
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(8)
         .background(Color.white.opacity(0.03))

@@ -92,7 +92,7 @@ struct MotionControlsPanel: View {
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
 
@@ -109,7 +109,7 @@ struct MotionControlsPanel: View {
                 .background(clip.isApproved ? Theme.lime : Color.white.opacity(0.06))
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .padding(.top, 4)
         }
     }

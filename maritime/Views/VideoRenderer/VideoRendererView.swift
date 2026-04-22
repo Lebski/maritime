@@ -82,7 +82,7 @@ struct VideoRendererView: View {
                     .background(AppModule.videoRenderer.tint)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(vm.isRendering)
         }
         .padding(.horizontal, 24)

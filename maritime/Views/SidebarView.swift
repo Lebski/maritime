@@ -120,8 +120,7 @@ private struct SidebarRow: View {
                     .fill(isSelected ? Color.white.opacity(0.08) : Color.clear)
             )
             .padding(.horizontal, 10)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }

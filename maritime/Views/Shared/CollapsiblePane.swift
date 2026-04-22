@@ -52,7 +52,7 @@ struct CollapsiblePane<Content: View>: View {
                     .background(tint.opacity(0.16))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .help(label.map { "Expand \($0)" } ?? "Expand")
             .padding(.top, 14)
 
@@ -95,7 +95,7 @@ struct CollapsiblePane<Content: View>: View {
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Theme.stroke, lineWidth: 1))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(isCollapsed ? "Expand" : "Collapse")
 
         if let shortcut {
@@ -186,7 +186,7 @@ struct StepIndicator: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(step.title)
     }
 
@@ -224,7 +224,7 @@ struct ToastView: View {
                         .background(Theme.lime)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             Button(action: onDismiss) {
                 Image(systemName: "xmark")
@@ -232,7 +232,7 @@ struct ToastView: View {
                     .foregroundStyle(Theme.textTertiary)
                     .frame(width: 22, height: 22)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

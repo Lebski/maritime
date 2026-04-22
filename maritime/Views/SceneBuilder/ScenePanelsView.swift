@@ -60,7 +60,7 @@ struct SceneSetupPanel: View {
                 .background(Theme.teal.opacity(0.12))
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -128,7 +128,7 @@ struct SceneSetupPanel: View {
                 .background(Theme.accent.opacity(0.12))
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -159,7 +159,7 @@ struct SceneSetupPanel: View {
                     .background(Color.white.opacity(0.06))
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -203,7 +203,7 @@ struct SceneSetupPanel: View {
                                     .background(Color.white.opacity(0.06))
                                     .clipShape(Circle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.plainSolid)
                         }
                     }
                 }
@@ -294,7 +294,7 @@ struct SceneSetupPanel: View {
                         .background(isOn ? Theme.lime.opacity(0.08) : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -379,7 +379,7 @@ struct ChipRow<T: Hashable & Identifiable>: View {
                         )
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -409,7 +409,7 @@ struct WrappedChips<T: Hashable & Identifiable, Content: View>: View {
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
@@ -467,7 +467,7 @@ struct LabCharacterDragChip: View {
                         .background(accent.opacity(0.18))
                         .clipShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
                 .help("Add to scene")
             }
             Image(systemName: "line.3.horizontal")
@@ -527,7 +527,7 @@ struct BackgroundPickerSheet: View {
                         .background(Color.white.opacity(0.06))
                         .clipShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             .padding(20)
             Divider().background(Theme.stroke)
@@ -564,7 +564,7 @@ struct BackgroundPickerSheet: View {
                                     .stroke(Theme.stroke, lineWidth: 1)
                             )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.plainSolid)
                     }
                 }
                 .padding(20)
@@ -594,7 +594,7 @@ struct PropPickerSheet: View {
                         .background(Color.white.opacity(0.06))
                         .clipShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             .padding(20)
             Divider().background(Theme.stroke)
@@ -630,7 +630,7 @@ struct PropPickerSheet: View {
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.plainSolid)
                     }
                 }
                 .padding(20)

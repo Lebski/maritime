@@ -217,21 +217,21 @@ struct SceneCanvasView: View {
             Button(action: { vm.regenerateFrame() }) {
                 actionPill(icon: "arrow.triangle.2.circlepath", label: "Regenerate", filled: false)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Button(action: {}) {
                 actionPill(icon: "pencil.and.scribble", label: "Edit Region", filled: false)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Button(action: {}) {
                 actionPill(icon: "link", label: "Open in Photoshop", filled: false)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Spacer()
             if !scene.frameApproved {
                 Button(action: { vm.approveFrame() }) {
                     actionPill(icon: "checkmark.seal.fill", label: "Approve Frame", filled: true)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
