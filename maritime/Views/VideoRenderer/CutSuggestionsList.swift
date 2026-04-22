@@ -95,7 +95,7 @@ private struct SuggestionRow: View {
                     .background(cut.applied ? cut.priority.tint : cut.priority.tint.opacity(0.15))
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .help(cut.applied ? "Applied" : "Apply suggestion")
         }
         .padding(10)

@@ -148,7 +148,7 @@ struct ShotTypeCard: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .disabled(!canApply)
     }
 }

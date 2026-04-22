@@ -64,7 +64,7 @@ struct CharacterWorkspaceView: View {
                         .background(Theme.teal)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
         .padding(.horizontal, 28)
@@ -221,7 +221,7 @@ struct RefinementView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textTertiary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -238,7 +238,7 @@ struct RefinementView: View {
                     .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Button(action: {
                 guard let sel = character.selectedVariations.first else { return }
                 if let id = vm.characters.first(where: { $0.id == character.id })?.id {
@@ -253,7 +253,7 @@ struct RefinementView: View {
                     .background(Theme.teal)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -269,7 +269,7 @@ struct RefinementView: View {
                     .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Button(action: {
                 if let id = vm.characters.first(where: { $0.id == character.id })?.id {
                     vm.advanceRound(characterID: id)
@@ -284,7 +284,7 @@ struct RefinementView: View {
                     .background(hasSelections ? Theme.teal : Theme.card)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(!hasSelections)
         }
     }
@@ -312,7 +312,7 @@ struct VariationCard: View {
             .scaleEffect(isSelected ? 1.02 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var artworkArea: some View {

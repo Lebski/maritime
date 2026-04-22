@@ -29,7 +29,7 @@ struct CharacterBuilderView: View {
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.magenta)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -91,7 +91,7 @@ struct CharacterBuilderView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var emptyDraftsHint: some View {
@@ -168,7 +168,7 @@ struct CharacterBuilderView: View {
                         .background(Theme.teal)
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
 
                 Menu {
@@ -263,7 +263,7 @@ struct CharacterBuilderView: View {
                     .background(Theme.magenta)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 60)
@@ -301,7 +301,7 @@ struct NewStoryCharacterSheet: View {
                                         .background(role == r ? Theme.magenta : Color.white.opacity(0.07))
                                         .clipShape(Capsule())
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.plainSolid)
                             }
                         }
                     }

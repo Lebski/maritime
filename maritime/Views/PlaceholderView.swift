@@ -46,7 +46,7 @@ struct PlaceholderView: View {
                     .background(module.tint)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(24)
         .background(Theme.bgElevated)
@@ -89,7 +89,7 @@ struct PlaceholderView: View {
                         .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
                 Button(action: {}) {
                     Text("Start tutorial")
                         .font(.system(size: 12, weight: .semibold))
@@ -99,7 +99,7 @@ struct PlaceholderView: View {
                         .background(module.tint)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             .padding(.top, 4)
             .padding(.bottom, 40)

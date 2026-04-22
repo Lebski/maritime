@@ -58,7 +58,7 @@ struct AssetDetailPanel: View {
                         .background(Color.white.opacity(0.06))
                         .clipShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
 
             HStack(spacing: 6) {

@@ -102,7 +102,7 @@ struct AssetLibraryView: View {
                     .background(vm.selectedCollection?.id == col.id ? col.tint.opacity(0.12) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
@@ -125,7 +125,7 @@ struct AssetLibraryView: View {
                 .background(vm.selectedKind == nil ? AppModule.assetLibrary.tint.opacity(0.1) : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
 
             ForEach(AssetKind.allCases) { kind in
                 Button(action: { vm.selectedKind = kind }) {
@@ -146,7 +146,7 @@ struct AssetLibraryView: View {
                     .background(vm.selectedKind == kind ? kind.tint.opacity(0.1) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
@@ -165,7 +165,7 @@ struct AssetLibraryView: View {
                             .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                             .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -208,7 +208,7 @@ struct AssetLibraryView: View {
                             .font(.system(size: 11))
                             .foregroundStyle(Theme.textTertiary)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
             .padding(.horizontal, 10).padding(.vertical, 8)
@@ -246,7 +246,7 @@ struct AssetLibraryView: View {
                     .background(AppModule.assetLibrary.tint)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)

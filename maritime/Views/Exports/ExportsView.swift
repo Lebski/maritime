@@ -119,7 +119,7 @@ struct ExportsView: View {
                     .background(vm.selectedFormats.isEmpty ? Theme.card : AppModule.exports.tint)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(vm.selectedFormats.isEmpty || vm.selectedProject == nil)
         }
         .padding(16)
@@ -179,6 +179,6 @@ private struct ProjectChip: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }

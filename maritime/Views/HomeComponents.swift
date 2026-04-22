@@ -70,7 +70,7 @@ struct HeroCard: View {
                             .background(Color.white)
                             .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
 
                     Button(action: onContinue) {
                         Label("Continue Editing", systemImage: "play.fill")
@@ -82,7 +82,7 @@ struct HeroCard: View {
                             .overlay(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1))
                             .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
             Spacer()
@@ -163,7 +163,7 @@ struct ModuleTile: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var header: some View {
@@ -220,17 +220,21 @@ struct ModuleTile: View {
 
 struct ProjectRow: View {
     let project: MovieProject
+    var action: () -> Void = {}
 
     var body: some View {
-        HStack(spacing: 16) {
-            poster
-            info
-            Spacer()
-            progress
-            openButton
+        Button(action: action) {
+            HStack(spacing: 16) {
+                poster
+                info
+                Spacer()
+                progress
+                openIndicator
+            }
+            .padding(14)
+            .cardStyle()
         }
-        .padding(14)
-        .cardStyle()
+        .buttonStyle(.plainSolid)
     }
 
     private var poster: some View {
@@ -303,16 +307,13 @@ struct ProjectRow: View {
         }
     }
 
-    private var openButton: some View {
-        Button(action: {}) {
-            Image(systemName: "arrow.right")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Theme.textPrimary)
-                .frame(width: 36, height: 36)
-                .background(Color.white.opacity(0.08))
-                .clipShape(Circle())
-        }
-        .buttonStyle(.plain)
+    private var openIndicator: some View {
+        Image(systemName: "arrow.right")
+            .font(.system(size: 12, weight: .bold))
+            .foregroundStyle(Theme.textPrimary)
+            .frame(width: 36, height: 36)
+            .background(Color.white.opacity(0.08))
+            .clipShape(Circle())
     }
 }
 
@@ -412,7 +413,7 @@ struct TipsCard: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.accent)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
         .padding(18)

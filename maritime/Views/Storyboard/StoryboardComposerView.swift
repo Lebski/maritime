@@ -91,7 +91,7 @@ struct StoryboardComposerView: View {
                 .background(showInnerSidebar ? Theme.violet.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showInnerSidebar ? "Hide sidebar" : "Show sidebar")
     }
 
@@ -104,7 +104,7 @@ struct StoryboardComposerView: View {
                 .background(showHelper ? Theme.violet.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showHelper ? "Hide helper panel" : "Show helper panel")
     }
 
@@ -213,7 +213,7 @@ struct StoryboardComposerView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var sidebarProgress: some View {
@@ -293,7 +293,7 @@ struct StoryboardComposerView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(14)
     }
@@ -359,7 +359,7 @@ struct StoryboardComposerView: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.textSecondary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Image(systemName: "chevron.right")
                 .font(.system(size: 8, weight: .bold))
                 .foregroundStyle(Theme.textTertiary)
@@ -394,7 +394,7 @@ struct StoryboardComposerView: View {
             .overlay(Capsule().stroke(Theme.magenta.opacity(0.35), lineWidth: 1))
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help("Open this scene in Story Forge")
     }
 
@@ -453,7 +453,7 @@ struct StoryboardComposerView: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     @ViewBuilder
@@ -559,7 +559,7 @@ struct NewStoryboardPanelSheet: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }
 
