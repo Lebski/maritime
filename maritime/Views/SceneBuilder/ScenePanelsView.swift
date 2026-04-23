@@ -577,6 +577,7 @@ struct BackgroundPickerSheet: View {
 
 struct PropPickerSheet: View {
     @ObservedObject var vm: SceneBuilderViewModel
+    @EnvironmentObject var project: MovieBlazeProject
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -599,44 +600,178 @@ struct PropPickerSheet: View {
             .padding(20)
             Divider().background(Theme.stroke)
             ScrollView {
-                let cols = [GridItem(.adaptive(minimum: 140, maximum: 200), spacing: 10)]
-                LazyVGrid(columns: cols, spacing: 10) {
-                    ForEach(SceneBuilderSamples.props) { prop in
-                        let isAdded = vm.activeScene?.props.contains(prop) ?? false
-                        Button(action: {
-                            if isAdded { vm.removeProp(prop) } else { vm.addProp(prop) }
-                        }) {
-                            VStack(spacing: 6) {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .fill(prop.tint.opacity(0.15))
-                                        .frame(height: 64)
-                                    Image(systemName: prop.symbol)
-                                        .font(.system(size: 24, weight: .semibold))
-                                        .foregroundStyle(prop.tint)
-                                }
-                                Text(prop.name)
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundStyle(Theme.textPrimary)
-                                Text(prop.category)
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(Theme.textTertiary)
-                            }
-                            .padding(10)
-                            .background(Theme.card)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(isAdded ? prop.tint : Theme.stroke, lineWidth: isAdded ? 2 : 1)
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        }
-                        .buttonStyle(.plain)
+                VStack(alignment: .leading, spacing: 16) {
+                    if !project.setPieces.isEmpty {
+                        setPiecesSection
+                        Divider().background(Theme.stroke)
                     }
+                    presetSection
                 }
                 .padding(20)
             }
         }
         .frame(minWidth: 520, minHeight: 520)
         .background(Theme.bg)
+    }
+
+    private var setPiecesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionHeader(
+                title: "Set Pieces",
+                subtitle: "From this project's Set Design",
+                icon: AppModule.setDesign.icon,
+                tint: Theme.coral
+            )
+            let cols = [GridItem(.adaptive(minimum: 140, maximum: 200), spacing: 10)]
+            LazyVGrid(columns: cols, spacing: 10) {
+                ForEach(project.setPieces) { piece in
+                    let prop = piece.asSceneProp()
+                    let isAdded = vm.activeScene?.props.contains(where: {
+                        $0.sourceSetPieceID == piece.id
+                    }) ?? false
+                    Button(action: {
+                        if isAdded {
+                            if let existing = vm.activeScene?.props.first(where: { $0.sourceSetPieceID == piece.id }) {
+                                vm.removeProp(existing)
+                            }
+                        } else {
+                            vm.addProp(prop)
+                        }
+                    }) {
+                        SetPieceTile(piece: piece, isAdded: isAdded)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var presetSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionHeader(
+                title: "Prop Library",
+                subtitle: "Built-in presets",
+                icon: "shippingbox.fill",
+                tint: Theme.accent
+            )
+            let cols = [GridItem(.adaptive(minimum: 140, maximum: 200), spacing: 10)]
+            LazyVGrid(columns: cols, spacing: 10) {
+                ForEach(SceneBuilderSamples.props) { prop in
+                    let isAdded = vm.activeScene?.props.contains(prop) ?? false
+                    Button(action: {
+                        if isAdded { vm.removeProp(prop) } else { vm.addProp(prop) }
+                    }) {
+                        VStack(spacing: 6) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(prop.tint.opacity(0.15))
+                                    .frame(height: 64)
+                                Image(systemName: prop.symbol)
+                                    .font(.system(size: 24, weight: .semibold))
+                                    .foregroundStyle(prop.tint)
+                            }
+                            Text(prop.name)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(Theme.textPrimary)
+                            Text(prop.category)
+                                .font(.system(size: 9))
+                                .foregroundStyle(Theme.textTertiary)
+                        }
+                        .padding(10)
+                        .background(Theme.card)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(isAdded ? prop.tint : Theme.stroke, lineWidth: isAdded ? 2 : 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private func sectionHeader(title: String, subtitle: String, icon: String, tint: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(tint)
+            Text(title.uppercased())
+                .font(.system(size: 10, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(Theme.textSecondary)
+            Text("·")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.textTertiary)
+            Text(subtitle)
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.textTertiary)
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Set Piece Tile
+
+private struct SetPieceTile: View {
+    let piece: SetPiece
+    let isAdded: Bool
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: piece.primaryColors.isEmpty
+                                ? [piece.category.tint.opacity(0.25), piece.category.tint.opacity(0.10)]
+                                : piece.primaryColors.map { $0.opacity(0.35) },
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(height: 64)
+                if let data = piece.generatedImageData,
+                   let image = NSImage(data: data) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 64)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                } else {
+                    Image(systemName: piece.category.icon)
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(piece.category.tint)
+                }
+            }
+            Text(piece.name)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+            Text(piece.category.title)
+                .font(.system(size: 9))
+                .foregroundStyle(Theme.textTertiary)
+        }
+        .padding(10)
+        .background(Theme.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(isAdded ? piece.category.tint : Theme.stroke, lineWidth: isAdded ? 2 : 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+// MARK: - SetPiece → SceneProp bridge
+
+extension SetPiece {
+    func asSceneProp() -> SceneProp {
+        SceneProp(
+            name: name,
+            category: category.title,
+            tint: primaryColors.first ?? category.tint,
+            symbol: category.icon,
+            sourceSetPieceID: id
+        )
     }
 }

@@ -196,7 +196,7 @@ final class SceneBuilderViewModel: ObservableObject {
             characters: [],
             activeGuides: [.ruleOfThirds],
             frameApproved: false,
-            projectTitle: project.activeBible?.projectTitle ?? "Untitled Project"
+            projectTitle: project.bible.projectTitle
         )
         project.addFilmScene(scene)
         activeSceneID = scene.id

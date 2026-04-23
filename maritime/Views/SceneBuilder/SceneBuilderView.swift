@@ -272,9 +272,7 @@ struct SceneListRow: View {
     @EnvironmentObject var project: MovieBlazeProject
 
     private var fromStoryboard: Bool {
-        project.sequences.contains { seq in
-            seq.panels.contains { $0.promotedFilmSceneID == scene.id }
-        }
+        project.storyboardPanels.contains { $0.promotedFilmSceneID == scene.id }
     }
 
     var body: some View {

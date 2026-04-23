@@ -13,8 +13,7 @@ extension MovieBlazeProject {
 
     var assets: [Asset] {
         var result: [Asset] = []
-        let project = activeBible?.projectTitle
-        let linked: [String] = project.map { [$0] } ?? []
+        let linked: [String] = [bible.projectTitle]
 
         // Characters
         for ch in characters {
@@ -80,14 +79,11 @@ extension MovieBlazeProject {
 
     var assetCollections: [AssetCollection] {
         let all = assets
-        var collections: [AssetCollection] = [
+        return [
             AssetCollection(name: "All Assets", count: all.count, tint: Theme.accent),
-            AssetCollection(name: "Favorites", count: all.filter(\.favorited).count, tint: Theme.magenta)
+            AssetCollection(name: "Favorites", count: all.filter(\.favorited).count, tint: Theme.magenta),
+            AssetCollection(name: bible.projectTitle, count: all.count, tint: Theme.teal)
         ]
-        if let title = activeBible?.projectTitle {
-            collections.append(AssetCollection(name: title, count: all.count, tint: Theme.teal))
-        }
-        return collections
     }
 
     func toggleAssetFavorite(id: UUID) {

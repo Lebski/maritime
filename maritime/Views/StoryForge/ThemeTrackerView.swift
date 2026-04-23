@@ -29,7 +29,7 @@ struct ThemeTrackerView: View {
             StyledTextField(
                 placeholder: "e.g. Memory is the only thing you can lose twice.",
                 text: Binding(
-                    get: { vm.activeBible?.theme.themeStatement ?? "" },
+                    get: { vm.bible.theme.themeStatement },
                     set: { vm.updateThemeStatement($0) }
                 ),
                 isMultiLine: true
@@ -65,9 +65,9 @@ struct ThemeTrackerView: View {
                 .buttonStyle(.plain)
             }
 
-            if let motifs = vm.activeBible?.theme.motifs, !motifs.isEmpty {
+            if !vm.bible.theme.motifs.isEmpty {
                 FlowLayout(spacing: 8, runSpacing: 8) {
-                    ForEach(motifs) { motif in
+                    ForEach(vm.bible.theme.motifs) { motif in
                         MotifChip(motif: motif, onRemove: { vm.removeMotif(motif.id) })
                     }
                 }
@@ -116,10 +116,10 @@ struct ThemeTrackerView: View {
                 .buttonStyle(.plain)
             }
 
-            if let palette = vm.activeBible?.theme.palette, !palette.isEmpty {
+            if !vm.bible.theme.palette.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 12) {
-                        ForEach(palette) { swatch in
+                        ForEach(vm.bible.theme.palette) { swatch in
                             PaletteSwatchView(swatch: swatch, onRemove: { vm.removePaletteSwatch(swatch.id) })
                         }
                     }
@@ -155,7 +155,7 @@ struct ThemeTrackerView: View {
             ("#EAE4CF", Color(red: 0.92, green: 0.89, blue: 0.81), "Resolution"),
             ("#0C1324", Color(red: 0.05, green: 0.07, blue: 0.14), "World")
         ]
-        let count = vm.activeBible?.theme.palette.count ?? 0
+        let count = vm.bible.theme.palette.count
         let pick = suggestions[count % suggestions.count]
         vm.addPaletteSwatch(hex: pick.0, color: pick.1, role: pick.2)
     }

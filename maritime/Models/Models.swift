@@ -5,8 +5,9 @@ import SwiftUI
 enum AppModule: String, CaseIterable, Identifiable {
     case home
     case storyForge
-    case storyboard
     case characterLab
+    case setDesign
+    case storyboard
     case sceneBuilder
     case videoRenderer
     case assetLibrary
@@ -20,6 +21,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyForge: return "Story Forge"
         case .storyboard: return "Storyboard Composer"
         case .characterLab: return "Character Lab"
+        case .setDesign: return "Set Design"
         case .sceneBuilder: return "Scene Builder"
         case .videoRenderer: return "Video Renderer"
         case .assetLibrary: return "Asset Library"
@@ -42,6 +44,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyForge: return "text.book.closed.fill"
         case .storyboard: return "square.grid.3x2.fill"
         case .characterLab: return "person.crop.artframe"
+        case .setDesign: return "cube.transparent.fill"
         case .sceneBuilder: return "photo.stack.fill"
         case .videoRenderer: return "film.stack.fill"
         case .assetLibrary: return "tray.full.fill"
@@ -55,6 +58,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyForge: return Theme.magenta
         case .storyboard: return Theme.violet
         case .characterLab: return Theme.teal
+        case .setDesign: return Theme.coral
         case .sceneBuilder: return Theme.accent
         case .videoRenderer: return Theme.lime
         case .assetLibrary: return Color.white.opacity(0.7)
@@ -68,6 +72,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyForge: return "Develop compelling stories"
         case .storyboard: return "Visualize shot sequences"
         case .characterLab: return "Design consistent heroes"
+        case .setDesign: return "Build the world's vocabulary"
         case .sceneBuilder: return "Compose cinematic frames"
         case .videoRenderer: return "Bring scenes to motion"
         case .assetLibrary: return "All your creative assets"

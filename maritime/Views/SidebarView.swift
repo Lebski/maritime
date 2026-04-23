@@ -4,7 +4,7 @@ struct SidebarView: View {
     @Binding var selection: AppModule
 
     private let productionModules: [AppModule] = [
-        .storyForge, .storyboard, .characterLab, .sceneBuilder, .videoRenderer
+        .storyForge, .characterLab, .setDesign, .storyboard, .sceneBuilder, .videoRenderer
     ]
     private let libraryModules: [AppModule] = [.assetLibrary, .exports]
 

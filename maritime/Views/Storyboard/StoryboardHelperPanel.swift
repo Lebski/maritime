@@ -65,12 +65,12 @@ struct StoryboardHelperPanel: View {
                 tint: Theme.violet
             )
             examplesCard(title: "Try", items: fieldExamples(field), tint: Theme.violet)
-        } else if let seq = vm.activeSequence, let panel = vm.selectedPanel {
-            panelSummary(seq: seq, panel: panel)
+        } else if let panel = vm.selectedPanel {
+            panelSummary(panels: vm.panels, panel: panel)
             ForEach(murchTips) { tip in
                 tipCard(tip: tip)
             }
-        } else if let seq = vm.activeSequence, seq.panels.isEmpty {
+        } else if vm.panels.isEmpty {
             emptyHelper(icon: "square.grid.3x2",
                         text: "Add your first panel — a wide to set geography, then close in.")
             ForEach(murchTips) { tip in
@@ -82,16 +82,16 @@ struct StoryboardHelperPanel: View {
         }
     }
 
-    private func panelSummary(seq: StoryboardSequence, panel: StoryboardPanel) -> some View {
+    private func panelSummary(panels: [StoryboardPanel], panel: StoryboardPanel) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("SEQUENCE STATS")
                 .font(.system(size: 9, weight: .bold))
                 .tracking(0.8)
                 .foregroundStyle(Theme.textTertiary)
-            statRow(icon: "square.grid.3x2.fill", tint: Theme.violet, label: "Panels", value: "\(seq.panels.count)")
-            statRow(icon: "clock.fill", tint: Theme.teal, label: "Runtime", value: seq.runtimeLabel)
-            statRow(icon: "waveform.path", tint: Theme.accent, label: "Avg Shot", value: String(format: "%.1fs", seq.averageShotLength))
-            statRow(icon: "checkmark.seal.fill", tint: Theme.magenta, label: "Promoted", value: "\(seq.promotedCount)/\(seq.panels.count)")
+            statRow(icon: "square.grid.3x2.fill", tint: Theme.violet, label: "Panels", value: "\(panels.count)")
+            statRow(icon: "clock.fill", tint: Theme.teal, label: "Runtime", value: panels.runtimeLabel)
+            statRow(icon: "waveform.path", tint: Theme.accent, label: "Avg Shot", value: String(format: "%.1fs", panels.averageShotLength))
+            statRow(icon: "checkmark.seal.fill", tint: Theme.magenta, label: "Promoted", value: "\(panels.promotedCount)/\(panels.count)")
             Divider().background(Theme.stroke).padding(.vertical, 4)
             Text("SELECTED PANEL")
                 .font(.system(size: 9, weight: .bold))

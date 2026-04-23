@@ -27,50 +27,49 @@ struct StoryboardPanelsGridView: View {
 
     @ViewBuilder
     private var gridSection: some View {
-        if let seq = vm.activeSequence {
-            if seq.panels.isEmpty {
-                emptySequenceState
-            } else {
-                gridHeader(seq)
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(Array(seq.panels.enumerated()), id: \.element.id) { idx, panel in
+        let panels = vm.panels
+        if panels.isEmpty {
+            emptySequenceState
+        } else {
+            gridHeader(panels)
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(Array(panels.enumerated()), id: \.element.id) { idx, panel in
+                    StoryboardPanelCard(
+                        panel: panel,
+                        isSelected: vm.selectedPanelID == panel.id,
+                        onTap: { vm.selectPanel(panel.id) },
+                        onReturnToScene: panel.promotedFilmSceneID.map { sceneID in
+                            { navigator.openSceneBuilder(sceneID: sceneID) }
+                        }
+                    )
+                    .draggable(PanelDragPayload(panelID: panel.id, fromIndex: idx)) {
                         StoryboardPanelCard(
                             panel: panel,
-                            isSelected: vm.selectedPanelID == panel.id,
-                            onTap: { vm.selectPanel(panel.id) },
-                            onReturnToScene: panel.promotedFilmSceneID.map { sceneID in
-                                { navigator.openSceneBuilder(sceneID: sceneID) }
-                            }
+                            isSelected: true,
+                            onTap: {}
                         )
-                        .draggable(PanelDragPayload(panelID: panel.id, fromIndex: idx)) {
-                            StoryboardPanelCard(
-                                panel: panel,
-                                isSelected: true,
-                                onTap: {}
-                            )
-                            .frame(width: 220)
-                            .opacity(0.85)
-                        }
-                        .dropDestination(for: PanelDragPayload.self) { payloads, _ in
-                            guard let payload = payloads.first else { return false }
-                            vm.reorderPanels(from: payload.fromIndex, to: idx)
-                            return true
-                        }
+                        .frame(width: 220)
+                        .opacity(0.85)
                     }
-                    addCard
+                    .dropDestination(for: PanelDragPayload.self) { payloads, _ in
+                        guard let payload = payloads.first else { return false }
+                        vm.reorderPanels(from: payload.fromIndex, to: idx)
+                        return true
+                    }
                 }
+                addCard
             }
         }
     }
 
-    private func gridHeader(_ seq: StoryboardSequence) -> some View {
+    private func gridHeader(_ panels: [StoryboardPanel]) -> some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("PANELS")
                     .font(.system(size: 11, weight: .bold))
                     .tracking(0.8)
                     .foregroundStyle(Theme.textTertiary)
-                Text("\(seq.panels.count) panels · \(seq.runtimeLabel) runtime")
+                Text("\(panels.count) panels · \(panels.runtimeLabel) runtime")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textSecondary)
             }

@@ -18,6 +18,7 @@ enum Theme {
     static let teal = Color(red: 0.28, green: 0.78, blue: 0.82)
     static let violet = Color(red: 0.56, green: 0.43, blue: 0.95)
     static let lime = Color(red: 0.62, green: 0.88, blue: 0.42)
+    static let coral = Color(red: 1.00, green: 0.54, blue: 0.46)
 
     static let heroGradient = LinearGradient(
         colors: [

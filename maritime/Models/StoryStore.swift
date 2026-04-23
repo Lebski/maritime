@@ -40,9 +40,8 @@ extension UTType {
 // MARK: - MovieBlazeProject
 //
 // ReferenceFileDocument backing the whole app. Every open .mblaze file maps
-// to exactly one window and one instance of this class. All four singleton
-// stores that used to exist (StoryStore / StoryboardStore / SceneStore /
-// CharacterStore) collapse into @Published properties here.
+// to exactly one window and one instance of this class. One project = one
+// bible, one flat list of storyboard panels, one scene set, one cast.
 
 private let projectLog = Logger(subsystem: "com.movieblaze", category: "project")
 
@@ -51,14 +50,14 @@ final class MovieBlazeProject: ReferenceFileDocument {
 
     // MARK: State
 
-    @Published var bibles: [StoryBible]
-    @Published var activeBibleID: UUID?
+    @Published var bible: StoryBible
 
-    @Published var sequences: [StoryboardSequence]
-    @Published var activeSequenceID: UUID?
+    @Published var storyboardPanels: [StoryboardPanel]
 
     @Published var scenes: [FilmScene]
     @Published var characters: [LabCharacter]
+    @Published var setPieces: [SetPiece]
+    @Published var moodboard: ProjectMoodboard
 
     @Published var cutSuggestions: [CutSuggestion]
     @Published var favoritedAssetIDs: Set<UUID>
@@ -72,12 +71,12 @@ final class MovieBlazeProject: ReferenceFileDocument {
 
     struct Snapshot: Codable {
         var schemaVersion: Int
-        var bibles: [StoryBible]
-        var activeBibleID: UUID?
-        var sequences: [StoryboardSequence]
-        var activeSequenceID: UUID?
+        var bible: StoryBible
+        var storyboardPanels: [StoryboardPanel]
         var scenes: [FilmScene]
         var characters: [LabCharacter]
+        var setPieces: [SetPiece]?
+        var moodboard: ProjectMoodboard?
         var cutSuggestions: [CutSuggestion]?
         var favoritedAssetIDs: [UUID]?
     }
@@ -88,7 +87,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
         var lastModified: Date
     }
 
-    private static let currentSchemaVersion = 1
+    private static let currentSchemaVersion = 2
     private static let manifestFilename = "manifest.json"
     private static let projectFilename  = "project.json"
 
@@ -96,36 +95,29 @@ final class MovieBlazeProject: ReferenceFileDocument {
 
     init() {
         let seed = MovieBlazeProject.seedSnapshot()
-        self.bibles             = seed.bibles
-        self.activeBibleID      = seed.activeBibleID
-        self.sequences          = seed.sequences
-        self.activeSequenceID   = seed.activeSequenceID
-        self.scenes             = seed.scenes
-        self.characters         = seed.characters
-        self.cutSuggestions     = seed.cutSuggestions ?? []
-        self.favoritedAssetIDs  = Set(seed.favoritedAssetIDs ?? [])
+        self.bible             = seed.bible
+        self.storyboardPanels  = seed.storyboardPanels
+        self.scenes            = seed.scenes
+        self.characters        = seed.characters
+        self.setPieces         = seed.setPieces ?? []
+        self.moodboard         = seed.moodboard ?? ProjectMoodboard()
+        self.cutSuggestions    = seed.cutSuggestions ?? []
+        self.favoritedAssetIDs = Set(seed.favoritedAssetIDs ?? [])
     }
 
     private static func seedSnapshot() -> Snapshot {
-        // New projects start with the full showcase catalogue so the app
-        // looks populated the first time a user launches it. Opening a saved
-        // .mblaze replaces all of this with the saved state.
-        let bibles    = StoryForgeSamples.bibles
-        let sequences = StoryboardSamples.sequences
-        let scenes    = SceneBuilderSamples.scenes
-        let chars     = CharacterLabSamples.libraryCharacters
-        let cuts      = VideoRendererSamples.cuts
-        let activeBible = bibles.first(where: { $0.projectTitle == "The Lantern Keeper" }) ?? bibles.first
-        let activeSeq   = sequences.first(where: { $0.projectTitle == "The Lantern Keeper" }) ?? sequences.first
+        // New projects ship The Lantern Keeper as the single showcase story so
+        // the app looks populated the first time a user launches it. Opening a
+        // saved .mblaze replaces all of this with the saved state.
         return Snapshot(
             schemaVersion: currentSchemaVersion,
-            bibles: bibles,
-            activeBibleID: activeBible?.id,
-            sequences: sequences,
-            activeSequenceID: activeSeq?.id,
-            scenes: scenes,
-            characters: chars,
-            cutSuggestions: cuts,
+            bible: StoryForgeSamples.lanternKeeper,
+            storyboardPanels: StoryboardSamples.lanternKeeperPanels,
+            scenes: SceneBuilderSamples.scenes,
+            characters: CharacterLabSamples.libraryCharacters,
+            setPieces: SetDesignSamples.lanternKeeperPieces,
+            moodboard: MoodboardSamples.lanternKeeper,
+            cutSuggestions: VideoRendererSamples.cuts,
             favoritedAssetIDs: nil
         )
     }
@@ -157,14 +149,14 @@ final class MovieBlazeProject: ReferenceFileDocument {
         }
 
         let snapshot = try decoder.decode(Snapshot.self, from: projectData)
-        self.bibles             = snapshot.bibles
-        self.activeBibleID      = snapshot.activeBibleID
-        self.sequences          = snapshot.sequences
-        self.activeSequenceID   = snapshot.activeSequenceID
-        self.scenes             = snapshot.scenes
-        self.characters         = snapshot.characters
-        self.cutSuggestions     = snapshot.cutSuggestions ?? []
-        self.favoritedAssetIDs  = Set(snapshot.favoritedAssetIDs ?? [])
+        self.bible             = snapshot.bible
+        self.storyboardPanels  = snapshot.storyboardPanels
+        self.scenes            = snapshot.scenes
+        self.characters        = snapshot.characters
+        self.setPieces         = snapshot.setPieces ?? []
+        self.moodboard         = snapshot.moodboard ?? ProjectMoodboard()
+        self.cutSuggestions    = snapshot.cutSuggestions ?? []
+        self.favoritedAssetIDs = Set(snapshot.favoritedAssetIDs ?? [])
     }
 
     // MARK: Snapshot + Write
@@ -172,12 +164,12 @@ final class MovieBlazeProject: ReferenceFileDocument {
     func snapshot(contentType: UTType) throws -> Snapshot {
         Snapshot(
             schemaVersion: Self.currentSchemaVersion,
-            bibles: bibles,
-            activeBibleID: activeBibleID,
-            sequences: sequences,
-            activeSequenceID: activeSequenceID,
+            bible: bible,
+            storyboardPanels: storyboardPanels,
             scenes: scenes,
             characters: characters,
+            setPieces: setPieces,
+            moodboard: moodboard,
             cutSuggestions: cutSuggestions,
             favoritedAssetIDs: Array(favoritedAssetIDs)
         )
@@ -223,37 +215,15 @@ final class MovieBlazeProject: ReferenceFileDocument {
         return root
     }
 
-    // MARK: Active helpers
-
-    var activeBible: StoryBible? {
-        guard let id = activeBibleID else { return nil }
-        return bibles.first(where: { $0.id == id })
-    }
-
-    var activeSequence: StoryboardSequence? {
-        guard let id = activeSequenceID else { return nil }
-        return sequences.first(where: { $0.id == id })
-    }
-
-    func setActiveBible(_ id: UUID) {
-        activeBibleID = id
-    }
-
-    func setActiveSequence(_ id: UUID) {
-        activeSequenceID = id
-    }
-
     // MARK: Mutators — Story Bible
 
-    private func mutateActiveBible(_ block: (inout StoryBible) -> Void) {
-        guard let id = activeBibleID,
-              let idx = bibles.firstIndex(where: { $0.id == id }) else { return }
-        block(&bibles[idx])
-        bibles[idx].lastUpdated = Date()
+    func mutateBible(_ block: (inout StoryBible) -> Void) {
+        block(&bible)
+        bible.lastUpdated = Date()
     }
 
     func updateDraft(_ draft: StoryCharacterDraft) {
-        mutateActiveBible { bible in
+        mutateBible { bible in
             if let i = bible.characterDrafts.firstIndex(where: { $0.id == draft.id }) {
                 bible.characterDrafts[i] = draft
             }
@@ -261,15 +231,15 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func addDraft(_ draft: StoryCharacterDraft) {
-        mutateActiveBible { $0.characterDrafts.append(draft) }
+        mutateBible { $0.characterDrafts.append(draft) }
     }
 
     func removeDraft(id: UUID) {
-        mutateActiveBible { $0.characterDrafts.removeAll(where: { $0.id == id }) }
+        mutateBible { $0.characterDrafts.removeAll(where: { $0.id == id }) }
     }
 
     func markDraftPromoted(draftID: UUID, labCharacterID: UUID) {
-        mutateActiveBible { bible in
+        mutateBible { bible in
             if let i = bible.characterDrafts.firstIndex(where: { $0.id == draftID }) {
                 bible.characterDrafts[i].promotedLabCharacterID = labCharacterID
             }
@@ -277,11 +247,11 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func chooseTemplate(_ template: StoryStructureTemplate) {
-        mutateActiveBible { $0.structure = StoryStructureDraft(template: template) }
+        mutateBible { $0.structure = StoryStructureDraft(template: template) }
     }
 
     func updateBeatNotes(beatID: UUID, notes: String) {
-        mutateActiveBible { bible in
+        mutateBible { bible in
             if let i = bible.structure.beats.firstIndex(where: { $0.id == beatID }) {
                 bible.structure.beats[i].userNotes = notes
             }
@@ -289,11 +259,11 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func addScene(_ scene: SceneBreakdown) {
-        mutateActiveBible { $0.sceneBreakdowns.append(scene) }
+        mutateBible { $0.sceneBreakdowns.append(scene) }
     }
 
     func updateScene(_ scene: SceneBreakdown) {
-        mutateActiveBible { bible in
+        mutateBible { bible in
             if let i = bible.sceneBreakdowns.firstIndex(where: { $0.id == scene.id }) {
                 bible.sceneBreakdowns[i] = scene
             }
@@ -301,11 +271,11 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func removeScene(id: UUID) {
-        mutateActiveBible { $0.sceneBreakdowns.removeAll(where: { $0.id == id }) }
+        mutateBible { $0.sceneBreakdowns.removeAll(where: { $0.id == id }) }
     }
 
     func markScenePromoted(sceneID: UUID, filmSceneID: UUID) {
-        mutateActiveBible { bible in
+        mutateBible { bible in
             if let i = bible.sceneBreakdowns.firstIndex(where: { $0.id == sceneID }) {
                 bible.sceneBreakdowns[i].promotedFilmSceneID = filmSceneID
             }
@@ -313,19 +283,6 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func updateTheme(_ theme: ThemeTracker) {
-        mutateActiveBible { $0.theme = theme }
-    }
-
-    @discardableResult
-    func createBible(title: String) -> StoryBible {
-        let bible = StoryBible(
-            projectTitle: title.isEmpty ? "Untitled Story" : title,
-            logline: "",
-            structure: StoryStructureDraft(template: .threeAct),
-            posterColors: [Theme.violet, Theme.magenta]
-        )
-        bibles.append(bible)
-        activeBibleID = bible.id
-        return bible
+        mutateBible { $0.theme = theme }
     }
 }
