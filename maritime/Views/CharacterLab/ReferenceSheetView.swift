@@ -34,7 +34,7 @@ struct ReferenceSheetView: View {
                             .background(Theme.teal)
                             .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -176,7 +176,7 @@ struct SheetDetailRow: View {
                             .background(Color.white.opacity(0.07))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                     Button(action: {}) {
                         Image(systemName: "arrow.counterclockwise")
                             .font(.system(size: 13))
@@ -185,7 +185,7 @@ struct SheetDetailRow: View {
                             .background(Color.white.opacity(0.07))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             } else {
                 Text("Pending")

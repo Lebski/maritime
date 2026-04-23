@@ -125,7 +125,7 @@ struct PanelDetailEditor: View {
                         .font(.system(size: 20))
                         .foregroundStyle(Theme.textSecondary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
                 Text(panel.durationLabel)
                     .font(.system(size: 18, weight: .bold, design: .monospaced))
                     .foregroundStyle(Theme.textPrimary)
@@ -135,7 +135,7 @@ struct PanelDetailEditor: View {
                         .font(.system(size: 20))
                         .foregroundStyle(Theme.textSecondary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
@@ -179,7 +179,7 @@ struct PanelDetailEditor: View {
                         .background(panel.timeOfDay == t ? t.tint : Color.white.opacity(0.06))
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -226,7 +226,7 @@ struct PanelDetailEditor: View {
                 .background(selected ? Theme.violet : Color.white.opacity(0.06))
                 .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private func movementChip(_ panel: StoryboardPanel, movement: CameraMovement) -> some View {
@@ -247,7 +247,7 @@ struct PanelDetailEditor: View {
             .background(selected ? Theme.teal : Color.white.opacity(0.06))
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Priority
@@ -287,7 +287,7 @@ struct PanelDetailEditor: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Characters
@@ -341,7 +341,7 @@ struct PanelDetailEditor: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Footer (promote + delete)
@@ -374,7 +374,7 @@ struct PanelDetailEditor: View {
                     .background(Theme.teal)
                     .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             Spacer()
             Button(action: { vm.removeSelectedPanel() }) {
@@ -391,7 +391,7 @@ struct PanelDetailEditor: View {
                 .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 

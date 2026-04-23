@@ -76,7 +76,7 @@ struct HomeView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: - Hero
@@ -119,7 +119,7 @@ struct HomeView: View {
                 sectionHeader("Recent Projects", subtitle: "Pick up where you left off")
                 Spacer()
                 Button("View all") {}
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Theme.accent)
             }

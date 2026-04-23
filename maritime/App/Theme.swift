@@ -48,3 +48,15 @@ extension View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
+
+struct FullHitPlainButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.75 : 1.0)
+    }
+}
+
+extension ButtonStyle where Self == FullHitPlainButtonStyle {
+    static var plainSolid: FullHitPlainButtonStyle { FullHitPlainButtonStyle() }
+}

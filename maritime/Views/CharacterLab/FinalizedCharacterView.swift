@@ -80,7 +80,7 @@ struct FinalizedCharacterView: View {
                         .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
                 Button(action: { vm.showReferenceSheet = true }) {
                     Label("View Sheets", systemImage: "square.grid.2x2.fill")
                         .font(.system(size: 12, weight: .semibold))
@@ -90,7 +90,7 @@ struct FinalizedCharacterView: View {
                         .background(Theme.teal)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
         .padding(20)
@@ -182,7 +182,7 @@ struct FinalizedCharacterView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textTertiary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -202,7 +202,7 @@ struct FinalizedCharacterView: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.teal)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
             HStack(spacing: 12) {
                 ForEach(character.costumes, id: \.self) { costume in
@@ -271,7 +271,7 @@ struct ReferenceSheetCard: View {
                     .background(isGenerated ? Color.white.opacity(0.06) : Theme.teal)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(isGenerating)
         }
         .padding(12)

@@ -89,7 +89,7 @@ struct StoryboardComposerView: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }
 
@@ -181,6 +181,6 @@ struct NewStoryboardPanelSheet: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }

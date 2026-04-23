@@ -87,7 +87,7 @@ struct StoryboardPanelsGridView: View {
                 .background(Theme.violet)
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -113,7 +113,7 @@ struct StoryboardPanelsGridView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Empty state
@@ -144,7 +144,7 @@ struct StoryboardPanelsGridView: View {
                 .background(Theme.violet)
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .frame(maxWidth: .infinity, minHeight: 280)
         .padding(32)

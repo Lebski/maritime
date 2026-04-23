@@ -38,7 +38,7 @@ struct SceneBreakdownView: View {
                     .background(Theme.magenta)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -128,7 +128,7 @@ struct SceneBreakdownView: View {
                         .background(Theme.violet)
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
                 if scene.isPromoted {
                     promotedBadge
@@ -146,7 +146,7 @@ struct SceneBreakdownView: View {
                         .background(Theme.accent)
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
                 Image(systemName: "chevron.down")
                     .font(.system(size: 11, weight: .semibold))
@@ -154,9 +154,8 @@ struct SceneBreakdownView: View {
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
             }
             .padding(14)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private func timeOfDayChip(_ time: TimeOfDay) -> some View {
@@ -226,7 +225,7 @@ struct SceneBreakdownView: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Color(red: 0.92, green: 0.45, blue: 0.45))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
@@ -293,7 +292,7 @@ struct SceneBreakdownView: View {
                         .background(scene.timeOfDay == tod ? tod.tint : tod.tint.opacity(0.12))
                         .clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
         }
@@ -319,7 +318,7 @@ struct SceneBreakdownView: View {
                             .background(isIn ? Theme.magenta : Color.white.opacity(0.07))
                             .clipShape(Capsule())
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.plainSolid)
                     }
                     if vm.bible.characterDrafts.isEmpty {
                         Text("No characters yet. Add them in the Characters tab.")

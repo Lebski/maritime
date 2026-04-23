@@ -107,7 +107,7 @@ struct TimelineView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var cutsTrack: some View {

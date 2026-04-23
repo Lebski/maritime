@@ -70,7 +70,7 @@ struct SceneBuilderView: View {
                 .background(showInnerSidebar ? Theme.accent.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showInnerSidebar ? "Hide sidebar" : "Show sidebar")
     }
 
@@ -83,7 +83,7 @@ struct SceneBuilderView: View {
                 .background(showHelper ? Theme.accent.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showHelper ? "Hide setup panel" : "Show setup panel")
     }
 
@@ -119,7 +119,7 @@ struct SceneBuilderView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 14)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
     }
 
@@ -204,7 +204,7 @@ struct SceneBuilderView: View {
                     .background(scene.frameApproved ? Theme.lime : Theme.card)
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(!scene.frameApproved)
         }
         .padding(.horizontal, 24)
@@ -329,7 +329,7 @@ struct SceneListRow: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }
 
@@ -412,7 +412,7 @@ struct PrepareRenderSheet: View {
                     .background(Color.white.opacity(0.06))
                     .clipShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -509,7 +509,7 @@ struct PrepareRenderSheet: View {
                         .background(Theme.accent.opacity(0.12))
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }
@@ -630,7 +630,7 @@ struct PrepareRenderSheet: View {
                     .background(Color.white.opacity(0.04))
                     .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             Button(action: renderTapped) {
                 HStack(spacing: 6) {
                     if vm.isGenerating {
@@ -647,7 +647,7 @@ struct PrepareRenderSheet: View {
                 .background(Theme.lime)
                 .clipShape(Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .disabled(vm.isGenerating || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
         .padding(.horizontal, 20)
@@ -803,7 +803,7 @@ struct CharacterReferenceRow: View {
                     )
                     .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
     }

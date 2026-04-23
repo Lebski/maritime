@@ -62,7 +62,7 @@ struct ThemeTrackerView: View {
                         .background(Theme.magenta)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
 
             if !vm.bible.theme.motifs.isEmpty {
@@ -113,7 +113,7 @@ struct ThemeTrackerView: View {
                         .overlay(Capsule().stroke(Theme.magenta.opacity(0.35), lineWidth: 1))
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
 
             if !vm.bible.theme.palette.isEmpty {
@@ -246,7 +246,7 @@ struct AddMotifSheet: View {
                                         .background(selectedSymbol == sym ? selectedTint : Color.white.opacity(0.06))
                                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.plainSolid)
                             }
                         }
                         Text("TINT").font(.system(size: 10, weight: .bold)).tracking(0.6).foregroundStyle(Theme.textTertiary)
@@ -260,7 +260,7 @@ struct AddMotifSheet: View {
                                             Circle().stroke(Color.white, lineWidth: selectedTint == tint.1 ? 2 : 0)
                                         )
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.plainSolid)
                             }
                         }
                     }

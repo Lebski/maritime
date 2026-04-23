@@ -59,7 +59,7 @@ private struct AssetTile: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var thumbnail: some View {
@@ -91,7 +91,7 @@ private struct AssetTile: View {
                             .background(.black.opacity(0.45))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
                 Spacer()
                 if asset.versions > 1 {

@@ -54,7 +54,7 @@ struct StoryForgeView: View {
                 .background(showInnerSidebar ? Theme.magenta.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showInnerSidebar ? "Hide sidebar" : "Show sidebar")
     }
 
@@ -67,7 +67,7 @@ struct StoryForgeView: View {
                 .background(showHelper ? Theme.magenta.opacity(0.14) : Color.white.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .help(showHelper ? "Hide helper panel" : "Show helper panel")
     }
 
@@ -147,7 +147,7 @@ struct StoryForgeView: View {
             .background(isActive ? Theme.magenta.opacity(0.08) : Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var sidebarActions: some View {
@@ -214,7 +214,7 @@ struct StoryForgeView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Workspace

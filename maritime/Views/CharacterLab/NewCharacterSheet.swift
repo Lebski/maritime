@@ -95,7 +95,7 @@ struct NewCharacterSheet: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     // MARK: Story Forge Picker
@@ -164,7 +164,7 @@ struct NewCharacterSheet: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
         .disabled(draft.isPromoted)
         .opacity(draft.isPromoted ? 0.55 : 1)
     }
@@ -220,7 +220,7 @@ struct NewCharacterSheet: View {
                                     .background(role == r ? Theme.teal : Color.white.opacity(0.07))
                                     .clipShape(Capsule())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.plainSolid)
                         }
                     }
                 }

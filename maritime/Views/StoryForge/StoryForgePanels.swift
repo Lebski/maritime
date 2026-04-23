@@ -56,7 +56,7 @@ struct SectionTabButton: View {
             )
             .clipShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }
 
@@ -162,7 +162,7 @@ struct TemplateChoiceCard: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 
     private var arcSparkline: some View {
@@ -214,7 +214,7 @@ struct BeatPill: View {
                     .foregroundStyle(beat.actTint.opacity(0.85))
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plainSolid)
     }
 }
 
@@ -241,7 +241,7 @@ struct PaletteSwatchView: View {
                             .foregroundStyle(Color.white.opacity(0.85))
                             .padding(4)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.plainSolid)
                 }
             }
             Text(swatch.role.uppercased())
@@ -283,7 +283,7 @@ struct MotifChip: View {
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(Theme.textTertiary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.plainSolid)
             }
         }
         .padding(.horizontal, 12)

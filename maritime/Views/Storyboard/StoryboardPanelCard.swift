@@ -218,7 +218,7 @@ struct StoryboardPanelCard: View {
             Button(action: onReturnToScene) {
                 chipLabel
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.plainSolid)
             .help("Open the matching scene in Scene Builder")
         } else {
             chipLabel
