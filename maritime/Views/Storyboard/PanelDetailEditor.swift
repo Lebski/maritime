@@ -293,7 +293,7 @@ struct PanelDetailEditor: View {
     // MARK: Characters
 
     private func characterRow(_ panel: StoryboardPanel) -> some View {
-        let drafts = project.activeBible?.characterDrafts ?? []
+        let drafts = project.bible.characterDrafts
         return VStack(alignment: .leading, spacing: 8) {
             Text("CHARACTERS IN FRAME")
                 .font(.system(size: 10, weight: .bold))

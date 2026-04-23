@@ -140,7 +140,8 @@ struct StoryForgeHelperPanel: View {
                 message: actContext(for: beat.actLabel),
                 tint: beat.actTint
             )
-        } else if let template = vm.activeBible?.structure.template {
+        } else {
+            let template = vm.bible.structure.template
             VStack(alignment: .leading, spacing: 10) {
                 Text(template.rawValue.uppercased())
                     .font(.system(size: 10, weight: .bold))
@@ -157,8 +158,6 @@ struct StoryForgeHelperPanel: View {
             .padding(14)
             .cardStyle()
             examplesCard(title: "Films using \(template.rawValue)", items: template.filmExamples, tint: Theme.magenta)
-        } else {
-            emptyHelper(icon: "chart.bar.xaxis", text: "Choose a template to begin.")
         }
     }
 
@@ -185,7 +184,8 @@ struct StoryForgeHelperPanel: View {
                 tint: Theme.magenta
             )
             examplesCard(title: "Try prompting with", items: sceneFieldExamples(field), tint: Theme.magenta)
-        } else if let bible = vm.activeBible, !bible.sceneBreakdowns.isEmpty {
+        } else if !vm.bible.sceneBreakdowns.isEmpty {
+            let bible = vm.bible
             VStack(alignment: .leading, spacing: 10) {
                 Text("SCENE STATS")
                     .font(.system(size: 9, weight: .bold))
@@ -251,8 +251,8 @@ struct StoryForgeHelperPanel: View {
         }
         .padding(14)
         .cardStyle()
-        if let palette = vm.activeBible?.theme.palette, palette.count >= 2 {
-            harmonyHintCard(palette: palette)
+        if vm.bible.theme.palette.count >= 2 {
+            harmonyHintCard(palette: vm.bible.theme.palette)
         }
     }
 

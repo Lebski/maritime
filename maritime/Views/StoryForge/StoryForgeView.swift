@@ -12,15 +12,10 @@ struct StoryForgeView: View {
     }
 
     private func consumePendingSceneBreakdownID() {
-        guard let id = navigator.pendingSceneBreakdownID else { return }
-        for bible in project.bibles where bible.sceneBreakdowns.contains(where: { $0.id == id }) {
-            if project.activeBibleID != bible.id {
-                project.setActiveBible(bible.id)
-            }
-            vm.activeSection = .scenes
-            vm.expandedSceneID = id
-            break
-        }
+        guard let id = navigator.pendingSceneBreakdownID,
+              project.bible.sceneBreakdowns.contains(where: { $0.id == id }) else { return }
+        vm.activeSection = .scenes
+        vm.expandedSceneID = id
         navigator.pendingSceneBreakdownID = nil
     }
 
@@ -46,9 +41,6 @@ struct StoryForgeView: View {
         .animation(.easeInOut(duration: 0.22), value: showInnerSidebar)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.bg)
-        .sheet(isPresented: $vm.showNewBibleSheet) {
-            NewStoryBibleSheet(vm: vm)
-        }
         .onAppear { consumePendingSceneBreakdownID() }
         .onChange(of: navigator.pendingSceneBreakdownID) { _, _ in consumePendingSceneBreakdownID() }
     }
@@ -133,7 +125,7 @@ struct StoryForgeView: View {
     }
 
     private func progressRow(section: StoryForgeSection) -> some View {
-        let value = vm.activeBible?.completion(for: section) ?? 0
+        let value = vm.bible.completion(for: section)
         let isActive = vm.activeSection == section
         return Button(action: { vm.selectSection(section) }) {
             HStack(spacing: 10) {
@@ -186,11 +178,11 @@ struct StoryForgeView: View {
     }
 
     private var unpromotedDrafts: Int {
-        (vm.activeBible?.characterDrafts ?? []).filter { !$0.isPromoted }.count
+        vm.bible.characterDrafts.filter { !$0.isPromoted }.count
     }
 
     private var unpromotedScenes: Int {
-        (vm.activeBible?.sceneBreakdowns ?? []).filter { !$0.isPromoted }.count
+        vm.bible.sceneBreakdowns.filter { !$0.isPromoted }.count
     }
 
     private func promoteButton(icon: String, label: String, tint: Color, count: Int, action: @escaping () -> Void) -> some View {
@@ -227,18 +219,13 @@ struct StoryForgeView: View {
 
     // MARK: Workspace
 
-    @ViewBuilder
     private var workspace: some View {
-        if let bible = vm.activeBible {
-            VStack(spacing: 0) {
-                workspaceHeader(bible: bible)
-                Divider().background(Theme.stroke)
-                tabRow(bible: bible)
-                Divider().background(Theme.stroke)
-                sectionContent
-            }
-        } else {
-            emptyWorkspace
+        VStack(spacing: 0) {
+            workspaceHeader(bible: vm.bible)
+            Divider().background(Theme.stroke)
+            tabRow(bible: vm.bible)
+            Divider().background(Theme.stroke)
+            sectionContent
         }
     }
 
@@ -332,71 +319,4 @@ struct StoryForgeView: View {
         }
     }
 
-    private var emptyWorkspace: some View {
-        VStack(spacing: 18) {
-            Image(systemName: "text.book.closed")
-                .font(.system(size: 42))
-                .foregroundStyle(Theme.magenta.opacity(0.6))
-            Text("No Story Bible selected")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
-            Text("Pick one from the sidebar, or start a new one.")
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.textSecondary)
-            Button(action: { vm.showNewBibleSheet = true }) {
-                Label("New Story Bible", systemImage: "plus")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 9)
-                    .background(Theme.magenta)
-                    .clipShape(Capsule())
-            }
-            .buttonStyle(.plainSolid)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-// MARK: - New Story Bible Sheet
-
-struct NewStoryBibleSheet: View {
-    @ObservedObject var vm: StoryForgeViewModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var title = ""
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Theme.bg.ignoresSafeArea()
-                VStack(alignment: .leading, spacing: 18) {
-                    Text("PROJECT TITLE")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(0.6)
-                        .foregroundStyle(Theme.textTertiary)
-                    StyledTextField(placeholder: "e.g. The Lantern Keeper", text: $title)
-                    Text("You'll pick a structure template, draft characters, and map scenes in the workspace.")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.textSecondary)
-                    Spacer()
-                }
-                .padding(24)
-            }
-            .navigationTitle("New Story Bible")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.foregroundStyle(Theme.textSecondary)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
-                        vm.createNewBible(title: title)
-                        dismiss()
-                    }
-                    .foregroundStyle(title.isEmpty ? Theme.textTertiary : Theme.magenta)
-                    .disabled(title.isEmpty)
-                }
-            }
-        }
-        .frame(minWidth: 420, minHeight: 260)
-    }
 }

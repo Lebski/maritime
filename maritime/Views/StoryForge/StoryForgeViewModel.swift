@@ -13,7 +13,6 @@ final class StoryForgeViewModel: ObservableObject {
     @Published var focusedSceneField: SceneField?
     @Published var showNewCharacterSheet = false
     @Published var showNewSceneSheet = false
-    @Published var showNewBibleSheet = false
     @Published var showAddMotifSheet = false
 
     enum SceneField: String {
@@ -25,44 +24,31 @@ final class StoryForgeViewModel: ObservableObject {
 
     init(project: MovieBlazeProject) {
         self.project = project
-        let bible = project.activeBible
-        activeDraftID = bible?.characterDrafts.first?.id
-        selectedBeatID = bible?.structure.beats.first?.id
+        activeDraftID = project.bible.characterDrafts.first?.id
+        selectedBeatID = project.bible.structure.beats.first?.id
 
-        // When the active bible changes, refresh selections so we don't
-        // hold onto IDs from a different bible.
-        project.$activeBibleID
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    guard let self else { return }
-                    let b = self.project.activeBible
-                    self.activeDraftID = b?.characterDrafts.first?.id
-                    self.selectedBeatID = b?.structure.beats.first?.id
-                    self.expandedSceneID = nil
-                    self.focusedField = nil
-                    self.focusedSceneField = nil
-                }
-            }
+        project.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
     }
 
     // MARK: Lookups
 
-    var activeBible: StoryBible? { project.activeBible }
+    var bible: StoryBible { project.bible }
 
     var activeDraft: StoryCharacterDraft? {
         guard let id = activeDraftID else { return nil }
-        return activeBible?.characterDrafts.first(where: { $0.id == id })
+        return bible.characterDrafts.first(where: { $0.id == id })
     }
 
     var selectedBeat: StoryBeat? {
         guard let id = selectedBeatID else { return nil }
-        return activeBible?.structure.beats.first(where: { $0.id == id })
+        return bible.structure.beats.first(where: { $0.id == id })
     }
 
     var expandedScene: SceneBreakdown? {
         guard let id = expandedSceneID else { return nil }
-        return activeBible?.sceneBreakdowns.first(where: { $0.id == id })
+        return bible.sceneBreakdowns.first(where: { $0.id == id })
     }
 
     // MARK: Section nav
@@ -111,13 +97,13 @@ final class StoryForgeViewModel: ObservableObject {
     func removeActiveDraft() {
         guard let draft = activeDraft else { return }
         project.removeDraft(id: draft.id)
-        activeDraftID = activeBible?.characterDrafts.first?.id
+        activeDraftID = bible.characterDrafts.first?.id
     }
 
     /// Promote the active draft into a LabCharacter in the project.
     /// Idempotent — if already promoted, does nothing.
     func promoteActiveDraftToLab() {
-        guard let bible = activeBible, var draft = activeDraft, !draft.isPromoted else { return }
+        guard var draft = activeDraft, !draft.isPromoted else { return }
         let labCharacter = LabCharacter(
             name: draft.name,
             description: bible.labDescription(for: draft),
@@ -132,7 +118,7 @@ final class StoryForgeViewModel: ObservableObject {
 
     func chooseTemplate(_ template: StoryStructureTemplate) {
         project.chooseTemplate(template)
-        selectedBeatID = project.activeBible?.structure.beats.first?.id
+        selectedBeatID = bible.structure.beats.first?.id
     }
 
     func selectBeat(_ id: UUID) {
@@ -157,7 +143,6 @@ final class StoryForgeViewModel: ObservableObject {
     }
 
     func addScene(title: String, location: String) {
-        guard let bible = activeBible else { return }
         let next = (bible.sceneBreakdowns.map(\.number).max() ?? 0) + 1
         let scene = SceneBreakdown(
             number: next,
@@ -181,7 +166,6 @@ final class StoryForgeViewModel: ObservableObject {
 
     func promoteScene(_ scene: SceneBreakdown) {
         guard !scene.isPromoted else { return }
-        let bibleTitle = activeBible?.projectTitle ?? "Untitled"
         let filmScene = FilmScene(
             number: (project.scenes.map(\.number).max() ?? 0) + 1,
             title: scene.title,
@@ -196,7 +180,7 @@ final class StoryForgeViewModel: ObservableObject {
             characters: [],
             activeGuides: [.ruleOfThirds],
             frameApproved: false,
-            projectTitle: bibleTitle
+            projectTitle: bible.projectTitle
         )
         project.addFilmScene(filmScene)
         project.markScenePromoted(sceneID: scene.id, filmSceneID: filmScene.id)
@@ -205,57 +189,45 @@ final class StoryForgeViewModel: ObservableObject {
     // MARK: Storyboard cross-module
 
     func hasStoryboard(scene: SceneBreakdown) -> Bool {
-        project.sequence(forSceneBreakdown: scene.id) != nil
+        !project.panels(forSceneBreakdown: scene.id).isEmpty
     }
 
     func storyboardScene(_ scene: SceneBreakdown) {
-        guard let bible = activeBible, !hasStoryboard(scene: scene) else { return }
-        _ = project.addSequence(fromScene: scene, bible: bible)
+        guard !hasStoryboard(scene: scene) else { return }
+        _ = project.appendPanels(fromScene: scene)
     }
 
     // MARK: Theme
 
     func updateThemeStatement(_ text: String) {
-        guard var theme = activeBible?.theme else { return }
+        var theme = bible.theme
         theme.themeStatement = text
         project.updateTheme(theme)
     }
 
     func addMotif(label: String, symbol: String, tint: Color) {
-        guard var theme = activeBible?.theme else { return }
+        var theme = bible.theme
         let motif = VisualMotif(label: label, symbol: symbol, tint: tint, frequency: 1)
         theme.motifs.append(motif)
         project.updateTheme(theme)
     }
 
     func removeMotif(_ id: UUID) {
-        guard var theme = activeBible?.theme else { return }
+        var theme = bible.theme
         theme.motifs.removeAll(where: { $0.id == id })
         project.updateTheme(theme)
     }
 
     func addPaletteSwatch(hex: String, color: Color, role: String) {
-        guard var theme = activeBible?.theme else { return }
+        var theme = bible.theme
         let swatch = ColorPaletteSwatch(hex: hex, color: color, role: role)
         theme.palette.append(swatch)
         project.updateTheme(theme)
     }
 
     func removePaletteSwatch(_ id: UUID) {
-        guard var theme = activeBible?.theme else { return }
+        var theme = bible.theme
         theme.palette.removeAll(where: { $0.id == id })
         project.updateTheme(theme)
-    }
-
-    // MARK: Bible lifecycle
-
-    func createNewBible(title: String) {
-        _ = project.createBible(title: title)
-        activeSection = .characters
-        activeDraftID = nil
-    }
-
-    func setActiveBible(_ id: UUID) {
-        project.setActiveBible(id)
     }
 }

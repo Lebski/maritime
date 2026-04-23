@@ -34,11 +34,7 @@ final class VideoRendererViewModel: ObservableObject {
     var cuts: [CutSuggestion] { project.cutSuggestions }
 
     var projectTitle: String {
-        project.activeBible?.projectTitle ?? "Untitled Project"
-    }
-
-    var sequenceName: String {
-        project.activeSequence?.title ?? "Untitled Sequence"
+        project.bible.projectTitle
     }
 
     var selectedClip: VideoClip? {

@@ -2,14 +2,12 @@ import SwiftUI
 
 // MARK: - Storyboard Models
 //
-// A StoryboardSequence is an ordered list of StoryboardPanels that plans a
-// scene's shot coverage. Sequences can originate from a Story Forge
-// SceneBreakdown (via sceneBreakdownID) or be authored fresh.
-//
 // Panels describe shot type, camera movement, duration, action note, dialogue,
 // and the editing priority driving the cut (Murch's simplified triad:
 // emotion / story / rhythm). A panel can be promoted into Scene Builder as
-// a FilmScene — the stamp is kept on promotedFilmSceneID.
+// a FilmScene — the stamp is kept on promotedFilmSceneID. Panels that
+// originated from a Story Forge SceneBreakdown carry the source ID on
+// sceneBreakdownID so the UI can still group by scene.
 
 enum CameraMovement: String, CaseIterable, Identifiable, Hashable, Codable {
     case `static` = "Static"
@@ -113,6 +111,7 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
     var characterDraftIDs: [UUID]
     var thumbnailSymbol: String       // SF Symbol for atmospheric backdrop
     var thumbnailColors: [Color]      // gradient stops for the thumbnail background
+    var sceneBreakdownID: UUID?
     var promotedFilmSceneID: UUID?
 
     init(id: UUID = UUID(),
@@ -127,6 +126,7 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
          characterDraftIDs: [UUID] = [],
          thumbnailSymbol: String = "square.grid.3x2",
          thumbnailColors: [Color] = [Theme.violet, Theme.magenta],
+         sceneBreakdownID: UUID? = nil,
          promotedFilmSceneID: UUID? = nil) {
         self.id = id
         self.number = number
@@ -140,6 +140,7 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
         self.characterDraftIDs = characterDraftIDs
         self.thumbnailSymbol = thumbnailSymbol
         self.thumbnailColors = thumbnailColors
+        self.sceneBreakdownID = sceneBreakdownID
         self.promotedFilmSceneID = promotedFilmSceneID
     }
 
@@ -159,43 +160,16 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
     }
 }
 
-// MARK: - Sequence
+// MARK: - Panel collection metrics
 
-struct StoryboardSequence: Identifiable, Hashable, Codable {
-    let id: UUID
-    var title: String
-    var bibleID: UUID?
-    var sceneBreakdownID: UUID?
-    var projectTitle: String
-    var posterColors: [Color]
-    var panels: [StoryboardPanel]
-    var lastUpdated: Date
-
-    init(id: UUID = UUID(),
-         title: String,
-         bibleID: UUID? = nil,
-         sceneBreakdownID: UUID? = nil,
-         projectTitle: String,
-         posterColors: [Color] = [Theme.violet, Theme.magenta],
-         panels: [StoryboardPanel] = [],
-         lastUpdated: Date = Date()) {
-        self.id = id
-        self.title = title
-        self.bibleID = bibleID
-        self.sceneBreakdownID = sceneBreakdownID
-        self.projectTitle = projectTitle
-        self.posterColors = posterColors
-        self.panels = panels
-        self.lastUpdated = lastUpdated
-    }
-
+extension Array where Element == StoryboardPanel {
     var totalRuntime: Double {
-        panels.map(\.duration).reduce(0, +)
+        map(\.duration).reduce(0, +)
     }
 
     var averageShotLength: Double {
-        guard !panels.isEmpty else { return 0 }
-        return totalRuntime / Double(panels.count)
+        guard !isEmpty else { return 0 }
+        return totalRuntime / Double(count)
     }
 
     var runtimeLabel: String {
@@ -204,20 +178,20 @@ struct StoryboardSequence: Identifiable, Hashable, Codable {
     }
 
     var completion: Double {
-        guard !panels.isEmpty else { return 0 }
-        return panels.map(\.completion).reduce(0, +) / Double(panels.count)
+        guard !isEmpty else { return 0 }
+        return map(\.completion).reduce(0, +) / Double(count)
     }
 
     var promotedCount: Int {
-        panels.filter(\.isPromoted).count
+        filter(\.isPromoted).count
     }
 
     var unpromotedCount: Int {
-        panels.count - promotedCount
+        count - promotedCount
     }
 
     var shotTypeHistogram: [(CameraShotType, Int)] {
-        let grouped = Dictionary(grouping: panels, by: \.shotType)
+        let grouped = Dictionary(grouping: self, by: \.shotType)
         return CameraShotType.allCases.compactMap { type in
             guard let group = grouped[type], !group.isEmpty else { return nil }
             return (type, group.count)
@@ -225,7 +199,7 @@ struct StoryboardSequence: Identifiable, Hashable, Codable {
     }
 
     var priorityHistogram: [(EditingPriority, Int)] {
-        let grouped = Dictionary(grouping: panels, by: \.editingPriority)
+        let grouped = Dictionary(grouping: self, by: \.editingPriority)
         return EditingPriority.allCases.map { priority in
             (priority, grouped[priority]?.count ?? 0)
         }
@@ -297,16 +271,14 @@ enum StoryboardSamples {
 
     // ---------- The Lantern Keeper — 9 panels (exact, matches SampleData.activity) ----------
 
-    static let lanternKeeperSequence: StoryboardSequence = {
-        let nightValley: [Color]   = [Color(red: 0.08, green: 0.12, blue: 0.22), Color(red: 0.25, green: 0.32, blue: 0.55)]
+    static let lanternKeeperPanels: [StoryboardPanel] = {
         let duskValley: [Color]    = [Color(red: 0.22, green: 0.12, blue: 0.32), Color(red: 0.85, green: 0.45, blue: 0.35)]
         let lanternGlow: [Color]   = [Color(red: 0.35, green: 0.15, blue: 0.05), Color(red: 1.0, green: 0.72, blue: 0.29)]
         let dawnShore: [Color]     = [Color(red: 0.12, green: 0.20, blue: 0.35), Color(red: 0.95, green: 0.75, blue: 0.55)]
-        let underwater: [Color]    = [Color(red: 0.03, green: 0.08, blue: 0.18), Color(red: 0.15, green: 0.45, blue: 0.55)]
         let valleyDay: [Color]     = [Color(red: 0.18, green: 0.25, blue: 0.35), Color(red: 0.65, green: 0.75, blue: 0.80)]
         let ferryTwilight: [Color] = [Color(red: 0.06, green: 0.10, blue: 0.20), Color(red: 0.38, green: 0.28, blue: 0.55)]
 
-        let panels: [StoryboardPanel] = [
+        return [
             StoryboardPanel(number: 1,
                             shotType: .wide,
                             cameraMovement: .dolly,
@@ -398,149 +370,5 @@ enum StoryboardSamples {
                             thumbnailSymbol: "sunrise.fill",
                             thumbnailColors: dawnShore)
         ]
-        // Deliberately don't reference underwater/nightValley here — kept for future panels.
-        _ = nightValley
-        _ = underwater
-
-        return StoryboardSequence(
-            title: "Act I — The Keeping Passes",
-            projectTitle: "The Lantern Keeper",
-            posterColors: [Color(red: 0.15, green: 0.25, blue: 0.45), Color(red: 0.35, green: 0.65, blue: 0.75)],
-            panels: panels,
-            lastUpdated: Date().addingTimeInterval(-3600)
-        )
     }()
-
-    // ---------- Neon Requiem — 12 panels, noir opening ----------
-
-    static let neonRequiemSequence: StoryboardSequence = {
-        let rainAlley: [Color]   = [Color(red: 0.05, green: 0.08, blue: 0.18), Color(red: 0.25, green: 0.32, blue: 0.55)]
-        let neonPink: [Color]    = [Color(red: 0.22, green: 0.05, blue: 0.28), Color(red: 0.92, green: 0.35, blue: 0.62)]
-        let noodleStall: [Color] = [Color(red: 0.20, green: 0.08, blue: 0.12), Color(red: 0.95, green: 0.62, blue: 0.35)]
-        let morgue: [Color]      = [Color(red: 0.08, green: 0.12, blue: 0.18), Color(red: 0.45, green: 0.58, blue: 0.65)]
-
-        let panels: [StoryboardPanel] = [
-            StoryboardPanel(number: 1, shotType: .wide, cameraMovement: .dolly, duration: 4.0,
-                            actionNote: "Slow push down rain-slick Shibuya alley. Neon bleeds into the puddles.",
-                            timeOfDay: .night, editingPriority: .rhythm,
-                            thumbnailSymbol: "cloud.rain.fill", thumbnailColors: rainAlley),
-            StoryboardPanel(number: 2, shotType: .medium, cameraMovement: .static, duration: 2.5,
-                            actionNote: "Elena at the noodle stall, eating alone. Steam rises past her face.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "fork.knife", thumbnailColors: noodleStall),
-            StoryboardPanel(number: 3, shotType: .extremeCloseUp, cameraMovement: .static, duration: 1.5,
-                            actionNote: "ECU on her eyes — they flick to something off-frame.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "eye.fill", thumbnailColors: noodleStall),
-            StoryboardPanel(number: 4, shotType: .pov, cameraMovement: .tracking, duration: 3.2,
-                            actionNote: "Her POV — a body is being loaded into a coroner's van two blocks down.",
-                            timeOfDay: .night, editingPriority: .story,
-                            thumbnailSymbol: "scope", thumbnailColors: rainAlley),
-            StoryboardPanel(number: 5, shotType: .wide, cameraMovement: .handheld, duration: 2.2,
-                            actionNote: "She's walking fast now. Neon signs smear as she passes them.",
-                            timeOfDay: .night, editingPriority: .rhythm,
-                            thumbnailSymbol: "figure.walk", thumbnailColors: neonPink),
-            StoryboardPanel(number: 6, shotType: .overTheShoulder, cameraMovement: .static, duration: 2.8,
-                            actionNote: "OTS at the morgue doors. Marcus in frame, hands in pockets.",
-                            timeOfDay: .night, editingPriority: .story,
-                            thumbnailSymbol: "person.2.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 7, shotType: .closeUp, cameraMovement: .static, duration: 2.0,
-                            actionNote: "CU on Marcus. He doesn't quite meet her eyes.",
-                            dialogue: "You shouldn't be here.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "person.crop.circle.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 8, shotType: .closeUp, cameraMovement: .static, duration: 2.0,
-                            actionNote: "CU on Elena. She doesn't answer.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "person.crop.circle.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 9, shotType: .dutchAngle, cameraMovement: .pan, duration: 2.5,
-                            actionNote: "Dutch across the body bag. Tag reads her partner's name.",
-                            timeOfDay: .night, editingPriority: .story,
-                            thumbnailSymbol: "tag.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 10, shotType: .extremeCloseUp, cameraMovement: .zoomIn, duration: 1.8,
-                            actionNote: "ECU — the name tag. Pull focus from tag to her hand hovering over it.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "hand.raised.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 11, shotType: .dutchAngle, cameraMovement: .handheld, duration: 2.3,
-                            actionNote: "Dutch on her face as she steadies herself against the cold slab.",
-                            timeOfDay: .night, editingPriority: .emotion,
-                            thumbnailSymbol: "person.fill", thumbnailColors: morgue),
-            StoryboardPanel(number: 12, shotType: .wide, cameraMovement: .zoomOut, duration: 4.2,
-                            actionNote: "Pull back through the morgue doors. Rain starts again behind glass. Smash to title.",
-                            timeOfDay: .night, editingPriority: .rhythm,
-                            thumbnailSymbol: "cloud.rain.fill", thumbnailColors: rainAlley)
-        ]
-
-        return StoryboardSequence(
-            title: "Cold Open — Empty Partner",
-            projectTitle: "Neon Requiem",
-            posterColors: [Color(red: 0.55, green: 0.15, blue: 0.35), Color(red: 0.95, green: 0.45, blue: 0.25)],
-            panels: panels,
-            lastUpdated: Date().addingTimeInterval(-9_000)
-        )
-    }()
-
-    // ---------- Tide & Bone — 7 panels, dawn discovery ----------
-
-    static let tideAndBoneSequence: StoryboardSequence = {
-        let dawnSea: [Color]    = [Color(red: 0.12, green: 0.20, blue: 0.30), Color(red: 0.72, green: 0.82, blue: 0.78)]
-        let tidePool: [Color]   = [Color(red: 0.10, green: 0.28, blue: 0.32), Color(red: 0.55, green: 0.72, blue: 0.65)]
-        let sandGold: [Color]   = [Color(red: 0.35, green: 0.30, blue: 0.22), Color(red: 0.85, green: 0.78, blue: 0.55)]
-
-        let panels: [StoryboardPanel] = [
-            StoryboardPanel(number: 1, shotType: .wide, cameraMovement: .static, duration: 4.8,
-                            actionNote: "Wide — Harrow Cove at first light. Tide receding. Mara's silhouette on the ridge.",
-                            timeOfDay: .dawn, editingPriority: .rhythm,
-                            thumbnailSymbol: "water.waves", thumbnailColors: dawnSea),
-            StoryboardPanel(number: 2, shotType: .medium, cameraMovement: .tracking, duration: 2.6,
-                            actionNote: "Tracking Mara as she walks the beach. Her eyes scan the pools.",
-                            timeOfDay: .dawn, editingPriority: .story,
-                            thumbnailSymbol: "figure.walk", thumbnailColors: sandGold),
-            StoryboardPanel(number: 3, shotType: .pov, cameraMovement: .tilt, duration: 2.0,
-                            actionNote: "Her POV — she tilts down into a pool. Something white under kelp.",
-                            timeOfDay: .dawn, editingPriority: .story,
-                            thumbnailSymbol: "scope", thumbnailColors: tidePool),
-            StoryboardPanel(number: 4, shotType: .closeUp, cameraMovement: .static, duration: 2.2,
-                            actionNote: "CU on her face — the professional mask drops for half a second.",
-                            timeOfDay: .dawn, editingPriority: .emotion,
-                            thumbnailSymbol: "person.crop.circle.fill", thumbnailColors: dawnSea),
-            StoryboardPanel(number: 5, shotType: .highAngle, cameraMovement: .static, duration: 2.8,
-                            actionNote: "High angle over the pool. She kneels, moves the kelp aside.",
-                            timeOfDay: .dawn, editingPriority: .rhythm,
-                            thumbnailSymbol: "arrow.down", thumbnailColors: tidePool),
-            StoryboardPanel(number: 6, shotType: .extremeCloseUp, cameraMovement: .zoomIn, duration: 1.6,
-                            actionNote: "ECU — teeth-marks on a rib bone. Old. Not animal.",
-                            timeOfDay: .dawn, editingPriority: .story,
-                            thumbnailSymbol: "staroflife.fill", thumbnailColors: sandGold),
-            StoryboardPanel(number: 7, shotType: .wide, cameraMovement: .zoomOut, duration: 3.5,
-                            actionNote: "Slow pull back — she alone with the bones, sea rising again behind her.",
-                            timeOfDay: .dawn, editingPriority: .emotion,
-                            thumbnailSymbol: "water.waves", thumbnailColors: dawnSea)
-        ]
-
-        return StoryboardSequence(
-            title: "Tide Pool Discovery",
-            projectTitle: "Tide & Bone",
-            posterColors: [Color(red: 0.08, green: 0.22, blue: 0.30), Color(red: 0.25, green: 0.78, blue: 0.82)],
-            panels: panels,
-            lastUpdated: Date().addingTimeInterval(-43_200)
-        )
-    }()
-
-    // ---------- Paper Moon 2049 — empty, for empty-state showcase ----------
-
-    static let paperMoonSequence: StoryboardSequence = StoryboardSequence(
-        title: "Lunar Arrival (unplanned)",
-        projectTitle: "Paper Moon 2049",
-        posterColors: [Color(red: 0.2, green: 0.1, blue: 0.35), Color(red: 0.65, green: 0.35, blue: 0.85)],
-        panels: [],
-        lastUpdated: Date().addingTimeInterval(-604_800)
-    )
-
-    static let sequences: [StoryboardSequence] = [
-        lanternKeeperSequence,
-        neonRequiemSequence,
-        tideAndBoneSequence,
-        paperMoonSequence
-    ]
 }

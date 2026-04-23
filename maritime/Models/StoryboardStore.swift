@@ -3,88 +3,55 @@ import SwiftUI
 // MARK: - Storyboard mutators
 //
 // Extensions on MovieBlazeProject that replace the old singleton
-// StoryboardStore. All mutation still funnels through the active-sequence
-// helper so lastUpdated is refreshed automatically.
+// StoryboardStore. Panels are a flat list on the project — one project =
+// one ordered panel sequence. Panels originating from a Story Forge
+// SceneBreakdown carry the source ID so the UI can still group by scene.
 
 @MainActor
 extension MovieBlazeProject {
 
-    // MARK: Sequence helpers
-
-    func mutateActiveSequence(_ block: (inout StoryboardSequence) -> Void) {
-        guard let id = activeSequenceID,
-              let idx = sequences.firstIndex(where: { $0.id == id }) else { return }
-        block(&sequences[idx])
-        sequences[idx].lastUpdated = Date()
-    }
-
-    func mutateSequence(id: UUID, _ block: (inout StoryboardSequence) -> Void) {
-        guard let idx = sequences.firstIndex(where: { $0.id == id }) else { return }
-        block(&sequences[idx])
-        sequences[idx].lastUpdated = Date()
-    }
-
     // MARK: Panel CRUD
 
     func addPanel(_ panel: StoryboardPanel) {
-        mutateActiveSequence { seq in
-            var p = panel
-            p.number = seq.panels.count + 1
-            seq.panels.append(p)
-        }
+        var p = panel
+        p.number = storyboardPanels.count + 1
+        storyboardPanels.append(p)
     }
 
     func updatePanel(_ panel: StoryboardPanel) {
-        mutateActiveSequence { seq in
-            guard let i = seq.panels.firstIndex(where: { $0.id == panel.id }) else { return }
-            seq.panels[i] = panel
-        }
+        guard let i = storyboardPanels.firstIndex(where: { $0.id == panel.id }) else { return }
+        storyboardPanels[i] = panel
     }
 
     func removePanel(id: UUID) {
-        mutateActiveSequence { seq in
-            seq.panels.removeAll(where: { $0.id == id })
-            for i in seq.panels.indices { seq.panels[i].number = i + 1 }
-        }
+        storyboardPanels.removeAll(where: { $0.id == id })
+        for i in storyboardPanels.indices { storyboardPanels[i].number = i + 1 }
     }
 
-    func reorderPanels(sequenceID: UUID, from sourceIndex: Int, to destinationIndex: Int) {
-        mutateSequence(id: sequenceID) { seq in
-            guard sourceIndex >= 0, sourceIndex < seq.panels.count else { return }
-            let panel = seq.panels.remove(at: sourceIndex)
-            let target = max(0, min(destinationIndex, seq.panels.count))
-            seq.panels.insert(panel, at: target)
-            for i in seq.panels.indices { seq.panels[i].number = i + 1 }
-        }
-    }
-
-    func reorderActivePanels(from sourceIndex: Int, to destinationIndex: Int) {
-        guard let id = activeSequenceID else { return }
-        reorderPanels(sequenceID: id, from: sourceIndex, to: destinationIndex)
+    func reorderPanels(from sourceIndex: Int, to destinationIndex: Int) {
+        guard sourceIndex >= 0, sourceIndex < storyboardPanels.count else { return }
+        let panel = storyboardPanels.remove(at: sourceIndex)
+        let target = max(0, min(destinationIndex, storyboardPanels.count))
+        storyboardPanels.insert(panel, at: target)
+        for i in storyboardPanels.indices { storyboardPanels[i].number = i + 1 }
     }
 
     func markPanelPromoted(panelID: UUID, filmSceneID: UUID) {
-        mutateActiveSequence { seq in
-            guard let i = seq.panels.firstIndex(where: { $0.id == panelID }) else { return }
-            seq.panels[i].promotedFilmSceneID = filmSceneID
-        }
+        guard let i = storyboardPanels.firstIndex(where: { $0.id == panelID }) else { return }
+        storyboardPanels[i].promotedFilmSceneID = filmSceneID
     }
 
-    // MARK: Sequence lifecycle
+    // MARK: Scene → Storyboard promotion
 
-    func addSequence(_ sequence: StoryboardSequence) {
-        sequences.append(sequence)
-        activeSequenceID = sequence.id
+    func panels(forSceneBreakdown sceneID: UUID) -> [StoryboardPanel] {
+        storyboardPanels.filter { $0.sceneBreakdownID == sceneID }
     }
 
-    func sequence(forSceneBreakdown sceneID: UUID) -> StoryboardSequence? {
-        sequences.first(where: { $0.sceneBreakdownID == sceneID })
-    }
-
-    /// Build a fresh sequence from a Story Forge SceneBreakdown with four
-    /// starter panels (WS → CU → OTS → WS) so the user has a canvas to build on.
+    /// Append four starter panels (WS → CU → OTS → WS) seeded from a
+    /// Story Forge SceneBreakdown. Returns the newly appended panels so the
+    /// caller can scroll-to them.
     @discardableResult
-    func addSequence(fromScene scene: SceneBreakdown, bible: StoryBible) -> StoryboardSequence {
+    func appendPanels(fromScene scene: SceneBreakdown) -> [StoryboardPanel] {
         let colors = bible.posterColors
         let symbol: String
         switch scene.timeOfDay {
@@ -94,37 +61,34 @@ extension MovieBlazeProject {
         case .dusk:        symbol = "sunset.fill"
         case .night:       symbol = "moon.stars.fill"
         }
+        let base = storyboardPanels.count
         let seed: [StoryboardPanel] = [
-            StoryboardPanel(number: 1, shotType: .wide, cameraMovement: .static, duration: 4.0,
+            StoryboardPanel(number: base + 1, shotType: .wide, cameraMovement: .static, duration: 4.0,
                             actionNote: "Establishing — \(scene.locationLabel).",
                             timeOfDay: scene.timeOfDay, editingPriority: .rhythm,
                             characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors),
-            StoryboardPanel(number: 2, shotType: .closeUp, cameraMovement: .static, duration: 2.2,
+                            thumbnailSymbol: symbol, thumbnailColors: colors,
+                            sceneBreakdownID: scene.id),
+            StoryboardPanel(number: base + 2, shotType: .closeUp, cameraMovement: .static, duration: 2.2,
                             actionNote: scene.emotionalBeat.isEmpty ? "Reaction." : scene.emotionalBeat,
                             timeOfDay: scene.timeOfDay, editingPriority: .emotion,
                             characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors),
-            StoryboardPanel(number: 3, shotType: .overTheShoulder, cameraMovement: .static, duration: 2.5,
+                            thumbnailSymbol: symbol, thumbnailColors: colors,
+                            sceneBreakdownID: scene.id),
+            StoryboardPanel(number: base + 3, shotType: .overTheShoulder, cameraMovement: .static, duration: 2.5,
                             actionNote: scene.conflict.isEmpty ? "Conflict beat." : scene.conflict,
                             timeOfDay: scene.timeOfDay, editingPriority: .story,
                             characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors),
-            StoryboardPanel(number: 4, shotType: .wide, cameraMovement: .zoomOut, duration: 3.2,
+                            thumbnailSymbol: symbol, thumbnailColors: colors,
+                            sceneBreakdownID: scene.id),
+            StoryboardPanel(number: base + 4, shotType: .wide, cameraMovement: .zoomOut, duration: 3.2,
                             actionNote: scene.transitionNote.isEmpty ? "Outro — release the tension." : scene.transitionNote,
                             timeOfDay: scene.timeOfDay, editingPriority: .rhythm,
                             characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors)
+                            thumbnailSymbol: symbol, thumbnailColors: colors,
+                            sceneBreakdownID: scene.id)
         ]
-        let seq = StoryboardSequence(
-            title: scene.title,
-            bibleID: bible.id,
-            sceneBreakdownID: scene.id,
-            projectTitle: bible.projectTitle,
-            posterColors: colors,
-            panels: seed
-        )
-        addSequence(seq)
-        return seq
+        storyboardPanels.append(contentsOf: seed)
+        return seed
     }
 }

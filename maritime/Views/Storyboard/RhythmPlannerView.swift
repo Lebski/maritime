@@ -11,12 +11,13 @@ struct RhythmPlannerView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                if let seq = vm.activeSequence, !seq.panels.isEmpty {
-                    header(seq)
-                    metricCards(seq)
-                    pacingCurve(seq)
-                    shotDistribution(seq)
-                    priorityMix(seq)
+                let panels = vm.panels
+                if !panels.isEmpty {
+                    header(panels)
+                    metricCards(panels)
+                    pacingCurve(panels)
+                    shotDistribution(panels)
+                    priorityMix(panels)
                     murchQuote
                 } else {
                     emptyRhythm
@@ -28,7 +29,7 @@ struct RhythmPlannerView: View {
 
     // MARK: Header
 
-    private func header(_ seq: StoryboardSequence) -> some View {
+    private func header(_ panels: [StoryboardPanel]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("RHYTHM & TIMING")
                 .font(.system(size: 11, weight: .bold))
@@ -46,29 +47,29 @@ struct RhythmPlannerView: View {
 
     // MARK: Metric cards
 
-    private func metricCards(_ seq: StoryboardSequence) -> some View {
+    private func metricCards(_ panels: [StoryboardPanel]) -> some View {
         HStack(spacing: 12) {
             metricCard(
                 label: "Total Runtime",
-                value: seq.runtimeLabel,
-                subtitle: "M:SS across \(seq.panels.count) panels",
+                value: panels.runtimeLabel,
+                subtitle: "M:SS across \(panels.count) panels",
                 tint: Theme.violet
             )
             metricCard(
                 label: "Panel Count",
-                value: "\(seq.panels.count)",
-                subtitle: "\(seq.unpromotedCount) unpromoted",
+                value: "\(panels.count)",
+                subtitle: "\(panels.unpromotedCount) unpromoted",
                 tint: Theme.teal
             )
             metricCard(
                 label: "Avg Shot Length",
-                value: String(format: "%.1fs", seq.averageShotLength),
-                subtitle: aslSubtitle(seq.averageShotLength),
+                value: String(format: "%.1fs", panels.averageShotLength),
+                subtitle: aslSubtitle(panels.averageShotLength),
                 tint: Theme.accent
             )
             metricCard(
                 label: "Promoted",
-                value: "\(seq.promotedCount)/\(seq.panels.count)",
+                value: "\(panels.promotedCount)/\(panels.count)",
                 subtitle: "→ Scene Builder",
                 tint: Theme.magenta
             )
@@ -111,7 +112,7 @@ struct RhythmPlannerView: View {
 
     // MARK: Pacing curve
 
-    private func pacingCurve(_ seq: StoryboardSequence) -> some View {
+    private func pacingCurve(_ panels: [StoryboardPanel]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("PACING CURVE")
                 .font(.system(size: 11, weight: .bold))
@@ -120,7 +121,7 @@ struct RhythmPlannerView: View {
             Text("Panel duration across cumulative runtime. Peaks = sustained shots; valleys = staccato.")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.textSecondary)
-            pacingChart(seq)
+            pacingChart(panels)
                 .frame(height: 120)
                 .padding(12)
                 .background(Theme.card)
@@ -132,15 +133,15 @@ struct RhythmPlannerView: View {
         }
     }
 
-    private func pacingChart(_ seq: StoryboardSequence) -> some View {
+    private func pacingChart(_ panels: [StoryboardPanel]) -> some View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
-            let maxDuration = (seq.panels.map(\.duration).max() ?? 1)
-            let totalRuntime = max(seq.totalRuntime, 0.1)
+            let maxDuration = (panels.map(\.duration).max() ?? 1)
+            let totalRuntime = max(panels.totalRuntime, 0.1)
             let points: [(CGFloat, CGFloat, StoryboardPanel)] = {
                 var cumulative: Double = 0
-                return seq.panels.map { panel in
+                return panels.map { panel in
                     let midpoint = cumulative + panel.duration / 2.0
                     cumulative += panel.duration
                     let x = w * CGFloat(midpoint / totalRuntime)
@@ -191,9 +192,9 @@ struct RhythmPlannerView: View {
 
     // MARK: Shot distribution
 
-    private func shotDistribution(_ seq: StoryboardSequence) -> some View {
-        let histogram = seq.shotTypeHistogram
-        let total = max(1, seq.panels.count)
+    private func shotDistribution(_ panels: [StoryboardPanel]) -> some View {
+        let histogram = panels.shotTypeHistogram
+        let total = max(1, panels.count)
         return VStack(alignment: .leading, spacing: 10) {
             Text("SHOT TYPE DISTRIBUTION")
                 .font(.system(size: 11, weight: .bold))
@@ -260,9 +261,9 @@ struct RhythmPlannerView: View {
 
     // MARK: Priority mix
 
-    private func priorityMix(_ seq: StoryboardSequence) -> some View {
-        let histogram = seq.priorityHistogram
-        let total = max(1, seq.panels.count)
+    private func priorityMix(_ panels: [StoryboardPanel]) -> some View {
+        let histogram = panels.priorityHistogram
+        let total = max(1, panels.count)
         return VStack(alignment: .leading, spacing: 10) {
             Text("EDITING PRIORITY MIX")
                 .font(.system(size: 11, weight: .bold))

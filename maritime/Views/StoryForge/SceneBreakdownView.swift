@@ -7,8 +7,8 @@ struct SceneBreakdownView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 headerRow
-                if let bible = vm.activeBible, !bible.sceneBreakdowns.isEmpty {
-                    ForEach(bible.sceneBreakdowns) { scene in
+                if !vm.bible.sceneBreakdowns.isEmpty {
+                    ForEach(vm.bible.sceneBreakdowns) { scene in
                         sceneRow(scene)
                     }
                 } else {
@@ -304,28 +304,26 @@ struct SceneBreakdownView: View {
                 .foregroundStyle(Theme.textTertiary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    if let bible = vm.activeBible {
-                        ForEach(bible.characterDrafts) { draft in
-                            let isIn = scene.characterDraftIDs.contains(draft.id)
-                            Button(action: { toggleCharacter(draft.id, in: scene) }) {
-                                HStack(spacing: 5) {
-                                    Image(systemName: isIn ? "checkmark.circle.fill" : "circle")
-                                        .font(.system(size: 10))
-                                    Text(draft.name).font(.system(size: 10, weight: .medium))
-                                }
-                                .foregroundStyle(isIn ? Color.black : Theme.textSecondary)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(isIn ? Theme.magenta : Color.white.opacity(0.07))
-                                .clipShape(Capsule())
+                    ForEach(vm.bible.characterDrafts) { draft in
+                        let isIn = scene.characterDraftIDs.contains(draft.id)
+                        Button(action: { toggleCharacter(draft.id, in: scene) }) {
+                            HStack(spacing: 5) {
+                                Image(systemName: isIn ? "checkmark.circle.fill" : "circle")
+                                    .font(.system(size: 10))
+                                Text(draft.name).font(.system(size: 10, weight: .medium))
                             }
-                            .buttonStyle(.plainSolid)
+                            .foregroundStyle(isIn ? Color.black : Theme.textSecondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(isIn ? Theme.magenta : Color.white.opacity(0.07))
+                            .clipShape(Capsule())
                         }
-                        if bible.characterDrafts.isEmpty {
-                            Text("No characters yet. Add them in the Characters tab.")
-                                .font(.system(size: 10))
-                                .foregroundStyle(Theme.textTertiary)
-                        }
+                        .buttonStyle(.plainSolid)
+                    }
+                    if vm.bible.characterDrafts.isEmpty {
+                        Text("No characters yet. Add them in the Characters tab.")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Theme.textTertiary)
                     }
                 }
             }

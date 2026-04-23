@@ -144,13 +144,23 @@ struct SceneProp: Identifiable, Hashable, Codable {
     let category: String
     let tint: Color
     let symbol: String
+    /// Non-nil when this prop was added from a project SetPiece. Lets the
+    /// canvas re-resolve to live piece metadata / imagery if needed without
+    /// forcing Scene Builder to depend on the Set Design module.
+    let sourceSetPieceID: UUID?
 
-    init(id: UUID = UUID(), name: String, category: String, tint: Color, symbol: String) {
+    init(id: UUID = UUID(),
+         name: String,
+         category: String,
+         tint: Color,
+         symbol: String,
+         sourceSetPieceID: UUID? = nil) {
         self.id = id
         self.name = name
         self.category = category
         self.tint = tint
         self.symbol = symbol
+        self.sourceSetPieceID = sourceSetPieceID
     }
 }
 

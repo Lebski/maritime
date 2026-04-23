@@ -100,10 +100,10 @@ struct HomeView: View {
 
     private var modulesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            sectionHeader("Production Pipeline", subtitle: "Five modules. One cinematic workflow.")
+            sectionHeader("Production Pipeline", subtitle: "Six modules. One cinematic workflow.")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 230), spacing: 14)], spacing: 14) {
-                ForEach([AppModule.storyForge, .storyboard, .characterLab, .sceneBuilder, .videoRenderer], id: \.self) { m in
-                    ModuleTile(module: m, isFeatured: m == .characterLab || m == .sceneBuilder) {
+                ForEach([AppModule.storyForge, .characterLab, .setDesign, .storyboard, .sceneBuilder, .videoRenderer], id: \.self) { m in
+                    ModuleTile(module: m, isFeatured: m == .setDesign || m == .sceneBuilder) {
                         onNavigate(m)
                     }
                 }

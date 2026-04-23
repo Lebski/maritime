@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */; };
+		06E798EDA56CD88508CD1E1F /* SetDesignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060680BA1A3ED603EC9C8946 /* SetDesignView.swift */; };
 		07C78D13878C11E09A635A58 /* ThemeTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */; };
 		07F7A27D0390ED99C0C9D619 /* StoryForgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5B3CAC4CC561CCA2792ED4 /* StoryForgeView.swift */; };
 		09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76759068CF8F2E06FCC18D90 /* SidebarView.swift */; };
@@ -16,14 +17,17 @@
 		0F638C7CC82E644DCDA8D262 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */; };
 		146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */; };
 		1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790CC7A590B10A287972B40D /* SceneBuilderView.swift */; };
+		26599A213BC21B0E8618A40E /* MoodboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCE948AD47C332631272 /* MoodboardViewModel.swift */; };
 		38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */; };
 		3A36013CB46D6547BCA0BD5E /* CutSuggestionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A731252C8E8E5A82BCA59C1 /* CutSuggestionsList.swift */; };
+		3BA13E8772A2A74602B0FA43 /* MoodboardCanvasItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589E8A75D1FE1394DD757DDA /* MoodboardCanvasItem.swift */; };
 		41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */; };
 		4AECCF9BEA20FD8B8A4498B9 /* MotionControlsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 487946A99EA11ADD0391DB89 /* MotionControlsPanel.swift */; };
 		4BCE350DE8B48A6C08781168 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557F7455FFC01965AA7A316D /* Theme.swift */; };
 		4F8044B155E5D22358C13BFC /* CharacterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */; };
 		553C7B428327C9AB418FBB3C /* StoryboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255692AA3FF39F06974AE381 /* StoryboardStore.swift */; };
 		58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */; };
+		5CC7BE0D08F46B9D9100A3BE /* MoodboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */; };
 		616FF3ADDB80DA670B732060 /* VideoRendererModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */; };
 		6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */; };
 		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
@@ -51,17 +55,23 @@
 		A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */; };
 		A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */; };
 		B3F24A87DD7CB8968FE50BC1 /* AssetLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7169227446C80046BF27DC59 /* AssetLibraryView.swift */; };
+		B478133DB97DCF599EB3632C /* SetPiecePromptPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */; };
 		BC774BAB2B8908B2F9A75791 /* ExportsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F2860DA7BEBD39382CC396 /* ExportsModels.swift */; };
+		BDEA6B45C1C7A14C9382FEAB /* MoodboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1858E9AF31C3B92540075837 /* MoodboardModels.swift */; };
 		BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */; };
 		C30B54B91EB18088BE87A69C /* VideoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A9D4321B8EB3C1A93D22C1 /* VideoStore.swift */; };
+		C6484B66E03FE159F2369AF9 /* MoodboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E2562501968B81FEBE4ED6 /* MoodboardView.swift */; };
+		CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */; };
 		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
 		CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */; };
+		CEC43CA51731C055693BA9CF /* SetPieceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */; };
 		CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */; };
 		D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */; };
 		D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A4530F5AB5E6DCDB635C61 /* RootView.swift */; };
 		DCE6A53FCC91BE70A12DB813 /* CollapsiblePane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531F81FCB48D80FAA0A34132 /* CollapsiblePane.swift */; };
 		DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */; };
 		E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */; };
+		E1F53039CD99CD18DAFC568A /* SetDesignModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265D9E64EB3C045C3713DF93 /* SetDesignModels.swift */; };
 		E28A559FD65900D11C4675B3 /* StoryboardPanelsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */; };
 		E2E3BB5B2EDDFC9182066F62 /* ExportHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */; };
 		E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */; };
@@ -69,18 +79,25 @@
 		EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */; };
 		F1179E9398605BAC938947B9 /* ExportsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34AE7A5A4ED209DDEFA3324 /* ExportsViewModel.swift */; };
 		F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09938CED6EEC08DD58EE0F5 /* CharacterWorkspaceView.swift */; };
+		F8D5CE2F5277E4E2FCFBB83B /* StoryboardDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */; };
+		F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0361BCE948AD47C332631272 /* MoodboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardViewModel.swift; sourceTree = "<group>"; };
+		060680BA1A3ED603EC9C8946 /* SetDesignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignView.swift; sourceTree = "<group>"; };
 		07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardModels.swift; sourceTree = "<group>"; };
 		0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = maritime.entitlements; sourceTree = "<group>"; };
 		0F1E4F240AF3F87FE6D8F75B /* maritime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = maritime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10F2860DA7BEBD39382CC396 /* ExportsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsModels.swift; sourceTree = "<group>"; };
 		12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelCard.swift; sourceTree = "<group>"; };
+		1858E9AF31C3B92540075837 /* MoodboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardModels.swift; sourceTree = "<group>"; };
 		1DC3B252001C630E7DDC279E /* StoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStore.swift; sourceTree = "<group>"; };
 		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		255692AA3FF39F06974AE381 /* StoryboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardStore.swift; sourceTree = "<group>"; };
+		256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPiecePromptPanel.swift; sourceTree = "<group>"; };
 		265623AA8D68BC8CA43528BC /* VideoRendererViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererViewModel.swift; sourceTree = "<group>"; };
+		265D9E64EB3C045C3713DF93 /* SetDesignModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignModels.swift; sourceTree = "<group>"; };
 		29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelsGridView.swift; sourceTree = "<group>"; };
 		2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCanvasView.swift; sourceTree = "<group>"; };
 		2BBD72237DC0E09D6CB30AF7 /* ScenePanelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePanelsView.swift; sourceTree = "<group>"; };
@@ -92,10 +109,12 @@
 		51EF76E034C4C55BC5F4DCD6 /* AssetDetailPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailPanel.swift; sourceTree = "<group>"; };
 		531F81FCB48D80FAA0A34132 /* CollapsiblePane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsiblePane.swift; sourceTree = "<group>"; };
 		557F7455FFC01965AA7A316D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		589E8A75D1FE1394DD757DDA /* MoodboardCanvasItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardCanvasItem.swift; sourceTree = "<group>"; };
 		59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeModels.swift; sourceTree = "<group>"; };
 		5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgePanels.swift; sourceTree = "<group>"; };
 		5C85B39767AF954D9B81E054 /* CharacterLabModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabModels.swift; sourceTree = "<group>"; };
 		5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelDetailEditor.swift; sourceTree = "<group>"; };
+		67E2562501968B81FEBE4ED6 /* MoodboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardView.swift; sourceTree = "<group>"; };
 		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
 		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
 		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
@@ -115,19 +134,24 @@
 		9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderModels.swift; sourceTree = "<group>"; };
 		97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerView.swift; sourceTree = "<group>"; };
 		9D42572AB4278A3CA326C1A8 /* ExportTargetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTargetCard.swift; sourceTree = "<group>"; };
+		9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardStore.swift; sourceTree = "<group>"; };
+		A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardDetailsView.swift; sourceTree = "<group>"; };
 		A257DD4F9E660BE9793F14FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportHistoryList.swift; sourceTree = "<group>"; };
 		A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
 		ABFA92A081040832E1DEBAFC /* VideoRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererView.swift; sourceTree = "<group>"; };
 		ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPieceCard.swift; sourceTree = "<group>"; };
 		BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderViewModel.swift; sourceTree = "<group>"; };
 		BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBreakdownView.swift; sourceTree = "<group>"; };
 		BE65ACD8BAF2B949ED3050CC /* ThemeTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeTrackerView.swift; sourceTree = "<group>"; };
 		C34AE7A5A4ED209DDEFA3324 /* ExportsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportsViewModel.swift; sourceTree = "<group>"; };
 		C81BA59EAF7CADB87B92F208 /* AssetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetStore.swift; sourceTree = "<group>"; };
+		D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignViewModel.swift; sourceTree = "<group>"; };
 		D202A7239C33290199AE8215 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
 		D36CCA281FE2E5C8D861703B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererModels.swift; sourceTree = "<group>"; };
+		D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignStore.swift; sourceTree = "<group>"; };
 		D9853233341AACB1CB9A71CD /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotLibraryView.swift; sourceTree = "<group>"; };
 		E0074D8CFCA3806C34AD6C6E /* StoryStructureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStructureView.swift; sourceTree = "<group>"; };
@@ -159,6 +183,17 @@
 				531F81FCB48D80FAA0A34132 /* CollapsiblePane.swift */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		1DA8C7083E2961576C473637 /* SetDesign */ = {
+			isa = PBXGroup;
+			children = (
+				060680BA1A3ED603EC9C8946 /* SetDesignView.swift */,
+				D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */,
+				B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */,
+				256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */,
+			);
+			path = SetDesign;
 			sourceTree = "<group>";
 		};
 		21573A825E1E37461598D0C0 /* VideoRenderer */ = {
@@ -201,8 +236,12 @@
 				7FE9F0D8CDED5AB9341FBD40 /* CharacterStore.swift */,
 				10F2860DA7BEBD39382CC396 /* ExportsModels.swift */,
 				FFCC80BEE94CE861EA8A4E0B /* Models.swift */,
+				1858E9AF31C3B92540075837 /* MoodboardModels.swift */,
+				9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */,
 				9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */,
 				F53F490D26233235CF96DE56 /* SceneStore.swift */,
+				265D9E64EB3C045C3713DF93 /* SetDesignModels.swift */,
+				D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */,
 				07818DA4D68E9F90EB249D2E /* StoryboardModels.swift */,
 				255692AA3FF39F06974AE381 /* StoryboardStore.swift */,
 				59E2D7FEDA09CE2E33D0C66B /* StoryForgeModels.swift */,
@@ -245,6 +284,7 @@
 				02270A4D612B10E3877B5662 /* CharacterLab */,
 				22CD9E4E679169BFA3B890AA /* Exports */,
 				BA10AC88B50F3DC2144B5155 /* SceneBuilder */,
+				1DA8C7083E2961576C473637 /* SetDesign */,
 				02F77230C6D0EA513322AB41 /* Shared */,
 				C7D138127F8C0FEE1F14DF44 /* Storyboard */,
 				E76C802FC833B130316E1328 /* StoryForge */,
@@ -267,11 +307,15 @@
 		C7D138127F8C0FEE1F14DF44 /* Storyboard */ = {
 			isa = PBXGroup;
 			children = (
+				589E8A75D1FE1394DD757DDA /* MoodboardCanvasItem.swift */,
+				67E2562501968B81FEBE4ED6 /* MoodboardView.swift */,
+				0361BCE948AD47C332631272 /* MoodboardViewModel.swift */,
 				5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */,
 				3EB0F4A31DCA4E5F26926E51 /* RhythmPlannerView.swift */,
 				DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */,
 				97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */,
 				6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */,
+				A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */,
 				FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */,
 				12DB8BDF8CA3958600A7C9AB /* StoryboardPanelCard.swift */,
 				29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */,
@@ -405,6 +449,11 @@
 				6DADB0E129F26DEE5F252D79 /* HomeComponents.swift in Sources */,
 				0A25B10019A8C0BEC9BA70F5 /* HomeView.swift in Sources */,
 				A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */,
+				3BA13E8772A2A74602B0FA43 /* MoodboardCanvasItem.swift in Sources */,
+				BDEA6B45C1C7A14C9382FEAB /* MoodboardModels.swift in Sources */,
+				5CC7BE0D08F46B9D9100A3BE /* MoodboardStore.swift in Sources */,
+				C6484B66E03FE159F2369AF9 /* MoodboardView.swift in Sources */,
+				26599A213BC21B0E8618A40E /* MoodboardViewModel.swift in Sources */,
 				4AECCF9BEA20FD8B8A4498B9 /* MotionControlsPanel.swift in Sources */,
 				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
 				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
@@ -420,6 +469,12 @@
 				D3FAA51AD8B7F31D0C2381F4 /* SceneCanvasView.swift in Sources */,
 				E10FDFDD7E917EBEBE82198C /* ScenePanelsView.swift in Sources */,
 				6FC58EAB8A71A3BB01513ED7 /* SceneStore.swift in Sources */,
+				E1F53039CD99CD18DAFC568A /* SetDesignModels.swift in Sources */,
+				F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */,
+				06E798EDA56CD88508CD1E1F /* SetDesignView.swift in Sources */,
+				CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */,
+				CEC43CA51731C055693BA9CF /* SetPieceCard.swift in Sources */,
+				B478133DB97DCF599EB3632C /* SetPiecePromptPanel.swift in Sources */,
 				BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */,
 				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
 				E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */,
@@ -431,6 +486,7 @@
 				EEF8984FF267CBFBC95A3F60 /* StoryStructureView.swift in Sources */,
 				6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */,
 				7C9AA5FBB9F570A879CC528F /* StoryboardComposerViewModel.swift in Sources */,
+				F8D5CE2F5277E4E2FCFBB83B /* StoryboardDetailsView.swift in Sources */,
 				EF7C4833979E2525E7EC8BE9 /* StoryboardHelperPanel.swift in Sources */,
 				58CD94E4EDA7B0EB2E3976F6 /* StoryboardModels.swift in Sources */,
 				8BD77850EE9A5B52692C4859 /* StoryboardPanelCard.swift in Sources */,

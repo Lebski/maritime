@@ -47,17 +47,9 @@ struct VideoRendererView: View {
                     .foregroundStyle(AppModule.videoRenderer.tint)
             }
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 8) {
-                    Text(vm.sequenceName)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text(vm.projectTitle)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Theme.textSecondary)
-                        .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(Color.white.opacity(0.06))
-                        .clipShape(Capsule())
-                }
+                Text(vm.projectTitle)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(Theme.textPrimary)
                 Text("\(vm.clips.count) clips · \(String(format: "%.1fs", vm.totalDuration)) · \(Int(vm.approvalPercent * 100))% approved")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textTertiary)

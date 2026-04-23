@@ -38,12 +38,10 @@ struct CharacterBuilderView: View {
 
             ScrollView {
                 VStack(spacing: 6) {
-                    if let drafts = vm.activeBible?.characterDrafts {
-                        ForEach(drafts) { draft in
-                            draftRow(draft)
-                        }
+                    ForEach(vm.bible.characterDrafts) { draft in
+                        draftRow(draft)
                     }
-                    if vm.activeBible?.characterDrafts.isEmpty == true {
+                    if vm.bible.characterDrafts.isEmpty {
                         emptyDraftsHint
                     }
                 }

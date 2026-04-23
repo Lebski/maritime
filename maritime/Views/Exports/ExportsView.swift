@@ -73,13 +73,7 @@ struct ExportsView: View {
     private var projectPicker: some View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader("Project", icon: "film.fill")
-            if let project = vm.currentProject {
-                ProjectChip(project: project, isActive: true, onTap: {})
-            } else {
-                Text("No project loaded.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textTertiary)
-            }
+            ProjectChip(project: vm.currentProject, isActive: true, onTap: {})
         }
     }
 
@@ -104,11 +98,9 @@ struct ExportsView: View {
                 Text("\(vm.selectedFormats.count) formats selected")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.textPrimary)
-                if let project = vm.selectedProject {
-                    Text("from \(project.title)")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.textTertiary)
-                }
+                Text("from \(vm.selectedProject.title)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
             }
             Spacer()
             Button(action: { vm.generate() }) {
@@ -120,7 +112,7 @@ struct ExportsView: View {
                     .clipShape(Capsule())
             }
             .buttonStyle(.plainSolid)
-            .disabled(vm.selectedFormats.isEmpty || vm.selectedProject == nil)
+            .disabled(vm.selectedFormats.isEmpty)
         }
         .padding(16)
         .background(Theme.bgElevated)

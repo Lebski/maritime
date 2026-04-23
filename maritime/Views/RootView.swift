@@ -20,7 +20,6 @@ final class AppNavigator: ObservableObject {
 
     @Published var pendingFilmSceneID: UUID?
     @Published var pendingSceneBreakdownID: UUID?
-    @Published var pendingSequenceID: UUID?
 
     @Published var toast: ToastContent?
 
@@ -38,19 +37,14 @@ final class AppNavigator: ObservableObject {
         selection = .storyForge
     }
 
-    func openStoryboard(sequenceID: UUID? = nil) {
-        pendingSequenceID = sequenceID
+    func openStoryboard(sceneBreakdownID: UUID? = nil) {
+        pendingSceneBreakdownID = sceneBreakdownID
         selection = .storyboard
     }
 
     func consumePendingFilmSceneID() -> UUID? {
         defer { pendingFilmSceneID = nil }
         return pendingFilmSceneID
-    }
-
-    func consumePendingSequenceID() -> UUID? {
-        defer { pendingSequenceID = nil }
-        return pendingSequenceID
     }
 
     func consumePendingSceneBreakdownID() -> UUID? {
@@ -113,6 +107,8 @@ struct RootView: View {
             StoryboardComposerView(project: project)
         case .characterLab:
             CharacterLabView(project: project)
+        case .setDesign:
+            SetDesignView(project: project)
         case .sceneBuilder:
             SceneBuilderView(project: project)
         case .videoRenderer:

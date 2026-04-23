@@ -28,8 +28,8 @@ final class ExportsViewModel: ObservableObject {
 
     /// Synthesize a MovieProject summary from the open document so the existing
     /// chip + summary UI keeps working without a hardcoded sample list.
-    var currentProject: MovieProject? {
-        guard let bible = project.activeBible else { return nil }
+    var currentProject: MovieProject {
+        let bible = project.bible
         let totalSeconds = project.scenes.reduce(0) { $0 + $1.clipDuration }
         let approved = project.scenes.filter(\.frameApproved).count
         let progress = project.scenes.isEmpty
@@ -51,11 +51,9 @@ final class ExportsViewModel: ObservableObject {
         )
     }
 
-    var projects: [MovieProject] {
-        currentProject.map { [$0] } ?? []
-    }
+    var projects: [MovieProject] { [currentProject] }
 
-    var selectedProject: MovieProject? { currentProject }
+    var selectedProject: MovieProject { currentProject }
 
     // MARK: Mutations
 
@@ -72,7 +70,7 @@ final class ExportsViewModel: ObservableObject {
     }
 
     func generate() {
-        guard let summary = currentProject else { return }
+        let summary = currentProject
         for format in selectedFormats {
             let job = ExportJob(format: format, projectTitle: summary.title, status: .running(progress: 0))
             history.insert(job, at: 0)

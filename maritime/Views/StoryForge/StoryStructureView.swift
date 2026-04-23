@@ -7,11 +7,9 @@ struct StoryStructureView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 templatePicker
-                if let bible = vm.activeBible {
-                    arcCard(bible: bible)
-                    timelineCard(bible: bible)
-                    selectedBeatCard(bible: bible)
-                }
+                arcCard(bible: vm.bible)
+                timelineCard(bible: vm.bible)
+                selectedBeatCard(bible: vm.bible)
             }
             .padding(24)
         }
@@ -33,7 +31,7 @@ struct StoryStructureView: View {
                 ForEach(StoryStructureTemplate.allCases) { template in
                     TemplateChoiceCard(
                         template: template,
-                        isSelected: vm.activeBible?.structure.template == template,
+                        isSelected: vm.bible.structure.template == template,
                         action: { chooseTemplate(template) }
                     )
                 }
@@ -42,11 +40,6 @@ struct StoryStructureView: View {
     }
 
     private func chooseTemplate(_ template: StoryStructureTemplate) {
-        // Confirm swap if current has annotations.
-        let hasNotes = (vm.activeBible?.structure.beats.contains { !$0.userNotes.isEmpty }) ?? false
-        if hasNotes && vm.activeBible?.structure.template != template {
-            // For now, switch directly. A confirmation sheet could be added later.
-        }
         vm.chooseTemplate(template)
     }
 

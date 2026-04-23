@@ -51,19 +51,7 @@ final class StoryboardComposerViewModel: ObservableObject {
 
     init(project: MovieBlazeProject) {
         self.project = project
-        let seq = project.activeSequence
-        selectedPanelID = seq?.panels.first?.id
-
-        project.$activeSequenceID
-            .sink { [weak self] _ in
-                Task { @MainActor in
-                    guard let self else { return }
-                    let seq = self.project.activeSequence
-                    self.selectedPanelID = seq?.panels.first?.id
-                    self.focusedField = nil
-                }
-            }
-            .store(in: &cancellables)
+        selectedPanelID = project.storyboardPanels.first?.id
 
         project.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
@@ -72,16 +60,15 @@ final class StoryboardComposerViewModel: ObservableObject {
 
     // MARK: Lookups
 
-    var activeSequence: StoryboardSequence? { project.activeSequence }
+    var panels: [StoryboardPanel] { project.storyboardPanels }
 
     var selectedPanel: StoryboardPanel? {
         guard let id = selectedPanelID else { return nil }
-        return activeSequence?.panels.first(where: { $0.id == id })
+        return panels.first(where: { $0.id == id })
     }
 
     var selectedPanelIndex: Int? {
-        guard let id = selectedPanelID,
-              let panels = activeSequence?.panels else { return nil }
+        guard let id = selectedPanelID else { return nil }
         return panels.firstIndex(where: { $0.id == id })
     }
 
@@ -98,17 +85,12 @@ final class StoryboardComposerViewModel: ObservableObject {
         if activeTab == .library { activeTab = .panels }
     }
 
-    func setActiveSequence(_ id: UUID) {
-        project.setActiveSequence(id)
-    }
-
     // MARK: Panel CRUD
 
     func addPanel(shotType: CameraShotType) {
-        guard let seq = activeSequence else { return }
-        let base = seq.panels.last
+        let base = panels.last
         let panel = StoryboardPanel(
-            number: seq.panels.count + 1,
+            number: panels.count + 1,
             shotType: shotType,
             cameraMovement: .static,
             duration: 2.5,
@@ -116,7 +98,8 @@ final class StoryboardComposerViewModel: ObservableObject {
             timeOfDay: base?.timeOfDay ?? .day,
             editingPriority: .emotion,
             thumbnailSymbol: base?.thumbnailSymbol ?? "square.grid.3x2",
-            thumbnailColors: base?.thumbnailColors ?? seq.posterColors
+            thumbnailColors: base?.thumbnailColors ?? [Theme.violet, Theme.magenta],
+            sceneBreakdownID: base?.sceneBreakdownID
         )
         project.addPanel(panel)
         selectedPanelID = panel.id
@@ -128,10 +111,9 @@ final class StoryboardComposerViewModel: ObservableObject {
 
     func removeSelectedPanel() {
         guard let panel = selectedPanel else { return }
-        let panels = activeSequence?.panels ?? []
         let nextIndex = (panels.firstIndex(where: { $0.id == panel.id }) ?? 0) - 1
         project.removePanel(id: panel.id)
-        let updated = activeSequence?.panels ?? []
+        let updated = panels
         if updated.isEmpty {
             selectedPanelID = nil
         } else {
@@ -146,21 +128,24 @@ final class StoryboardComposerViewModel: ObservableObject {
     }
 
     func reorderPanels(from sourceIndex: Int, to destinationIndex: Int) {
-        project.reorderActivePanels(from: sourceIndex, to: destinationIndex)
+        project.reorderPanels(from: sourceIndex, to: destinationIndex)
     }
 
     // MARK: Promotion → Scene Builder
 
     @discardableResult
     func promoteSelectedPanelToSceneBuilder() -> (panel: StoryboardPanel, filmScene: FilmScene)? {
-        guard let seq = activeSequence,
-              let panel = selectedPanel,
+        guard let panel = selectedPanel,
               !panel.isPromoted else { return nil }
         let number = (project.scenes.map(\.number).max() ?? 0) + 1
+        let originScene = originSceneBreakdown(for: panel)
+        let title = originScene.map { "Scene \($0.number) · Panel \(panel.number)" }
+            ?? "Panel \(panel.number)"
+        let location = originScene?.title ?? project.bible.projectTitle
         let filmScene = FilmScene(
             number: number,
-            title: "\(seq.projectTitle) · Panel \(panel.number)",
-            location: seq.title,
+            title: title,
+            location: location,
             isInterior: true,
             timeOfDay: panel.timeOfDay,
             lightingMood: .neutral,
@@ -171,10 +156,17 @@ final class StoryboardComposerViewModel: ObservableObject {
             characters: [],
             activeGuides: [.ruleOfThirds],
             frameApproved: false,
-            projectTitle: seq.projectTitle
+            projectTitle: project.bible.projectTitle
         )
         project.addFilmScene(filmScene)
         project.markPanelPromoted(panelID: panel.id, filmSceneID: filmScene.id)
         return (panel, filmScene)
+    }
+
+    // MARK: Scene lookup
+
+    func originSceneBreakdown(for panel: StoryboardPanel) -> SceneBreakdown? {
+        guard let id = panel.sceneBreakdownID else { return nil }
+        return project.bible.sceneBreakdowns.first(where: { $0.id == id })
     }
 }
