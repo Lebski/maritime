@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 
 struct SetDesignView: View {
     @EnvironmentObject var project: MovieBlazeProject
+    @EnvironmentObject var settings: AppSettings
     @StateObject private var vm: SetDesignViewModel
 
     init(project: MovieBlazeProject) {
@@ -48,6 +49,11 @@ struct SetDesignView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.bg)
+        .sheet(isPresented: $vm.showWizard) {
+            SetDesignWizardSheet(vm: vm)
+                .environmentObject(project)
+                .environmentObject(settings)
+        }
     }
 
     // MARK: Sidebar
@@ -82,6 +88,17 @@ struct SetDesignView: View {
                         .foregroundStyle(Theme.textTertiary)
                 }
                 Spacer()
+                Button(action: { vm.openWizard() }) {
+                    Label("AI setup", systemImage: "sparkles")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Theme.coral)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Theme.coral.opacity(0.12))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .help("Generate a set from a description")
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 16)
@@ -218,20 +235,33 @@ struct SetDesignView: View {
             Text("Build Your Set Vocabulary")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
-            Text("Create a set piece to start generating\nthe props, vehicles, and architecture\nthat define this project's world.")
+            Text("Describe the set in a sentence and let Claude\npropose a starter list of pieces — or add\nthem one at a time.")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
-            Button(action: { vm.createPiece() }) {
-                Label("New Set Piece", systemImage: "plus")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(Theme.coral)
-                    .clipShape(Capsule())
+            HStack(spacing: 10) {
+                Button(action: { vm.openWizard() }) {
+                    Label("Start with AI", systemImage: "sparkles")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Theme.coral)
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                Button(action: { vm.createPiece() }) {
+                    Label("Add a blank piece", systemImage: "plus")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textSecondary)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Theme.card)
+                        .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
