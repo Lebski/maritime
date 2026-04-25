@@ -36,12 +36,19 @@ struct AssetDetailPanel: View {
     private func hero(asset: Asset) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             ZStack {
-                LinearGradient(colors: asset.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                Image(systemName: asset.kind.icon)
-                    .font(.system(size: 38))
-                    .foregroundStyle(.white.opacity(0.4))
+                if let image = vm.assetImage(for: asset) {
+                    Image(nsImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    LinearGradient(colors: asset.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    Image(systemName: asset.kind.icon)
+                        .font(.system(size: 38))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
             }
             .frame(height: 140)
+            .frame(maxWidth: .infinity)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
             HStack(spacing: 8) {
@@ -71,9 +78,53 @@ struct AssetDetailPanel: View {
             .padding(.horizontal, 8).padding(.vertical, 4)
             .background(asset.kind.tint.opacity(0.15))
             .clipShape(Capsule())
+
+            photoshopRow(asset: asset)
         }
         .padding(12)
         .cardStyle()
+    }
+
+    @ViewBuilder
+    private func photoshopRow(asset: Asset) -> some View {
+        if vm.isEditingInPhotoshop(asset) {
+            HStack(spacing: 8) {
+                Button(action: { vm.stopEditingInPhotoshop(asset) }) {
+                    photoshopPill(icon: "stop.circle.fill", label: "Stop editing", filled: true)
+                }
+                .buttonStyle(.plainSolid)
+                Button(action: { vm.revealEditFile(for: asset) }) {
+                    Image(systemName: "folder")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.textSecondary)
+                        .padding(.horizontal, 10).padding(.vertical, 8)
+                        .background(Color.white.opacity(0.06))
+                        .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+            }
+        } else {
+            Button(action: { vm.editInPhotoshop(asset) }) {
+                photoshopPill(icon: "paintbrush.fill", label: "Edit in Photoshop", filled: false)
+            }
+            .buttonStyle(.plainSolid)
+        }
+    }
+
+    private func photoshopPill(icon: String, label: String, filled: Bool) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(label)
+                .font(.system(size: 12, weight: .semibold))
+        }
+        .foregroundStyle(filled ? .black : Theme.textPrimary)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12).padding(.vertical, 8)
+        .background(filled ? Theme.accent : Color.white.opacity(0.06))
+        .overlay(Capsule().stroke(filled ? Color.clear : Theme.stroke, lineWidth: 1))
+        .clipShape(Capsule())
     }
 
     private func tagsCard(asset: Asset) -> some View {
