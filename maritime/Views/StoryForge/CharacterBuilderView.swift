@@ -27,6 +27,27 @@ struct CharacterBuilderView: View {
         } message: { detail in
             Text(detail)
         }
+        .confirmationDialog(
+            deleteDraftTitle,
+            isPresented: $vm.confirmingDraftDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) { vm.removeActiveDraft() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            if vm.activeDraftHasLabLink {
+                Text("The Character Lab character will be kept but unlinked.")
+            } else {
+                Text("This action cannot be undone.")
+            }
+        }
+    }
+
+    private var deleteDraftTitle: String {
+        if let name = vm.activeDraft?.name, !name.isEmpty {
+            return "Delete \(name)?"
+        }
+        return "Delete draft?"
     }
 
     // MARK: Draft List
@@ -94,11 +115,6 @@ struct CharacterBuilderView: View {
                         .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
                     Spacer()
-                    if draft.isPromoted {
-                        Image(systemName: "checkmark.seal.fill")
-                            .font(.system(size: 11))
-                            .foregroundStyle(Theme.teal)
-                    }
                 }
                 HStack(spacing: 6) {
                     Text(draft.role.uppercased())
@@ -180,27 +196,8 @@ struct CharacterBuilderView: View {
 
                 aiGenerateMenu(draft: draft)
 
-                if draft.isPromoted {
-                    promotedBadge
-                } else {
-                    Button(action: { vm.promoteActiveDraftToLab() }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "arrow.up.right.circle.fill")
-                                .font(.system(size: 12))
-                            Text("Promote to Character Lab")
-                                .font(.system(size: 12, weight: .semibold))
-                        }
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Theme.teal)
-                        .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plainSolid)
-                }
-
                 Menu {
-                    Button(role: .destructive) { vm.removeActiveDraft() } label: {
+                    Button(role: .destructive) { vm.confirmingDraftDelete = true } label: {
                         Label("Remove draft", systemImage: "trash")
                     }
                 } label: {
@@ -242,20 +239,6 @@ struct CharacterBuilderView: View {
         .fixedSize()
     }
 
-    private var promotedBadge: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 12))
-            Text("In Character Lab")
-                .font(.system(size: 11, weight: .semibold))
-        }
-        .foregroundStyle(Theme.teal)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Theme.teal.opacity(0.12))
-        .overlay(Capsule().stroke(Theme.teal.opacity(0.4), lineWidth: 1))
-        .clipShape(Capsule())
-    }
 
     private func fieldCardBinding(for field: StoryCharacterField, draft: StoryCharacterDraft) -> some View {
         FieldCard(

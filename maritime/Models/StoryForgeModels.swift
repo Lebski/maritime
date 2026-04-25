@@ -904,16 +904,11 @@ enum StoryForgeSamples {
                 ColorPaletteSwatch(hex: "#EAE4CF", color: Color(red: 0.92, green: 0.89, blue: 0.81), role: "Act 3")
             ]
         )
-        // Mark both characters as promoted — they already live in CharacterStore.
-        var elenaPromoted = elena
-        elenaPromoted.promotedLabCharacterID = UUID()
-        var marcusPromoted = marcus
-        marcusPromoted.promotedLabCharacterID = UUID()
         return StoryBible(
             projectTitle: "Neon Requiem",
             logline: "A cybernetic detective chases a ghost through a city that never sleeps.",
             lastUpdated: Date().addingTimeInterval(-7200),
-            characterDrafts: [elenaPromoted, marcusPromoted],
+            characterDrafts: [elena, marcus],
             structure: structure,
             sceneBreakdowns: scenes,
             theme: theme,
