@@ -5,6 +5,10 @@ struct MovieBlazeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var appSettings = AppSettings()
 
+    init() {
+        print("MovieBlaze \(BuildInfo.versionString)")
+    }
+
     var body: some Scene {
         DocumentGroup(newDocument: { MovieBlazeProject() }) { file in
             RootView()

@@ -25,8 +25,17 @@ struct SidebarView: View {
 
             Spacer(minLength: 0)
             userFooter
+            versionLabel
         }
         .background(Theme.bgElevated.ignoresSafeArea())
+    }
+
+    private var versionLabel: some View {
+        Text(BuildInfo.versionString)
+            .font(.system(size: 10, weight: .regular))
+            .foregroundStyle(Theme.textTertiary)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.bottom, 10)
     }
 
     private var brandHeader: some View {
