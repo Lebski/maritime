@@ -18,12 +18,11 @@ extension MovieBlazeProject {
         // Characters
         for ch in characters {
             let gradient = ch.finalVariation?.gradientColors
-                ?? ch.selectedVariations.first?.gradientColors
                 ?? [Theme.teal.opacity(0.8), Theme.violet.opacity(0.8)]
             let tags = [ch.role, ch.isFinalized ? "finalized" : "in-lab"]
                 .map { $0.lowercased() }
                 .filter { !$0.isEmpty }
-            let baseVersions = max(1, ch.selectedVariations.count)
+            let baseVersions = max(1, ch.portraitVariations.count)
             result.append(Asset(
                 id: ch.id,
                 name: ch.name,

@@ -14,25 +14,18 @@ struct FinalizedCharacterView: View {
             }
             .padding(28)
         }
+        .overlay {
+            if vm.isGenerating {
+                GeneratingOverlay(progress: vm.generationProgress)
+            }
+        }
     }
 
     // MARK: Hero Card
 
     private var heroCard: some View {
         HStack(spacing: 24) {
-            ZStack {
-                let color = character.finalVariation?.accentColor ?? Theme.teal
-                LinearGradient(
-                    colors: character.finalVariation?.gradientColors ?? [Theme.card, Theme.teal],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .frame(width: 120, height: 140)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                Image(systemName: "person.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(color.opacity(0.7))
-            }
+            portraitThumb
             VStack(alignment: .leading, spacing: 10) {
                 Text(character.name)
                     .font(.system(size: 22, weight: .bold))
@@ -40,8 +33,8 @@ struct FinalizedCharacterView: View {
                 Label(character.role, systemImage: "person.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textSecondary)
-                if let v = character.finalVariation {
-                    Text(v.style)
+                if !character.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(character.description)
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.textTertiary)
                         .lineLimit(3)
@@ -66,12 +59,8 @@ struct FinalizedCharacterView: View {
             }
             Spacer()
             VStack(spacing: 10) {
-                Button(action: {
-                    if let id = vm.characters.first(where: { $0.id == character.id })?.id {
-                        vm.requestMoreRounds(characterID: id)
-                    }
-                }) {
-                    Label("Re-refine", systemImage: "arrow.counterclockwise")
+                Button(action: { vm.clearSelection(characterID: character.id) }) {
+                    Label("Pick Different", systemImage: "arrow.counterclockwise")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.textSecondary)
                         .padding(.horizontal, 14)
@@ -115,6 +104,31 @@ struct FinalizedCharacterView: View {
         }
     }
 
+    private var portraitThumb: some View {
+        ZStack {
+            if let portrait = character.selectedPortrait,
+               let nsImage = NSImage(data: portrait.imageData) {
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 120, height: 140)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            } else {
+                let color = character.finalVariation?.accentColor ?? Theme.teal
+                LinearGradient(
+                    colors: character.finalVariation?.gradientColors ?? [Theme.card, Theme.teal],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .frame(width: 120, height: 140)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                Image(systemName: "person.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(color.opacity(0.7))
+            }
+        }
+    }
+
     // MARK: Reference Sheets
 
     private var referenceSheets: some View {
@@ -132,12 +146,10 @@ struct FinalizedCharacterView: View {
                 ForEach(ReferenceSheetType.allCases) { sheet in
                     ReferenceSheetCard(
                         sheet: sheet,
-                        isGenerated: character.generatedSheets.contains(sheet),
+                        imageData: character.sheetImages[sheet],
                         isGenerating: vm.isGenerating
                     ) {
-                        if let id = vm.characters.first(where: { $0.id == character.id })?.id {
-                            vm.generateSheet(characterID: id, sheet: sheet)
-                        }
+                        vm.generateSheet(characterID: character.id, sheet: sheet)
                     }
                 }
             }
@@ -232,26 +244,15 @@ struct FinalizedCharacterView: View {
 
 struct ReferenceSheetCard: View {
     let sheet: ReferenceSheetType
-    let isGenerated: Bool
+    let imageData: Data?
     let isGenerating: Bool
     let onGenerate: () -> Void
 
+    private var hasImage: Bool { imageData != nil }
+
     var body: some View {
         VStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isGenerated ? Theme.teal.opacity(0.15) : Theme.bg)
-                    .frame(height: 80)
-                if isGenerated {
-                    Image(systemName: sheet.icon)
-                        .font(.system(size: 28))
-                        .foregroundStyle(Theme.teal)
-                } else {
-                    Image(systemName: sheet.icon)
-                        .font(.system(size: 28))
-                        .foregroundStyle(Theme.textTertiary)
-                }
-            }
+            thumb
             VStack(spacing: 3) {
                 Text(sheet.title)
                     .font(.system(size: 11, weight: .semibold))
@@ -263,12 +264,12 @@ struct ReferenceSheetCard: View {
                     .lineLimit(2)
             }
             Button(action: { if !isGenerating { onGenerate() } }) {
-                Text(isGenerated ? "Regenerate" : "Generate")
+                Text(hasImage ? "Regenerate" : "Generate")
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(isGenerated ? Theme.textTertiary : .black)
+                    .foregroundStyle(hasImage ? Theme.textTertiary : .black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
-                    .background(isGenerated ? Color.white.opacity(0.06) : Theme.teal)
+                    .background(hasImage ? Color.white.opacity(0.06) : Theme.teal)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plainSolid)
@@ -276,5 +277,25 @@ struct ReferenceSheetCard: View {
         }
         .padding(12)
         .cardStyle()
+    }
+
+    private var thumb: some View {
+        ZStack {
+            if let data = imageData, let nsImage = NSImage(data: data) {
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 80)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            } else {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Theme.bg)
+                    .frame(height: 80)
+                Image(systemName: sheet.icon)
+                    .font(.system(size: 28))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+        }
     }
 }
