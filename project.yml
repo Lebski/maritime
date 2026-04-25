@@ -22,6 +22,19 @@ targets:
     deploymentTarget: '14.0'
     sources:
       - path: maritime
+    preBuildScripts:
+      - name: Inject Git Info into Info.plist (Debug only)
+        basedOnDependencyAnalysis: false
+        script: |
+          PLIST="$SRCROOT/maritime/Info.plist"
+          BRANCH=""
+          SHA=""
+          if [ "$CONFIGURATION" = "Debug" ] && [ -e "$SRCROOT/.git" ]; then
+            BRANCH=$(git -C "$SRCROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+            SHA=$(git -C "$SRCROOT" rev-parse --short HEAD 2>/dev/null || true)
+          fi
+          /usr/libexec/PlistBuddy -c "Set :GitBranch $BRANCH" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Set :GitShortSHA $SHA" "$PLIST" || true
     entitlements:
       path: maritime/maritime.entitlements
       properties:
@@ -40,6 +53,8 @@ targets:
         CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GitBranch: ''
+        GitShortSHA: ''
         CFBundleIconName: AppIcon
         LSApplicationCategoryType: public.app-category.utilities
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)

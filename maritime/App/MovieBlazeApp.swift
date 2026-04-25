@@ -2,6 +2,10 @@ import SwiftUI
 
 @main
 struct MovieBlazeApp: App {
+    init() {
+        print("MovieBlaze \(BuildInfo.versionString)")
+    }
+
     var body: some Scene {
         DocumentGroup(newDocument: { MovieBlazeProject() }) { file in
             RootView()

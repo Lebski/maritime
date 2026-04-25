@@ -18,6 +18,7 @@
 		146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */; };
 		1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790CC7A590B10A287972B40D /* SceneBuilderView.swift */; };
 		26599A213BC21B0E8618A40E /* MoodboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCE948AD47C332631272 /* MoodboardViewModel.swift */; };
+		2FBA0DA860705BED71D3BACE /* BuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A615C770E8420ADF38B415CA /* BuildInfo.swift */; };
 		38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */; };
 		3A36013CB46D6547BCA0BD5E /* CutSuggestionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A731252C8E8E5A82BCA59C1 /* CutSuggestionsList.swift */; };
 		3BA13E8772A2A74602B0FA43 /* MoodboardCanvasItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589E8A75D1FE1394DD757DDA /* MoodboardCanvasItem.swift */; };
@@ -143,6 +144,7 @@
 		A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardDetailsView.swift; sourceTree = "<group>"; };
 		A257DD4F9E660BE9793F14FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportHistoryList.swift; sourceTree = "<group>"; };
+		A615C770E8420ADF38B415CA /* BuildInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildInfo.swift; sourceTree = "<group>"; };
 		A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
 		ABFA92A081040832E1DEBAFC /* VideoRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererView.swift; sourceTree = "<group>"; };
 		AC5CF27F6A14B395A67CBF61 /* PremiereStillRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiereStillRenderer.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 		7D59425C2C354F9FE3CBB10D /* App */ = {
 			isa = PBXGroup;
 			children = (
+				A615C770E8420ADF38B415CA /* BuildInfo.swift */,
 				68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */,
 				557F7455FFC01965AA7A316D /* Theme.swift */,
 			);
@@ -375,6 +378,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A51A2A7CFA1B4601EF302B5D /* Build configuration list for PBXNativeTarget "maritime" */;
 			buildPhases = (
+				140FF6E421ED3EC33EE07DCA /* Inject Git Info into Info.plist (Debug only) */,
 				8EE5724EE1C987B998E07185 /* Sources */,
 				3D0F69F897DC563313DB8621 /* Resources */,
 			);
@@ -430,6 +434,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		140FF6E421ED3EC33EE07DCA /* Inject Git Info into Info.plist (Debug only) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Inject Git Info into Info.plist (Debug only)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PLIST=\"$SRCROOT/maritime/Info.plist\"\nBRANCH=\"\"\nSHA=\"\"\nif [ \"$CONFIGURATION\" = \"Debug\" ] && [ -e \"$SRCROOT/.git\" ]; then\n  BRANCH=$(git -C \"$SRCROOT\" rev-parse --abbrev-ref HEAD 2>/dev/null || true)\n  SHA=$(git -C \"$SRCROOT\" rev-parse --short HEAD 2>/dev/null || true)\nfi\n/usr/libexec/PlistBuddy -c \"Set :GitBranch $BRANCH\" \"$PLIST\" || true\n/usr/libexec/PlistBuddy -c \"Set :GitShortSHA $SHA\" \"$PLIST\" || true\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8EE5724EE1C987B998E07185 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -441,6 +467,7 @@
 				B3F24A87DD7CB8968FE50BC1 /* AssetLibraryView.swift in Sources */,
 				86C65B51BAC127E8DC6EE615 /* AssetLibraryViewModel.swift in Sources */,
 				9D31C7DCE00C51EBF4DFFE36 /* AssetStore.swift in Sources */,
+				2FBA0DA860705BED71D3BACE /* BuildInfo.swift in Sources */,
 				9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */,
 				0017D1C3E352F93536FA77DB /* CharacterLabModels.swift in Sources */,
 				38F5678955E1E6C55317BD36 /* CharacterLabView.swift in Sources */,
