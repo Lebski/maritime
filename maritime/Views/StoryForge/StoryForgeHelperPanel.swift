@@ -241,7 +241,6 @@ struct StoryForgeHelperPanel: View {
                     .tracking(0.8)
                     .foregroundStyle(Theme.textTertiary)
                 statRow(icon: "rectangle.stack.fill", tint: Theme.magenta, label: "Scenes", value: "\(bible.sceneBreakdowns.count)")
-                statRow(icon: "checkmark.seal.fill", tint: Theme.teal, label: "Promoted", value: "\(bible.sceneBreakdowns.filter { $0.isPromoted }.count)")
                 statRow(icon: "person.2.fill", tint: Theme.accent, label: "With Characters", value: "\(bible.sceneBreakdowns.filter { !$0.characterDraftIDs.isEmpty }.count)")
             }
             .padding(14)

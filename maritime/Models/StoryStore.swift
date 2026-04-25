@@ -183,6 +183,69 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 self.assetImageBytes[id] = data
             }
         }
+
+        backfillStoryForgeLinks()
+    }
+
+    /// Older `.mblaze` documents (and pre-auto-sync seed data) may contain
+    /// drafts/scenes whose link IDs are nil or point to entities that no
+    /// longer exist. Pair every draft with a real LabCharacter and every
+    /// scene breakdown with a real FilmScene, in place, on load.
+    private func backfillStoryForgeLinks() {
+        var bibleChanged = false
+
+        for i in bible.characterDrafts.indices {
+            let draft = bible.characterDrafts[i]
+            let needsLink: Bool
+            if let id = draft.promotedLabCharacterID {
+                needsLink = !characters.contains(where: { $0.id == id })
+            } else {
+                needsLink = true
+            }
+            guard needsLink else { continue }
+            let lab = LabCharacter(
+                name: draft.name,
+                description: bible.labDescription(for: draft),
+                role: bible.mapLabRole(for: draft)
+            )
+            characters.append(lab)
+            bible.characterDrafts[i].promotedLabCharacterID = lab.id
+            bibleChanged = true
+        }
+
+        for i in bible.sceneBreakdowns.indices {
+            let scene = bible.sceneBreakdowns[i]
+            let needsLink: Bool
+            if let id = scene.promotedFilmSceneID {
+                needsLink = !scenes.contains(where: { $0.id == id })
+            } else {
+                needsLink = true
+            }
+            guard needsLink else { continue }
+            let film = FilmScene(
+                number: (scenes.map(\.number).max() ?? 0) + 1,
+                title: scene.title,
+                location: scene.location,
+                isInterior: scene.isInterior,
+                timeOfDay: scene.timeOfDay,
+                lightingMood: .neutral,
+                keyLight: .frontal,
+                shotType: .medium,
+                background: nil,
+                props: [],
+                characters: [],
+                activeGuides: [.ruleOfThirds],
+                frameApproved: false,
+                projectTitle: bible.projectTitle
+            )
+            scenes.append(film)
+            bible.sceneBreakdowns[i].promotedFilmSceneID = film.id
+            bibleChanged = true
+        }
+
+        if bibleChanged {
+            bible.lastUpdated = Date()
+        }
     }
 
     // MARK: Snapshot + Write
@@ -297,22 +360,38 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 bible.characterDrafts[i] = draft
             }
         }
+        syncLinkedCharacter(for: draft)
     }
 
     func addDraft(_ draft: StoryCharacterDraft) {
-        mutateBible { $0.characterDrafts.append(draft) }
+        var stored = draft
+        let lab = LabCharacter(
+            name: stored.name,
+            description: bible.labDescription(for: stored),
+            role: bible.mapLabRole(for: stored)
+        )
+        stored.promotedLabCharacterID = lab.id
+        mutateBible { $0.characterDrafts.append(stored) }
+        upsertCharacter(lab)
     }
 
     func removeDraft(id: UUID) {
+        // Unlink only — the Lab character stays in `characters`. Removing the
+        // draft severs the only inbound reference.
         mutateBible { $0.characterDrafts.removeAll(where: { $0.id == id }) }
     }
 
-    func markDraftPromoted(draftID: UUID, labCharacterID: UUID) {
-        mutateBible { bible in
-            if let i = bible.characterDrafts.firstIndex(where: { $0.id == draftID }) {
-                bible.characterDrafts[i].promotedLabCharacterID = labCharacterID
-            }
-        }
+    /// Propagate one-way name/role/description edits from a Story Forge draft
+    /// down to the linked Lab character (if any). Lab-only fields (variations,
+    /// costumes, refinement state) are untouched.
+    private func syncLinkedCharacter(for draft: StoryCharacterDraft) {
+        guard let labID = draft.promotedLabCharacterID,
+              let idx = characters.firstIndex(where: { $0.id == labID }) else { return }
+        var lab = characters[idx]
+        lab.name = draft.name
+        lab.role = bible.mapLabRole(for: draft)
+        lab.description = bible.labDescription(for: draft)
+        characters[idx] = lab
     }
 
     func chooseTemplate(_ template: StoryStructureTemplate) {
@@ -328,7 +407,26 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func addScene(_ scene: SceneBreakdown) {
-        mutateBible { $0.sceneBreakdowns.append(scene) }
+        var stored = scene
+        let film = FilmScene(
+            number: (scenes.map(\.number).max() ?? 0) + 1,
+            title: stored.title,
+            location: stored.location,
+            isInterior: stored.isInterior,
+            timeOfDay: stored.timeOfDay,
+            lightingMood: .neutral,
+            keyLight: .frontal,
+            shotType: .medium,
+            background: nil,
+            props: [],
+            characters: [],
+            activeGuides: [.ruleOfThirds],
+            frameApproved: false,
+            projectTitle: bible.projectTitle
+        )
+        stored.promotedFilmSceneID = film.id
+        mutateBible { $0.sceneBreakdowns.append(stored) }
+        addFilmScene(film)
     }
 
     func updateScene(_ scene: SceneBreakdown) {
@@ -337,18 +435,26 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 bible.sceneBreakdowns[i] = scene
             }
         }
+        syncLinkedFilmScene(for: scene)
     }
 
     func removeScene(id: UUID) {
+        // Unlink only — the linked FilmScene stays in `scenes`.
         mutateBible { $0.sceneBreakdowns.removeAll(where: { $0.id == id }) }
     }
 
-    func markScenePromoted(sceneID: UUID, filmSceneID: UUID) {
-        mutateBible { bible in
-            if let i = bible.sceneBreakdowns.firstIndex(where: { $0.id == sceneID }) {
-                bible.sceneBreakdowns[i].promotedFilmSceneID = filmSceneID
-            }
-        }
+    /// Propagate one-way story-level edits from a SceneBreakdown to the linked
+    /// FilmScene (title/location/interior/timeOfDay). Production-side fields
+    /// (lighting, shot type, props) are untouched.
+    private func syncLinkedFilmScene(for scene: SceneBreakdown) {
+        guard let filmID = scene.promotedFilmSceneID,
+              let idx = scenes.firstIndex(where: { $0.id == filmID }) else { return }
+        var film = scenes[idx]
+        film.title = scene.title
+        film.location = scene.location
+        film.isInterior = scene.isInterior
+        film.timeOfDay = scene.timeOfDay
+        scenes[idx] = film
     }
 
     func updateTheme(_ theme: ThemeTracker) {

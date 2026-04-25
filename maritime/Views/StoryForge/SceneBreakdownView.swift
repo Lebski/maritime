@@ -23,6 +23,32 @@ struct SceneBreakdownView: View {
         .sheet(isPresented: $vm.showNewSceneSheet) {
             NewSceneBreakdownSheet(vm: vm)
         }
+        .confirmationDialog(
+            deleteSceneTitle,
+            isPresented: Binding(
+                get: { vm.pendingSceneDeletionID != nil },
+                set: { if !$0 { vm.pendingSceneDeletionID = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) { vm.confirmPendingSceneDeletion() }
+            Button("Cancel", role: .cancel) { vm.pendingSceneDeletionID = nil }
+        } message: {
+            if let id = vm.pendingSceneDeletionID, vm.sceneHasFilmSceneLink(id) {
+                Text("The Scene Builder scene will be kept but unlinked.")
+            } else {
+                Text("This action cannot be undone.")
+            }
+        }
+    }
+
+    private var deleteSceneTitle: String {
+        guard let id = vm.pendingSceneDeletionID,
+              let scene = vm.bible.sceneBreakdowns.first(where: { $0.id == id }) else {
+            return "Delete scene?"
+        }
+        let label = scene.title.isEmpty ? "Scene \(scene.number)" : scene.title
+        return "Delete \(label)?"
     }
 
     private var pendingDiffBanner: some View {
@@ -178,24 +204,6 @@ struct SceneBreakdownView: View {
                     }
                     .buttonStyle(.plainSolid)
                 }
-                if scene.isPromoted {
-                    promotedBadge
-                } else {
-                    Button(action: { vm.promoteScene(scene) }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.up.right.circle.fill")
-                                .font(.system(size: 11))
-                            Text("Send")
-                                .font(.system(size: 11, weight: .semibold))
-                        }
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Theme.accent)
-                        .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plainSolid)
-                }
                 Image(systemName: "chevron.down")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
@@ -217,20 +225,6 @@ struct SceneBreakdownView: View {
         .padding(.horizontal, 7)
         .padding(.vertical, 3)
         .background(time.tint.opacity(0.12))
-        .clipShape(Capsule())
-    }
-
-    private var promotedBadge: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 10))
-            Text("In Builder")
-                .font(.system(size: 10, weight: .semibold))
-        }
-        .foregroundStyle(Theme.teal)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .background(Theme.teal.opacity(0.12))
         .clipShape(Capsule())
     }
 
@@ -268,7 +262,7 @@ struct SceneBreakdownView: View {
             fieldEditor("Transition Note", key: .transition, value: scene.transitionNote, scene: scene)
             HStack {
                 Spacer()
-                Button(role: .destructive, action: { vm.removeScene(scene.id) }) {
+                Button(role: .destructive, action: { vm.pendingSceneDeletionID = scene.id }) {
                     Label("Remove scene", systemImage: "trash")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Color(red: 0.92, green: 0.45, blue: 0.45))

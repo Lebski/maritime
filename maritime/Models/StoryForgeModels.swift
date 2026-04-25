@@ -942,11 +942,6 @@ enum StoryForgeSamples {
                 ColorPaletteSwatch(hex: "#EAE4CF", color: Color(red: 0.92, green: 0.89, blue: 0.81), role: "Act 3")
             ]
         )
-        // Mark both characters as promoted — they already live in CharacterStore.
-        var elenaPromoted = elena
-        elenaPromoted.promotedLabCharacterID = UUID()
-        var marcusPromoted = marcus
-        marcusPromoted.promotedLabCharacterID = UUID()
         return StoryBible(
             projectTitle: "Neon Requiem",
             logline: "A cybernetic detective chases a ghost through a city that never sleeps.",
@@ -954,7 +949,7 @@ enum StoryForgeSamples {
             Elena's a memory-detective in a rain-drenched city where erasure is for sale on the black market. When her old partner is found memory-wiped on her watch, she breaks every rule trying to recover his last moments — and stumbles into a personal file she doesn't remember writing. The closer she gets to the cartel's ledger, the more she realizes the only way to know who she is is to face what she chose to forget.
             """,
             lastUpdated: Date().addingTimeInterval(-7200),
-            characterDrafts: [elenaPromoted, marcusPromoted],
+            characterDrafts: [elena, marcus],
             structure: structure,
             sceneBreakdowns: scenes,
             theme: theme,
