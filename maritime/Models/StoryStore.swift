@@ -62,6 +62,14 @@ final class MovieBlazeProject: ReferenceFileDocument {
     @Published var cutSuggestions: [CutSuggestion]
     @Published var favoritedAssetIDs: Set<UUID>
 
+    /// Number of times each asset has been re-imported from a Photoshop edit.
+    /// Persisted in `project.json`; the bytes themselves live in `assets/`.
+    @Published var assetEditCounts: [UUID: Int]
+
+    /// In-memory cache of per-asset PNG bytes loaded from `assets/<uuid>.png`.
+    /// Read with ``assetImageData(for:)`` and updated with ``setAssetImageData(_:for:)``.
+    var assetImageBytes: [UUID: Data] = [:]
+
     // MARK: Document type
 
     nonisolated static var readableContentTypes: [UTType] { [.movieBlazeProject] }
@@ -79,6 +87,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
         var moodboard: ProjectMoodboard?
         var cutSuggestions: [CutSuggestion]?
         var favoritedAssetIDs: [UUID]?
+        var assetEditCounts: [UUID: Int]?
     }
 
     struct Manifest: Codable {
@@ -90,6 +99,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
     private static let currentSchemaVersion = 2
     private static let manifestFilename = "manifest.json"
     private static let projectFilename  = "project.json"
+    static let assetsDirname            = "assets"
 
     // MARK: Init (new document)
 
@@ -103,6 +113,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
         self.moodboard         = seed.moodboard ?? ProjectMoodboard()
         self.cutSuggestions    = seed.cutSuggestions ?? []
         self.favoritedAssetIDs = Set(seed.favoritedAssetIDs ?? [])
+        self.assetEditCounts   = seed.assetEditCounts ?? [:]
     }
 
     private static func seedSnapshot() -> Snapshot {
@@ -157,6 +168,18 @@ final class MovieBlazeProject: ReferenceFileDocument {
         self.moodboard         = snapshot.moodboard ?? ProjectMoodboard()
         self.cutSuggestions    = snapshot.cutSuggestions ?? []
         self.favoritedAssetIDs = Set(snapshot.favoritedAssetIDs ?? [])
+        self.assetEditCounts   = snapshot.assetEditCounts ?? [:]
+
+        if let assetsDir = children[Self.assetsDirname],
+           assetsDir.isDirectory,
+           let entries = assetsDir.fileWrappers {
+            for (filename, wrapper) in entries {
+                let stem = (filename as NSString).deletingPathExtension
+                guard let id = UUID(uuidString: stem),
+                      let data = wrapper.regularFileContents else { continue }
+                self.assetImageBytes[id] = data
+            }
+        }
     }
 
     // MARK: Snapshot + Write
@@ -171,7 +194,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
             setPieces: setPieces,
             moodboard: moodboard,
             cutSuggestions: cutSuggestions,
-            favoritedAssetIDs: Array(favoritedAssetIDs)
+            favoritedAssetIDs: Array(favoritedAssetIDs),
+            assetEditCounts: assetEditCounts.isEmpty ? nil : assetEditCounts
         )
     }
 
@@ -212,7 +236,49 @@ final class MovieBlazeProject: ReferenceFileDocument {
         manifestFile.preferredFilename = Self.manifestFilename
         root.addFileWrapper(manifestFile)
 
+        writeAssetWrappers(into: root)
+
         return root
+    }
+
+    private func writeAssetWrappers(into root: FileWrapper) {
+        if assetImageBytes.isEmpty {
+            if let old = root.fileWrappers?[Self.assetsDirname] {
+                root.removeFileWrapper(old)
+            }
+            return
+        }
+
+        let assetsWrapper: FileWrapper
+        if let existing = root.fileWrappers?[Self.assetsDirname], existing.isDirectory {
+            assetsWrapper = existing
+        } else {
+            if let old = root.fileWrappers?[Self.assetsDirname] {
+                root.removeFileWrapper(old)
+            }
+            assetsWrapper = FileWrapper(directoryWithFileWrappers: [:])
+            assetsWrapper.preferredFilename = Self.assetsDirname
+            root.addFileWrapper(assetsWrapper)
+        }
+
+        let liveFilenames = Set(assetImageBytes.keys.map { "\($0.uuidString).png" })
+        for (filename, child) in assetsWrapper.fileWrappers ?? [:] where !liveFilenames.contains(filename) {
+            assetsWrapper.removeFileWrapper(child)
+        }
+
+        for (id, data) in assetImageBytes {
+            let filename = "\(id.uuidString).png"
+            if let existing = assetsWrapper.fileWrappers?[filename],
+               existing.regularFileContents == data {
+                continue
+            }
+            if let stale = assetsWrapper.fileWrappers?[filename] {
+                assetsWrapper.removeFileWrapper(stale)
+            }
+            let file = FileWrapper(regularFileWithContents: data)
+            file.preferredFilename = filename
+            assetsWrapper.addFileWrapper(file)
+        }
     }
 
     // MARK: Mutators — Story Bible
@@ -284,5 +350,20 @@ final class MovieBlazeProject: ReferenceFileDocument {
 
     func updateTheme(_ theme: ThemeTracker) {
         mutateBible { $0.theme = theme }
+    }
+
+    // MARK: Asset image bytes
+
+    func assetImageData(for id: UUID) -> Data? {
+        assetImageBytes[id]
+    }
+
+    /// Replaces the PNG bytes stored for `id`, bumps its Photoshop edit counter,
+    /// and marks the document dirty so autosave persists the bytes into the
+    /// `.mblaze` package on the next pass.
+    func setAssetImageData(_ data: Data, for id: UUID) {
+        objectWillChange.send()
+        assetImageBytes[id] = data
+        assetEditCounts[id, default: 0] += 1
     }
 }

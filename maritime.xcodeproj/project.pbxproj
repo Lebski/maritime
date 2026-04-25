@@ -32,6 +32,7 @@
 		5E1BE91159940F113396A392 /* CharacterWizardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9018E7021AEB146791BAA3 /* CharacterWizardSheet.swift */; };
 		616FF3ADDB80DA670B732060 /* VideoRendererModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */; };
 		6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */; };
+		64E06B9583338A0F0FC50D0D /* PhotoshopBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */; };
 		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
 		67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */; };
 		685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9853233341AACB1CB9A71CD /* PlaceholderView.swift */; };
@@ -55,15 +56,18 @@
 		9FF609CCAB74F739D071AFF5 /* CharacterBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3676ABAAFB3C8BC9D4EBDF61 /* CharacterBuilderView.swift */; };
 		A29C5E6C224459FD10F164EE /* StoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC3B252001C630E7DDC279E /* StoryStore.swift */; };
 		A3FB5C948FE28081C4FFBB3A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCC80BEE94CE861EA8A4E0B /* Models.swift */; };
+		A4093D47197AEE2E6ED97543 /* PremiereXMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B226C5582A3EE167B16A6B /* PremiereXMLExporter.swift */; };
 		A51C7836BCAEF9C62E51D1B1 /* SceneBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE55D61280830B4F56DC4A89 /* SceneBreakdownView.swift */; };
 		A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */; };
 		B3F24A87DD7CB8968FE50BC1 /* AssetLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7169227446C80046BF27DC59 /* AssetLibraryView.swift */; };
 		B478133DB97DCF599EB3632C /* SetPiecePromptPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */; };
+		B920C9190B7EE3B61448F159 /* PremiereExportSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2B1849A09A925BD5F786E9 /* PremiereExportSettings.swift */; };
 		BC774BAB2B8908B2F9A75791 /* ExportsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F2860DA7BEBD39382CC396 /* ExportsModels.swift */; };
 		BDEA6B45C1C7A14C9382FEAB /* MoodboardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1858E9AF31C3B92540075837 /* MoodboardModels.swift */; };
 		BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9B9FAC577D9FF082CC850D /* ShotLibraryView.swift */; };
 		C30B54B91EB18088BE87A69C /* VideoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A9D4321B8EB3C1A93D22C1 /* VideoStore.swift */; };
 		C6484B66E03FE159F2369AF9 /* MoodboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E2562501968B81FEBE4ED6 /* MoodboardView.swift */; };
+		CA21C7978697B4676056AA1F /* PremiereStillRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5CF27F6A14B395A67CBF61 /* PremiereStillRenderer.swift */; };
 		CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */; };
 		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
 		CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */; };
@@ -106,10 +110,12 @@
 		1B61C8AFB8A078F711067ED1 /* AnthropicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicClient.swift; sourceTree = "<group>"; };
 		1DC3B252001C630E7DDC279E /* StoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStore.swift; sourceTree = "<group>"; };
 		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoshopBridge.swift; sourceTree = "<group>"; };
 		255692AA3FF39F06974AE381 /* StoryboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardStore.swift; sourceTree = "<group>"; };
 		256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPiecePromptPanel.swift; sourceTree = "<group>"; };
 		265623AA8D68BC8CA43528BC /* VideoRendererViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererViewModel.swift; sourceTree = "<group>"; };
 		265D9E64EB3C045C3713DF93 /* SetDesignModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignModels.swift; sourceTree = "<group>"; };
+		26B226C5582A3EE167B16A6B /* PremiereXMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiereXMLExporter.swift; sourceTree = "<group>"; };
 		27C99AC2666CB93197FC7271 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		29A24522A68B292E1A9CEE72 /* StoryboardPanelsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardPanelsGridView.swift; sourceTree = "<group>"; };
 		2B89B3DCD47A1CB81FAFEA99 /* SceneCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneCanvasView.swift; sourceTree = "<group>"; };
@@ -130,6 +136,7 @@
 		67E2562501968B81FEBE4ED6 /* MoodboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardView.swift; sourceTree = "<group>"; };
 		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
 		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
+		6C2B1849A09A925BD5F786E9 /* PremiereExportSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiereExportSettings.swift; sourceTree = "<group>"; };
 		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
 		6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerViewModel.swift; sourceTree = "<group>"; };
 		6FDF8900D1EB67AD5FFD1038 /* ReferenceSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceSheetView.swift; sourceTree = "<group>"; };
@@ -155,6 +162,7 @@
 		A513C63714A94F2CF8C978D2 /* ExportHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportHistoryList.swift; sourceTree = "<group>"; };
 		A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalizedCharacterView.swift; sourceTree = "<group>"; };
 		ABFA92A081040832E1DEBAFC /* VideoRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererView.swift; sourceTree = "<group>"; };
+		AC5CF27F6A14B395A67CBF61 /* PremiereStillRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiereStillRenderer.swift; sourceTree = "<group>"; };
 		ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPieceCard.swift; sourceTree = "<group>"; };
 		BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderViewModel.swift; sourceTree = "<group>"; };
@@ -246,6 +254,7 @@
 				EAE3DD5660C2C61E4DF8390B /* FalaiSceneRenderService.swift */,
 				F342B369AEFE6B6474A98720 /* FalaiSetPieceService.swift */,
 				7B61F126F20D1EEC2EE4BAF1 /* KeychainStore.swift */,
+				23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -270,6 +279,9 @@
 				FFCC80BEE94CE861EA8A4E0B /* Models.swift */,
 				1858E9AF31C3B92540075837 /* MoodboardModels.swift */,
 				9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */,
+				6C2B1849A09A925BD5F786E9 /* PremiereExportSettings.swift */,
+				AC5CF27F6A14B395A67CBF61 /* PremiereStillRenderer.swift */,
+				26B226C5582A3EE167B16A6B /* PremiereXMLExporter.swift */,
 				9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */,
 				F53F490D26233235CF96DE56 /* SceneStore.swift */,
 				265D9E64EB3C045C3713DF93 /* SetDesignModels.swift */,
@@ -509,8 +521,12 @@
 				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
 				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
 				CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */,
+				64E06B9583338A0F0FC50D0D /* PhotoshopBridge.swift in Sources */,
 				685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */,
 				FFE8A53C73CEF09379EB0B73 /* PreferencesView.swift in Sources */,
+				B920C9190B7EE3B61448F159 /* PremiereExportSettings.swift in Sources */,
+				CA21C7978697B4676056AA1F /* PremiereStillRenderer.swift in Sources */,
+				A4093D47197AEE2E6ED97543 /* PremiereXMLExporter.swift in Sources */,
 				A90C421F76736620129E5516 /* ReferenceSheetView.swift in Sources */,
 				DF7D5C87E96EF3790A8E9D0E /* RhythmPlannerView.swift in Sources */,
 				D45E8A2D169622A3EC1DD9F6 /* RootView.swift in Sources */,
