@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SidebarView: View {
     @Binding var selection: AppModule
+    @Environment(\.openSettings) private var openSettings
 
     private let productionModules: [AppModule] = [
         .storyForge, .characterLab, .setDesign, .storyboard, .sceneBuilder, .videoRenderer
@@ -85,9 +86,17 @@ struct SidebarView: View {
                     .foregroundStyle(Theme.textTertiary)
             }
             Spacer()
-            Image(systemName: "ellipsis")
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.textSecondary)
+            Button {
+                openSettings()
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Theme.textSecondary)
+                    .frame(width: 24, height: 24)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plainSolid)
+            .help("Settings (⌘,)")
         }
         .padding(14)
         .background(Theme.card)

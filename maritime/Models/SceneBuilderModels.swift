@@ -327,7 +327,7 @@ enum ImageModel: String, CaseIterable, Codable, Identifiable {
 
     var subtitle: String {
         switch self {
-        case .nanoBanana2: return "Gemini 3 Pro Image · up to 14 refs"
+        case .nanoBanana2: return "Gemini 3 Flash Image · up to 14 refs"
         }
     }
 
