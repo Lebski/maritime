@@ -355,6 +355,67 @@ final class MovieBlazeProject: ReferenceFileDocument {
         mutateBible { $0.theme = theme }
     }
 
+    func updatePitch(_ pitch: String) {
+        mutateBible { $0.pitch = pitch }
+    }
+
+    /// Atomic apply of a freshly generated bible. Replaces every facet in a
+    /// single mutation so undo/save sees one change.
+    func applyGeneratedBible(title: String,
+                             logline: String,
+                             pitch: String,
+                             characters: [StoryCharacterDraft],
+                             structure: StoryStructureDraft,
+                             scenes: [SceneBreakdown],
+                             theme: ThemeTracker) {
+        mutateBible { bible in
+            bible.projectTitle    = title
+            bible.logline         = logline
+            bible.pitch           = pitch
+            bible.characterDrafts = characters
+            bible.structure       = structure
+            bible.sceneBreakdowns = scenes
+            bible.theme           = theme
+        }
+    }
+
+    /// Apply a partial scene update (used by the regen diff sheet).
+    /// `replacements[number]` writes a new scene over the existing one with
+    /// the same `number`, preserving the existing scene's `id` and
+    /// `promotedFilmSceneID` so downstream FilmScene links don't break.
+    /// `removals` deletes scenes by `number`. `additions` are appended.
+    func applySceneDiff(replacements: [Int: SceneBreakdown],
+                        removals: Set<Int>,
+                        additions: [SceneBreakdown]) {
+        mutateBible { bible in
+            bible.sceneBreakdowns.removeAll { removals.contains($0.number) }
+            for i in bible.sceneBreakdowns.indices {
+                let n = bible.sceneBreakdowns[i].number
+                if let replacement = replacements[n] {
+                    var s = replacement
+                    s = SceneBreakdown(
+                        id: bible.sceneBreakdowns[i].id,
+                        number: replacement.number,
+                        title: replacement.title,
+                        location: replacement.location,
+                        isInterior: replacement.isInterior,
+                        timeOfDay: replacement.timeOfDay,
+                        characterDraftIDs: replacement.characterDraftIDs,
+                        sceneGoal: replacement.sceneGoal,
+                        conflict: replacement.conflict,
+                        emotionalBeat: replacement.emotionalBeat,
+                        visualMetaphor: replacement.visualMetaphor,
+                        transitionNote: replacement.transitionNote,
+                        promotedFilmSceneID: bible.sceneBreakdowns[i].promotedFilmSceneID
+                    )
+                    bible.sceneBreakdowns[i] = s
+                }
+            }
+            bible.sceneBreakdowns.append(contentsOf: additions)
+            bible.sceneBreakdowns.sort { $0.number < $1.number }
+        }
+    }
+
     // MARK: Asset image bytes
 
     func assetImageData(for id: UUID) -> Data? {

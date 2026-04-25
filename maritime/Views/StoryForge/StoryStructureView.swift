@@ -2,10 +2,14 @@ import SwiftUI
 
 struct StoryStructureView: View {
     @ObservedObject var vm: StoryForgeViewModel
+    @EnvironmentObject var settings: AppSettings
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
+                if vm.isRegeneratingScenes {
+                    regeneratingBanner
+                }
                 templatePicker
                 arcCard(bible: vm.bible)
                 timelineCard(bible: vm.bible)
@@ -13,6 +17,24 @@ struct StoryStructureView: View {
             }
             .padding(24)
         }
+    }
+
+    private var regeneratingBanner: some View {
+        HStack(spacing: 10) {
+            ProgressView().controlSize(.small)
+            Text("Regenerating scenes for the new structure…")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Theme.magenta.opacity(0.08))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Theme.magenta.opacity(0.3), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     // MARK: Template Picker
@@ -40,7 +62,12 @@ struct StoryStructureView: View {
     }
 
     private func chooseTemplate(_ template: StoryStructureTemplate) {
-        vm.chooseTemplate(template)
+        guard template != vm.bible.structure.template else { return }
+        if vm.bible.sceneBreakdowns.isEmpty {
+            vm.chooseTemplate(template)
+        } else {
+            Task { await vm.chooseTemplateWithRegen(template, settings: settings) }
+        }
     }
 
     // MARK: Emotional Arc

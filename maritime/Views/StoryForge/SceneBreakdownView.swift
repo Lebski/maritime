@@ -7,6 +7,9 @@ struct SceneBreakdownView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 headerRow
+                if vm.pendingSceneDiff != nil && !vm.showSceneDiff {
+                    pendingDiffBanner
+                }
                 if !vm.bible.sceneBreakdowns.isEmpty {
                     ForEach(vm.bible.sceneBreakdowns) { scene in
                         sceneRow(scene)
@@ -20,6 +23,51 @@ struct SceneBreakdownView: View {
         .sheet(isPresented: $vm.showNewSceneSheet) {
             NewSceneBreakdownSheet(vm: vm)
         }
+    }
+
+    private var pendingDiffBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "wand.and.stars")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Theme.magenta)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Suggested scene revisions ready")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Text("Review the proposed changes from your structure switch.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            Spacer()
+            Button(action: { vm.showSceneDiff = true }) {
+                Text("Review changes →")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Theme.magenta)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plainSolid)
+            Button(action: { vm.discardSceneDiff() }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textTertiary)
+                    .frame(width: 24, height: 24)
+                    .background(Color.white.opacity(0.04))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plainSolid)
+            .help("Discard proposal")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Theme.magenta.opacity(0.08))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.magenta.opacity(0.3), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var headerRow: some View {
