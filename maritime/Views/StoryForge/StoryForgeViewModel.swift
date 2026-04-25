@@ -14,6 +14,9 @@ final class StoryForgeViewModel: ObservableObject {
     @Published var showNewCharacterSheet = false
     @Published var showNewSceneSheet = false
     @Published var showAddMotifSheet = false
+    @Published var wizardMode: CharacterWizardMode?
+    @Published var regeneratingField: StoryCharacterField?
+    @Published var generationError: String?
 
     enum SceneField: String {
         case goal, conflict, emotionalBeat, visualMetaphor, transition
@@ -92,6 +95,73 @@ final class StoryForgeViewModel: ObservableObject {
         )
         project.addDraft(draft)
         activeDraftID = draft.id
+    }
+
+    /// Add a fully-formed draft (used by the AI wizard when the user applies generated fields).
+    func insertDraft(_ draft: StoryCharacterDraft) {
+        project.addDraft(draft)
+        activeDraftID = draft.id
+    }
+
+    /// Apply wizard edits to an existing draft. Only writes generated fields the wizard produced;
+    /// anything not in `generated` is left untouched.
+    func updateDraftFields(id: UUID,
+                           name: String,
+                           role: String,
+                           backstory: String,
+                           generated: [StoryCharacterField: String]) {
+        guard var draft = bible.characterDrafts.first(where: { $0.id == id }) else { return }
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        draft.name = trimmedName.isEmpty ? draft.name : trimmedName
+        draft.role = role
+        draft.backstory = backstory
+        for (field, value) in generated {
+            draft.setValue(value, for: field)
+        }
+        project.updateDraft(draft)
+        activeDraftID = id
+    }
+
+    /// Inline regeneration of a single psychology field on the active draft.
+    /// Other non-empty fields are passed as context so the new value stays coherent.
+    func regenerate(field: StoryCharacterField, settings: AppSettings) async {
+        guard let draft = activeDraft else { return }
+        guard settings.isConfigured else {
+            generationError = "Add your Anthropic API key in Preferences (⌘,) first."
+            return
+        }
+        guard StoryCharacterField.psychologyFields.contains(field) else { return }
+
+        regeneratingField = field
+        defer { regeneratingField = nil }
+        generationError = nil
+
+        var context: [StoryCharacterField: String] = [:]
+        for f in StoryCharacterField.psychologyFields where f != field {
+            let value = draft.value(for: f)
+            if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                context[f] = value
+            }
+        }
+
+        let client = AnthropicClient(apiKey: settings.apiKey, model: settings.modelID)
+        let service = CharacterGenerationService(client: client)
+        let req = CharacterGenerationService.Request(
+            name: draft.name,
+            role: draft.role,
+            backstory: draft.backstory,
+            existing: context,
+            fieldsToFill: [field]
+        )
+
+        do {
+            let result = try await service.generate(req)
+            if let value = result.fields[field] {
+                updateDraftField(field, value: value)
+            }
+        } catch {
+            generationError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
     }
 
     func removeActiveDraft() {

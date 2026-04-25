@@ -22,7 +22,7 @@ final class SetDesignViewModel: ObservableObject {
     private let service: SetPieceGenerationService
 
     init(project: MovieBlazeProject,
-         service: SetPieceGenerationService = StubSetPieceGenerationService()) {
+         service: SetPieceGenerationService = FalaiSetPieceService()) {
         self.project = project
         self.service = service
         self.selectedPieceID = project.setPieces.first?.id
