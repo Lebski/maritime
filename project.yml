@@ -35,6 +35,17 @@ targets:
           fi
           /usr/libexec/PlistBuddy -c "Set :GitBranch $BRANCH" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Set :GitShortSHA $SHA" "$PLIST" || true
+    postBuildScripts:
+      - name: Restore Info.plist Git placeholders
+        basedOnDependencyAnalysis: false
+        script: |
+          # The pre-build phase writes branch/SHA into the source Info.plist so
+          # they are picked up when Xcode copies the plist into the .app. After
+          # the build is signed, restore the source to empty placeholders so the
+          # working tree stays clean.
+          PLIST="$SRCROOT/maritime/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :GitBranch " "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Set :GitShortSHA " "$PLIST" || true
     entitlements:
       path: maritime/maritime.entitlements
       properties:

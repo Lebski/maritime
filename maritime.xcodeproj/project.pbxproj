@@ -461,6 +461,7 @@
 				140FF6E421ED3EC33EE07DCA /* Inject Git Info into Info.plist (Debug only) */,
 				8EE5724EE1C987B998E07185 /* Sources */,
 				3D0F69F897DC563313DB8621 /* Resources */,
+				49B3D02453AFCEC0DA7FDD8E /* Restore Info.plist Git placeholders */,
 			);
 			buildRules = (
 			);
@@ -534,6 +535,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "PLIST=\"$SRCROOT/maritime/Info.plist\"\nBRANCH=\"\"\nSHA=\"\"\nif [ \"$CONFIGURATION\" = \"Debug\" ] && [ -e \"$SRCROOT/.git\" ]; then\n  BRANCH=$(git -C \"$SRCROOT\" rev-parse --abbrev-ref HEAD 2>/dev/null || true)\n  SHA=$(git -C \"$SRCROOT\" rev-parse --short HEAD 2>/dev/null || true)\nfi\n/usr/libexec/PlistBuddy -c \"Set :GitBranch $BRANCH\" \"$PLIST\" || true\n/usr/libexec/PlistBuddy -c \"Set :GitShortSHA $SHA\" \"$PLIST\" || true\n";
+		};
+		49B3D02453AFCEC0DA7FDD8E /* Restore Info.plist Git placeholders */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Restore Info.plist Git placeholders";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The pre-build phase writes branch/SHA into the source Info.plist so\n# they are picked up when Xcode copies the plist into the .app. After\n# the build is signed, restore the source to empty placeholders so the\n# working tree stays clean.\nPLIST=\"$SRCROOT/maritime/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :GitBranch \" \"$PLIST\" || true\n/usr/libexec/PlistBuddy -c \"Set :GitShortSHA \" \"$PLIST\" || true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
