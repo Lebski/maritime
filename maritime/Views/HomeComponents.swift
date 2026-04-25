@@ -3,8 +3,11 @@ import SwiftUI
 // MARK: - Hero
 
 struct HeroCard: View {
-    let onStart: () -> Void
+    let projectTitle: String
+    let nextStepLabel: String
+    let nextStepIcon: String
     let onContinue: () -> Void
+    let onOpenBible: () -> Void
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -39,7 +42,7 @@ struct HeroCard: View {
         HStack(alignment: .top, spacing: 24) {
             VStack(alignment: .leading, spacing: 14) {
                 Label {
-                    Text("AI Filmmaking · Studio v1.0")
+                    Text("Current Project")
                         .font(.system(size: 11, weight: .semibold))
                 } icon: {
                     Image(systemName: "sparkles")
@@ -51,18 +54,19 @@ struct HeroCard: View {
                 .background(Color.white.opacity(0.18))
                 .clipShape(Capsule())
 
-                Text("From a single idea\nto a finished film.")
+                Text(projectTitle)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(.white)
                     .lineSpacing(2)
+                    .lineLimit(2)
 
                 Text("Story Forge • Storyboard • Character Lab • Scene Builder • Renderer")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
 
                 HStack(spacing: 10) {
-                    Button(action: onStart) {
-                        Label("New Project", systemImage: "plus")
+                    Button(action: onContinue) {
+                        Label(nextStepLabel, systemImage: nextStepIcon)
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(.black)
                             .padding(.horizontal, 16)
@@ -72,8 +76,8 @@ struct HeroCard: View {
                     }
                     .buttonStyle(.plainSolid)
 
-                    Button(action: onContinue) {
-                        Label("Continue Editing", systemImage: "play.fill")
+                    Button(action: onOpenBible) {
+                        Label("Open Story Bible", systemImage: "text.book.closed.fill")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 16)
@@ -88,6 +92,24 @@ struct HeroCard: View {
             Spacer()
         }
         .padding(28)
+    }
+}
+
+// MARK: - Status pill
+
+struct StatusPill: View {
+    let status: ProjectStatus
+
+    var body: some View {
+        Text(status.rawValue)
+            .font(.system(size: 10, weight: .bold))
+            .tracking(0.8)
+            .foregroundStyle(status.tint)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(status.tint.opacity(0.15))
+            .overlay(Capsule().stroke(status.tint.opacity(0.35), lineWidth: 1))
+            .clipShape(Capsule())
     }
 }
 
@@ -216,155 +238,333 @@ struct ModuleTile: View {
     }
 }
 
-// MARK: - Project row
+// MARK: - Strips (Characters / Sets / Scenes)
 
-struct ProjectRow: View {
-    let project: MovieProject
-    var action: () -> Void = {}
+struct StripHeader: View {
+    let title: String
+    let count: Int
+    let viewAll: () -> Void
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Theme.textPrimary)
+            Text("\(count)")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.textTertiary)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Color.white.opacity(0.06))
+                .clipShape(Capsule())
+            Spacer()
+            Button("View all", action: viewAll)
+                .buttonStyle(.plainSolid)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.accent)
+        }
+    }
+}
+
+private struct StripEmptyState: View {
+    let icon: String
+    let message: String
+    let cta: String
+    let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 16) {
-                poster
-                info
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                    .frame(width: 36, height: 36)
+                    .background(Color.white.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(message)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(cta)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.accent)
+                }
                 Spacer()
-                progress
-                openIndicator
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Theme.accent)
             }
             .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
+        }
+        .buttonStyle(.plainSolid)
+    }
+}
+
+struct CharacterStrip: View {
+    let characters: [LabCharacter]
+    let onViewAll: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            StripHeader(title: "Characters", count: characters.count, viewAll: onViewAll)
+            if characters.isEmpty {
+                StripEmptyState(
+                    icon: "person.crop.artframe",
+                    message: "No characters yet",
+                    cta: "Open Character Lab →",
+                    action: onViewAll
+                )
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(characters) { character in
+                            CharacterChip(character: character, onOpen: onViewAll)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+}
+
+private struct CharacterChip: View {
+    let character: LabCharacter
+    let onOpen: () -> Void
+
+    private static let palette: [Color] = [Theme.teal, Theme.magenta, Theme.violet, Theme.coral, Theme.lime, Theme.accent]
+
+    private var tint: Color {
+        let idx = abs(character.id.hashValue) % Self.palette.count
+        return Self.palette[idx]
+    }
+
+    private var initial: String {
+        String(character.name.first ?? "?").uppercased()
+    }
+
+    var body: some View {
+        Button(action: onOpen) {
+            VStack(alignment: .leading, spacing: 10) {
+                ZStack {
+                    LinearGradient(
+                        colors: [tint.opacity(0.85), tint.opacity(0.45)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    Text(initial)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(.white)
+                    if character.isFinalized {
+                        VStack {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "checkmark.seal.fill")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundStyle(.white)
+                                    .padding(8)
+                            }
+                            Spacer()
+                        }
+                    }
+                }
+                .frame(width: 124, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(character.name.isEmpty ? "Untitled" : character.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    Text(character.isFinalized ? "Finalized" : "Round \(character.currentRound.rawValue)")
+                        .font(.system(size: 10))
+                        .foregroundStyle(character.isFinalized ? Theme.lime : Theme.textTertiary)
+                }
+            }
+            .frame(width: 140, alignment: .leading)
+            .padding(8)
+            .cardStyle()
+        }
+        .buttonStyle(.plainSolid)
+    }
+}
+
+struct SetPieceStrip: View {
+    let setPieces: [SetPiece]
+    let onViewAll: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            StripHeader(title: "Sets", count: setPieces.count, viewAll: onViewAll)
+            if setPieces.isEmpty {
+                StripEmptyState(
+                    icon: "cube.transparent.fill",
+                    message: "No set pieces yet",
+                    cta: "Open Set Design →",
+                    action: onViewAll
+                )
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(setPieces) { piece in
+                            SetPieceChip(piece: piece, onOpen: onViewAll)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+}
+
+private struct SetPieceChip: View {
+    let piece: SetPiece
+    let onOpen: () -> Void
+
+    var body: some View {
+        Button(action: onOpen) {
+            VStack(alignment: .leading, spacing: 10) {
+                thumbnail
+                    .frame(width: 164, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(piece.name.isEmpty ? "Untitled" : piece.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Image(systemName: piece.category.icon)
+                            .font(.system(size: 9, weight: .bold))
+                        Text(piece.category.title)
+                            .font(.system(size: 10, weight: .medium))
+                    }
+                    .foregroundStyle(piece.category.tint)
+                }
+            }
+            .frame(width: 180, alignment: .leading)
+            .padding(8)
             .cardStyle()
         }
         .buttonStyle(.plainSolid)
     }
 
-    private var poster: some View {
-        ZStack(alignment: .bottomLeading) {
-            LinearGradient(colors: project.posterColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-            Image(systemName: "film.fill")
-                .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.white.opacity(0.8))
-                .padding(10)
-        }
-        .frame(width: 80, height: 80)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private var info: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Text(project.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                statusPill
-            }
-            Text(project.logline)
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.textSecondary)
-                .lineLimit(2)
-                .frame(maxWidth: 380, alignment: .leading)
-            HStack(spacing: 12) {
-                metaItem(icon: "theatermasks.fill", text: project.genre)
-                metaItem(icon: "square.stack.3d.up.fill", text: "\(project.scenes) scenes")
-                metaItem(icon: "person.2.fill", text: "\(project.characters) chars")
-                metaItem(icon: "clock", text: "\(project.durationMinutes)m")
+    @ViewBuilder
+    private var thumbnail: some View {
+        if let data = piece.generatedImageData ?? piece.referenceImageData,
+           let nsImage = NSImage(data: data) {
+            Image(nsImage: nsImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            ZStack {
+                LinearGradient(
+                    colors: piece.primaryColors.isEmpty ? [piece.category.tint.opacity(0.55), piece.category.tint.opacity(0.25)] : piece.primaryColors,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                Image(systemName: piece.category.icon)
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.85))
             }
         }
-    }
-
-    private var statusPill: some View {
-        Text(project.status.rawValue)
-            .font(.system(size: 9, weight: .bold))
-            .tracking(0.8)
-            .foregroundStyle(project.status.tint)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(project.status.tint.opacity(0.15))
-            .clipShape(Capsule())
-    }
-
-    private func metaItem(icon: String, text: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 9, weight: .semibold))
-            Text(text)
-                .font(.system(size: 11, weight: .medium))
-        }
-        .foregroundStyle(Theme.textTertiary)
-    }
-
-    private var progress: some View {
-        VStack(alignment: .trailing, spacing: 6) {
-            Text("\(Int(project.progress * 100))%")
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(Theme.textPrimary)
-            ProgressView(value: project.progress)
-                .progressViewStyle(.linear)
-                .tint(project.status.tint)
-                .frame(width: 120)
-            Text("Updated \(project.updatedLabel)")
-                .font(.system(size: 10))
-                .foregroundStyle(Theme.textTertiary)
-        }
-    }
-
-    private var openIndicator: some View {
-        Image(systemName: "arrow.right")
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(Theme.textPrimary)
-            .frame(width: 36, height: 36)
-            .background(Color.white.opacity(0.08))
-            .clipShape(Circle())
     }
 }
 
-// MARK: - Activity
-
-struct ActivityCard: View {
-    let items: [ActivityItem]
+struct SceneStrip: View {
+    let scenes: [FilmScene]
+    let onViewAll: () -> Void
+    let onOpenScene: (UUID) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Recent Activity")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(Theme.textPrimary)
-                Spacer()
-                Text("Today")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textTertiary)
-            }
-            VStack(spacing: 12) {
-                ForEach(items) { item in
-                    row(item)
+        VStack(alignment: .leading, spacing: 12) {
+            StripHeader(title: "Scenes", count: scenes.count, viewAll: onViewAll)
+            if scenes.isEmpty {
+                StripEmptyState(
+                    icon: "photo.stack.fill",
+                    message: "No scenes yet",
+                    cta: "Open Scene Builder →",
+                    action: onViewAll
+                )
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(scenes) { scene in
+                            SceneChip(scene: scene, onOpen: { onOpenScene(scene.id) })
+                        }
+                    }
+                    .padding(.vertical, 2)
                 }
             }
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle()
     }
+}
 
-    private func row(_ item: ActivityItem) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            ZStack {
-                Circle().fill(item.tint.opacity(0.18)).frame(width: 30, height: 30)
-                Image(systemName: item.icon)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(item.tint)
+private struct SceneChip: View {
+    let scene: FilmScene
+    let onOpen: () -> Void
+
+    var body: some View {
+        Button(action: onOpen) {
+            VStack(alignment: .leading, spacing: 10) {
+                ZStack(alignment: .topTrailing) {
+                    LinearGradient(
+                        colors: [scene.timeOfDay.tint.opacity(0.65), Theme.card],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(width: 184, height: 90)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    HStack(spacing: 6) {
+                        Image(systemName: scene.timeOfDay.icon)
+                            .font(.system(size: 10, weight: .bold))
+                        Text(scene.timeOfDay.rawValue)
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black.opacity(0.35))
+                    .clipShape(Capsule())
+                    .padding(8)
+
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Text("Scene \(scene.number)")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundStyle(.white)
+                            Spacer()
+                            if scene.frameApproved {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundStyle(Theme.lime)
+                            }
+                        }
+                        .padding(10)
+                    }
+                }
+                .frame(width: 184, height: 90)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(scene.title.isEmpty ? "Untitled scene" : scene.title)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    Text("\(scene.isInterior ? "INT." : "EXT.") \(scene.location)")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(Theme.textTertiary)
+                        .lineLimit(1)
+                }
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                Text(item.subtitle)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textTertiary)
-            }
-            Spacer()
-            Text(item.time)
-                .font(.system(size: 10))
-                .foregroundStyle(Theme.textTertiary)
+            .frame(width: 200, alignment: .leading)
+            .padding(8)
+            .cardStyle()
         }
+        .buttonStyle(.plainSolid)
     }
 }
 

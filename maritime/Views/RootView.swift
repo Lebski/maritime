@@ -100,7 +100,10 @@ struct RootView: View {
     private var detailView: some View {
         switch navigator.selection {
         case .home:
-            HomeView(onNavigate: { navigator.go(to: $0) })
+            HomeView(
+                onNavigate: { navigator.go(to: $0) },
+                onJumpToScene: { navigator.openSceneBuilder(sceneID: $0) }
+            )
         case .storyForge:
             StoryForgeView(project: project)
         case .storyboard:

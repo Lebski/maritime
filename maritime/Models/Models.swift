@@ -167,28 +167,11 @@ enum SampleData {
         )
     ]
 
-    static let activity: [ActivityItem] = [
-        .init(icon: "wand.and.stars", tint: Theme.accent, title: "Rendered 3 shots", subtitle: "Neon Requiem · Scene 07", time: "12m"),
-        .init(icon: "person.crop.artframe", tint: Theme.teal, title: "Character finalized: Elena", subtitle: "Character Lab · Round 3", time: "1h"),
-        .init(icon: "square.grid.3x2.fill", tint: Theme.violet, title: "Storyboard updated", subtitle: "The Lantern Keeper · 9 panels", time: "3h"),
-        .init(icon: "text.book.closed.fill", tint: Theme.magenta, title: "Beat sheet completed", subtitle: "Paper Moon 2049 · Save the Cat", time: "Yesterday"),
-        .init(icon: "square.and.arrow.up.on.square.fill", tint: Theme.lime, title: "Exported to Premiere Pro", subtitle: "Tide & Bone · Final cut XML", time: "Yesterday")
-    ]
-
     static let tips: [FilmTip] = [
         .init(title: "Murch's Rule of Six", body: "Emotion first, story second, rhythm third. Cut on the highest-priority element you can preserve."),
         .init(title: "Mamet on Want", body: "Every protagonist must want something. Make it clear, make it active, make it visual."),
         .init(title: "180° Rule", body: "Keep the camera on one side of an imaginary axis to preserve spatial continuity for the audience.")
     ]
-}
-
-struct ActivityItem: Identifiable, Hashable {
-    let id = UUID()
-    let icon: String
-    let tint: Color
-    let title: String
-    let subtitle: String
-    let time: String
 }
 
 struct FilmTip: Identifiable, Hashable {
