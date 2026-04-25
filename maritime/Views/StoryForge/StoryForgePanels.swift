@@ -67,6 +67,8 @@ struct FieldCard: View {
     @Binding var text: String
     let isFocused: Bool
     let onFocus: () -> Void
+    var onRegenerate: (() -> Void)? = nil
+    var isRegenerating: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -94,6 +96,27 @@ struct FieldCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.textSecondary)
+                }
+                if let onRegenerate {
+                    Button(action: onRegenerate) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.06))
+                                .frame(width: 22, height: 22)
+                            if isRegenerating {
+                                ProgressView().scaleEffect(0.5)
+                            } else {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 10, weight: .semibold))
+                                    .foregroundStyle(field.tint)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plainSolid)
+                    .disabled(isRegenerating)
+                    .help(text.trimmingCharacters(in: .whitespaces).isEmpty
+                          ? "Generate this field with AI"
+                          : "Regenerate with AI (keeps other fields as context)")
                 }
             }
 

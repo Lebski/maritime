@@ -36,6 +36,7 @@ struct ExportsView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     projectPicker
                     targetGrid
+                    premiereSettingsStrip
                     summaryBar
                 }
                 .padding(24)
@@ -89,6 +90,49 @@ struct ExportsView: View {
                     )
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var premiereSettingsStrip: some View {
+        if vm.selectedFormats.contains(.premiereXML) {
+            HStack(spacing: 14) {
+                HStack(spacing: 6) {
+                    Image(systemName: ExportFormat.premiereXML.icon)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(ExportFormat.premiereXML.tint)
+                    Text("PREMIERE PRO")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.5)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Picker("Frame rate", selection: $vm.premiereSettings.frameRate) {
+                    ForEach(PremiereFrameRate.allCases) { fps in
+                        Text(fps.label).tag(fps)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .frame(maxWidth: 120)
+
+                Picker("Resolution", selection: $vm.premiereSettings.resolution) {
+                    ForEach(PremiereResolution.allCases) { res in
+                        Text(res.label).tag(res)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .frame(maxWidth: 180)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Theme.bgElevated)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Theme.stroke, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
 

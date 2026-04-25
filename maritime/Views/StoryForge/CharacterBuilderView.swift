@@ -3,6 +3,7 @@ import SwiftUI
 struct CharacterBuilderView: View {
     @ObservedObject var vm: StoryForgeViewModel
     @EnvironmentObject var project: MovieBlazeProject
+    @EnvironmentObject var settings: AppSettings
 
     var body: some View {
         HStack(spacing: 0) {
@@ -11,6 +12,20 @@ struct CharacterBuilderView: View {
             Divider().background(Theme.stroke)
             editorColumn
                 .frame(maxWidth: .infinity)
+        }
+        .sheet(item: $vm.wizardMode) { mode in
+            CharacterWizardSheet(mode: mode, vm: vm)
+                .environmentObject(settings)
+        }
+        .alert("Generation failed",
+               isPresented: Binding(
+                   get: { vm.generationError != nil },
+                   set: { if !$0 { vm.generationError = nil } }
+               ),
+               presenting: vm.generationError) { _ in
+            Button("OK") { vm.generationError = nil }
+        } message: { detail in
+            Text(detail)
         }
     }
 
@@ -24,12 +39,25 @@ struct CharacterBuilderView: View {
                     .tracking(0.6)
                     .foregroundStyle(Theme.textSecondary)
                 Spacer()
-                Button(action: { vm.showNewCharacterSheet = true }) {
+                Menu {
+                    Button {
+                        vm.wizardMode = .new
+                    } label: {
+                        Label("New with AI…", systemImage: "sparkles")
+                    }
+                    Button {
+                        vm.showNewCharacterSheet = true
+                    } label: {
+                        Label("Blank draft", systemImage: "plus")
+                    }
+                } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.magenta)
                 }
-                .buttonStyle(.plainSolid)
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -150,6 +178,8 @@ struct CharacterBuilderView: View {
 
                 Spacer()
 
+                aiGenerateMenu(draft: draft)
+
                 if draft.isPromoted {
                     promotedBadge
                 } else {
@@ -235,8 +265,45 @@ struct CharacterBuilderView: View {
                 set: { vm.updateDraftField(field, value: $0) }
             ),
             isFocused: vm.focusedField == field,
-            onFocus: { vm.focusedField = field }
+            onFocus: { vm.focusedField = field },
+            onRegenerate: StoryCharacterField.psychologyFields.contains(field)
+                ? { Task { await vm.regenerate(field: field, settings: settings) } }
+                : nil,
+            isRegenerating: vm.regeneratingField == field
         )
+    }
+
+    // MARK: AI Generate Menu
+
+    @ViewBuilder
+    private func aiGenerateMenu(draft: StoryCharacterDraft) -> some View {
+        Menu {
+            Button {
+                vm.wizardMode = .refine(draftID: draft.id)
+            } label: {
+                Label("Fill empty fields…", systemImage: "sparkles")
+            }
+            .disabled(!settings.isConfigured)
+
+            if !settings.isConfigured {
+                Divider()
+                Text("Add your Anthropic API key in Preferences (⌘,) to enable.")
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles").font(.system(size: 11))
+                Text("Generate with AI").font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(settings.isConfigured ? Theme.textPrimary : Theme.textTertiary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(Color.white.opacity(settings.isConfigured ? 0.08 : 0.03))
+            .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+            .clipShape(Capsule())
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
     }
 
     private var emptyEditor: some View {
@@ -247,21 +314,40 @@ struct CharacterBuilderView: View {
             Text("Add your first character")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
-            Text("Start with the protagonist. The guided fields below will help surface what your story is actually about.")
+            Text("Start with the protagonist. Tell Claude a name, role, and a sentence of backstory — it'll draft Want, Need, Ghost, Flaw, Stakes, and Voice for you to refine.")
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 380)
-            Button(action: { vm.showNewCharacterSheet = true }) {
-                Label("New Character Draft", systemImage: "plus")
-                    .font(.system(size: 12, weight: .semibold))
+
+            VStack(spacing: 8) {
+                Button(action: { vm.wizardMode = .new }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles").font(.system(size: 12))
+                        Text("Start with AI").font(.system(size: 12, weight: .semibold))
+                    }
                     .foregroundStyle(.black)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
                     .background(Theme.magenta)
                     .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+
+                Button(action: { vm.showNewCharacterSheet = true }) {
+                    Text("Blank character")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                .buttonStyle(.plainSolid)
             }
-            .buttonStyle(.plainSolid)
+
+            if !settings.isConfigured {
+                Text("Add your Anthropic API key in Preferences (⌘,) to enable AI.")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textTertiary)
+                    .padding(.top, 8)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 60)

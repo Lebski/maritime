@@ -49,11 +49,18 @@ enum StoryForgeSection: String, CaseIterable, Identifiable, Hashable {
 // MARK: - Character Draft
 
 enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
-    case want, need, ghost, flaw, stakes, voice
+    case backstory, want, need, ghost, flaw, stakes, voice
     var id: String { rawValue }
+
+    /// Fields that describe character psychology. Backstory is author-provided context,
+    /// not a psychology pillar, so AI generation fills only these six.
+    static var psychologyFields: [StoryCharacterField] {
+        [.want, .need, .ghost, .flaw, .stakes, .voice]
+    }
 
     var label: String {
         switch self {
+        case .backstory: return "Backstory"
         case .want:   return "Want"
         case .need:   return "Need"
         case .ghost:  return "Ghost / Wound"
@@ -65,6 +72,7 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
 
     var subtitle: String {
         switch self {
+        case .backstory: return "What shaped them before page one"
         case .want:   return "External goal — what they pursue on-screen"
         case .need:   return "Internal truth — what they actually require"
         case .ghost:  return "Past wound shaping present behaviour"
@@ -76,6 +84,7 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
 
     var icon: String {
         switch self {
+        case .backstory: return "book.closed.fill"
         case .want:   return "target"
         case .need:   return "heart.fill"
         case .ghost:  return "moon.stars.fill"
@@ -87,6 +96,7 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
 
     var tint: Color {
         switch self {
+        case .backstory: return Theme.textSecondary
         case .want:   return Theme.accent
         case .need:   return Theme.magenta
         case .ghost:  return Theme.violet
@@ -98,6 +108,8 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
 
     var whyItMatters: String {
         switch self {
+        case .backstory:
+            return "A sentence or two of backstory gives every psychology field something concrete to echo. The more specific you are here, the less generic the rest becomes."
         case .want:
             return "Every protagonist must want something visible. Want is what the camera can photograph — a goal, an object, a destination. Without a clear want, scenes drift."
         case .need:
@@ -115,6 +127,12 @@ enum StoryCharacterField: String, CaseIterable, Identifiable, Hashable {
 
     var examples: [String] {
         switch self {
+        case .backstory:
+            return [
+                "A medic who lost her brother during a refugee crossing she helped organize.",
+                "A disgraced cartographer redrawing maps of a country that no longer exists.",
+                "A retired dancer teaching children the steps she's no longer strong enough to perform."
+            ]
         case .want:
             return [
                 "Michael Corleone wants to protect his family without becoming his father.",
@@ -159,6 +177,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
     var role: String
+    var backstory: String = ""
     var want: String = ""
     var need: String = ""
     var ghost: String = ""
@@ -170,6 +189,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
     init(id: UUID = UUID(),
          name: String,
          role: String,
+         backstory: String = "",
          want: String = "",
          need: String = "",
          ghost: String = "",
@@ -180,6 +200,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
         self.id = id
         self.name = name
         self.role = role
+        self.backstory = backstory
         self.want = want
         self.need = need
         self.ghost = ghost
@@ -191,6 +212,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
 
     func value(for field: StoryCharacterField) -> String {
         switch field {
+        case .backstory: return backstory
         case .want:   return want
         case .need:   return need
         case .ghost:  return ghost
@@ -202,6 +224,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
 
     mutating func setValue(_ text: String, for field: StoryCharacterField) {
         switch field {
+        case .backstory: backstory = text
         case .want:   want = text
         case .need:   need = text
         case .ghost:  ghost = text
@@ -211,6 +234,7 @@ struct StoryCharacterDraft: Identifiable, Hashable, Codable {
         }
     }
 
+    /// Psychology completion (Want…Voice). Backstory is not counted — it's an input, not a pillar.
     var completion: Double {
         let all: [String] = [want, need, ghost, flaw, stakes, voice]
         let filled = all.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count

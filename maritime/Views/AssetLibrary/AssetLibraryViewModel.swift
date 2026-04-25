@@ -18,16 +18,45 @@ final class AssetLibraryViewModel: ObservableObject {
     @Published var filtersCollapsed: Bool = false
     @Published var inspectorCollapsed: Bool = false
 
-    private let project: MovieBlazeProject
+    let project: MovieBlazeProject
+    let photoshopBridge: PhotoshopBridge
     private var cancellables: Set<AnyCancellable> = []
 
     init(project: MovieBlazeProject) {
         self.project = project
+        self.photoshopBridge = PhotoshopBridge(project: project)
         selectedAssetID = project.assets.first?.id
         selectedCollectionID = project.assetCollections.first?.id
         project.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
+        photoshopBridge.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+    }
+
+    // MARK: Photoshop round-trip
+
+    func editInPhotoshop(_ asset: Asset) {
+        photoshopBridge.beginEditing(asset)
+    }
+
+    func stopEditingInPhotoshop(_ asset: Asset) {
+        photoshopBridge.endEditing(asset.id)
+    }
+
+    func isEditingInPhotoshop(_ asset: Asset) -> Bool {
+        photoshopBridge.isEditing(asset.id)
+    }
+
+    func revealEditFile(for asset: Asset) {
+        guard let url = photoshopBridge.tempFileURL(for: asset.id) else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    func assetImage(for asset: Asset) -> NSImage? {
+        guard let data = project.assetImageData(for: asset.id) else { return nil }
+        return NSImage(data: data)
     }
 
     // MARK: Derived state

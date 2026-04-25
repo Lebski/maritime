@@ -19,7 +19,7 @@ final class SceneBuilderViewModel: ObservableObject {
     var scenes: [FilmScene] { project.scenes }
 
     init(project: MovieBlazeProject,
-         imageService: ImageGenerationService = StubImageGenerationService()) {
+         imageService: ImageGenerationService = FalaiSceneRenderService()) {
         self.project = project
         self.imageService = imageService
         activeSceneID = project.scenes.first?.id

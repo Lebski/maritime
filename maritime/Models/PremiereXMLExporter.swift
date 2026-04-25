@@ -1,0 +1,153 @@
+import Foundation
+
+// MARK: - Premiere Pro XML serializer
+//
+// Emits an FCP7-style xmeml v5 document — the format Adobe Premiere Pro
+// imports natively via File → Import. Each clip becomes a still-image
+// <clipitem> sized to its scene duration; applied cut suggestions become
+// timeline <marker>s placed at the boundary frame after the referenced
+// clip's scene number.
+
+struct PremiereXMLExporter {
+
+    @MainActor
+    static func xml(
+        for project: MovieBlazeProject,
+        settings: PremiereExportSettings,
+        clips: [VideoClip],
+        mediaURLs: [UUID: URL]
+    ) -> String {
+        let fps = settings.frameRate.rawValue
+        let width = settings.resolution.width
+        let height = settings.resolution.height
+        let titleRaw = project.bible.projectTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let projectName = xmlEscape(titleRaw.isEmpty ? "Untitled" : titleRaw)
+
+        // Lay each clip out sequentially on the timeline, snapping duration
+        // to whole frames at the chosen rate (clamped to a 1-frame minimum).
+        struct LaidOutClip {
+            let clip: VideoClip
+            let frames: Int
+            let start: Int
+            let end: Int
+            let mediaURL: URL?
+        }
+        var laidOut: [LaidOutClip] = []
+        var cursor = 0
+        for clip in clips {
+            let frames = max(1, Int((clip.duration * Double(fps)).rounded()))
+            let start = cursor
+            let end = cursor + frames
+            laidOut.append(LaidOutClip(
+                clip: clip,
+                frames: frames,
+                start: start,
+                end: end,
+                mediaURL: mediaURLs[clip.id]
+            ))
+            cursor = end
+        }
+        let totalFrames = cursor
+
+        var lines: [String] = []
+        lines.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+        lines.append("<!DOCTYPE xmeml>")
+        lines.append("<xmeml version=\"5\">")
+        lines.append("  <sequence id=\"sequence-1\">")
+        lines.append("    <name>\(projectName)</name>")
+        lines.append("    <duration>\(totalFrames)</duration>")
+        lines.append("    <rate><timebase>\(fps)</timebase><ntsc>FALSE</ntsc></rate>")
+        lines.append("    <timecode>")
+        lines.append("      <rate><timebase>\(fps)</timebase><ntsc>FALSE</ntsc></rate>")
+        lines.append("      <string>00:00:00:00</string>")
+        lines.append("      <frame>0</frame>")
+        lines.append("      <displayformat>NDF</displayformat>")
+        lines.append("    </timecode>")
+        lines.append("    <media>")
+        lines.append("      <video>")
+        lines.append("        <format>")
+        lines.append("          <samplecharacteristics>")
+        lines.append("            <width>\(width)</width>")
+        lines.append("            <height>\(height)</height>")
+        lines.append("            <pixelaspectratio>square</pixelaspectratio>")
+        lines.append("            <rate><timebase>\(fps)</timebase><ntsc>FALSE</ntsc></rate>")
+        lines.append("          </samplecharacteristics>")
+        lines.append("        </format>")
+        lines.append("        <track>")
+
+        for (idx, lc) in laidOut.enumerated() {
+            let clipId = idx + 1
+            let pathURL = lc.mediaURL?.absoluteString ?? ""
+            let mediaName = lc.mediaURL?.lastPathComponent
+                ?? "\(lc.clip.title).png"
+
+            lines.append("          <clipitem id=\"clipitem-\(clipId)\">")
+            lines.append("            <name>\(xmlEscape(lc.clip.title))</name>")
+            // FCP7 convention for stills: massive file duration, the timeline
+            // length is carved out by <in>/<out> on the clipitem.
+            lines.append("            <duration>1000000</duration>")
+            lines.append("            <rate><timebase>\(fps)</timebase><ntsc>FALSE</ntsc></rate>")
+            lines.append("            <start>\(lc.start)</start>")
+            lines.append("            <end>\(lc.end)</end>")
+            lines.append("            <in>0</in>")
+            lines.append("            <out>\(lc.frames)</out>")
+            lines.append("            <file id=\"file-\(clipId)\">")
+            lines.append("              <name>\(xmlEscape(mediaName))</name>")
+            lines.append("              <pathurl>\(xmlEscape(pathURL))</pathurl>")
+            lines.append("              <rate><timebase>\(fps)</timebase><ntsc>FALSE</ntsc></rate>")
+            lines.append("              <duration>1000000</duration>")
+            lines.append("              <media>")
+            lines.append("                <video>")
+            lines.append("                  <samplecharacteristics>")
+            lines.append("                    <width>\(width)</width>")
+            lines.append("                    <height>\(height)</height>")
+            lines.append("                  </samplecharacteristics>")
+            lines.append("                </video>")
+            lines.append("              </media>")
+            lines.append("            </file>")
+            lines.append("          </clipitem>")
+        }
+
+        lines.append("        </track>")
+        lines.append("      </video>")
+        lines.append("      <audio>")
+        lines.append("        <track></track>")
+        lines.append("      </audio>")
+        lines.append("    </media>")
+
+        // Map scene number → frame at end of that scene's clip on the timeline,
+        // so cut suggestions land exactly on the cut boundary.
+        let frameAfterScene: [Int: Int] = laidOut.reduce(into: [:]) { acc, lc in
+            acc[lc.clip.sceneNumber] = lc.end
+        }
+        for cut in project.cutSuggestions where cut.applied {
+            guard let frame = frameAfterScene[cut.afterClipNumber] else { continue }
+            lines.append("    <marker>")
+            lines.append("      <name>\(xmlEscape(cut.priority.rawValue))</name>")
+            lines.append("      <comment>\(xmlEscape(cut.rationale))</comment>")
+            lines.append("      <in>\(frame)</in>")
+            lines.append("      <out>-1</out>")
+            lines.append("    </marker>")
+        }
+
+        lines.append("  </sequence>")
+        lines.append("</xmeml>")
+        return lines.joined(separator: "\n") + "\n"
+    }
+
+    private static func xmlEscape(_ s: String) -> String {
+        var out = ""
+        out.reserveCapacity(s.count)
+        for ch in s {
+            switch ch {
+            case "&":  out += "&amp;"
+            case "<":  out += "&lt;"
+            case ">":  out += "&gt;"
+            case "\"": out += "&quot;"
+            case "'":  out += "&apos;"
+            default:   out.append(ch)
+            }
+        }
+        return out
+    }
+}
