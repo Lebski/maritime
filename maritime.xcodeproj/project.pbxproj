@@ -60,6 +60,7 @@
 		953AAA99DD9569F20B5C4289 /* AssetLibraryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7F45B899AFD3BEA1B3CBC9 /* AssetLibraryModels.swift */; };
 		9570F1EEAA1C0848A26C164B /* LauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CD89B8598C5745F0CCE575 /* LauncherView.swift */; };
 		99B4C59FA1927C3EC94F7106 /* FinalizedCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA3FD42B31F9B1E146D11C /* FinalizedCharacterView.swift */; };
+		9C16930876D03FA1E11E1479 /* SetPieceSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4121F635CA36327C26AE479 /* SetPieceSuggestionService.swift */; };
 		9D31C7DCE00C51EBF4DFFE36 /* AssetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81BA59EAF7CADB87B92F208 /* AssetStore.swift */; };
 		9E05AC0967EEB5E4FB69F6D3 /* StoryForgePanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1FF04F9363B5B3CAD0DD83 /* StoryForgePanels.swift */; };
 		9F94F5947A4AFA51020E410D /* FalaiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43D4DC675E811A3DFED55B7 /* FalaiClient.swift */; };
@@ -104,6 +105,7 @@
 		F88132523E243486D86281D7 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EEE8014BA61972C34BA273 /* AppSettings.swift */; };
 		F8D5CE2F5277E4E2FCFBB83B /* StoryboardDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */; };
 		F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */; };
+		FC600AD2203A1E61A3BB4453 /* SetDesignWizardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A15167420ACA669A0487C40 /* SetDesignWizardSheet.swift */; };
 		FFE8A53C73CEF09379EB0B73 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C99AC2666CB93197FC7271 /* PreferencesView.swift */; };
 /* End PBXBuildFile section */
 
@@ -173,6 +175,7 @@
 		91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabViewModel.swift; sourceTree = "<group>"; };
 		9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilderModels.swift; sourceTree = "<group>"; };
 		97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerView.swift; sourceTree = "<group>"; };
+		9A15167420ACA669A0487C40 /* SetDesignWizardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignWizardSheet.swift; sourceTree = "<group>"; };
 		9D42572AB4278A3CA326C1A8 /* ExportTargetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTargetCard.swift; sourceTree = "<group>"; };
 		9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardStore.swift; sourceTree = "<group>"; };
 		A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardDetailsView.swift; sourceTree = "<group>"; };
@@ -196,6 +199,7 @@
 		D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignViewModel.swift; sourceTree = "<group>"; };
 		D202A7239C33290199AE8215 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
 		D36CCA281FE2E5C8D861703B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D4121F635CA36327C26AE479 /* SetPieceSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPieceSuggestionService.swift; sourceTree = "<group>"; };
 		D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererModels.swift; sourceTree = "<group>"; };
 		D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignStore.swift; sourceTree = "<group>"; };
 		D9853233341AACB1CB9A71CD /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
@@ -250,6 +254,7 @@
 			children = (
 				060680BA1A3ED603EC9C8946 /* SetDesignView.swift */,
 				D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */,
+				9A15167420ACA669A0487C40 /* SetDesignWizardSheet.swift */,
 				B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */,
 				256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */,
 			);
@@ -292,6 +297,7 @@
 				7B61F126F20D1EEC2EE4BAF1 /* KeychainStore.swift */,
 				23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */,
 				1AF8820FE76BFE228630905D /* RecraftClient.swift */,
+				D4121F635CA36327C26AE479 /* SetPieceSuggestionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -643,8 +649,10 @@
 				F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */,
 				06E798EDA56CD88508CD1E1F /* SetDesignView.swift in Sources */,
 				CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */,
+				FC600AD2203A1E61A3BB4453 /* SetDesignWizardSheet.swift in Sources */,
 				CEC43CA51731C055693BA9CF /* SetPieceCard.swift in Sources */,
 				B478133DB97DCF599EB3632C /* SetPiecePromptPanel.swift in Sources */,
+				9C16930876D03FA1E11E1479 /* SetPieceSuggestionService.swift in Sources */,
 				BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */,
 				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
 				E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */,
