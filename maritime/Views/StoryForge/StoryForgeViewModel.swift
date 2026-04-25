@@ -18,6 +18,11 @@ final class StoryForgeViewModel: ObservableObject {
     @Published var regeneratingField: StoryCharacterField?
     @Published var generationError: String?
 
+    /// Drives the confirmation dialog before deleting the active character draft.
+    @Published var confirmingDraftDelete = false
+    /// Drives the confirmation dialog before deleting a scene breakdown.
+    @Published var pendingSceneDeletionID: UUID?
+
     enum SceneField: String {
         case goal, conflict, emotionalBeat, visualMetaphor, transition
     }
@@ -170,18 +175,10 @@ final class StoryForgeViewModel: ObservableObject {
         activeDraftID = bible.characterDrafts.first?.id
     }
 
-    /// Promote the active draft into a LabCharacter in the project.
-    /// Idempotent — if already promoted, does nothing.
-    func promoteActiveDraftToLab() {
-        guard var draft = activeDraft, !draft.isPromoted else { return }
-        let labCharacter = LabCharacter(
-            name: draft.name,
-            description: bible.labDescription(for: draft),
-            role: bible.mapLabRole(for: draft)
-        )
-        project.upsertCharacter(labCharacter)
-        draft.promotedLabCharacterID = labCharacter.id
-        project.markDraftPromoted(draftID: draft.id, labCharacterID: labCharacter.id)
+    /// True when the active draft is paired with a Lab character. Used to
+    /// decide whether the delete confirmation needs to mention unlinking.
+    var activeDraftHasLabLink: Bool {
+        activeDraft?.promotedLabCharacterID != nil
     }
 
     // MARK: Structure
@@ -234,26 +231,17 @@ final class StoryForgeViewModel: ObservableObject {
         if expandedSceneID == id { expandedSceneID = nil }
     }
 
-    func promoteScene(_ scene: SceneBreakdown) {
-        guard !scene.isPromoted else { return }
-        let filmScene = FilmScene(
-            number: (project.scenes.map(\.number).max() ?? 0) + 1,
-            title: scene.title,
-            location: scene.location,
-            isInterior: scene.isInterior,
-            timeOfDay: scene.timeOfDay,
-            lightingMood: .neutral,
-            keyLight: .frontal,
-            shotType: .medium,
-            background: nil,
-            props: [],
-            characters: [],
-            activeGuides: [.ruleOfThirds],
-            frameApproved: false,
-            projectTitle: bible.projectTitle
-        )
-        project.addFilmScene(filmScene)
-        project.markScenePromoted(sceneID: scene.id, filmSceneID: filmScene.id)
+    /// Confirm + delete a scene that the user has chosen to remove. Triggered
+    /// from the per-scene "Remove" button via `pendingSceneDeletionID`.
+    func confirmPendingSceneDeletion() {
+        guard let id = pendingSceneDeletionID else { return }
+        removeScene(id)
+        pendingSceneDeletionID = nil
+    }
+
+    func sceneHasFilmSceneLink(_ id: UUID) -> Bool {
+        guard let scene = bible.sceneBreakdowns.first(where: { $0.id == id }) else { return false }
+        return scene.promotedFilmSceneID != nil
     }
 
     // MARK: Storyboard cross-module
