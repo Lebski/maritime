@@ -9,6 +9,7 @@ struct StoryForgeHelperPanel: View {
             Divider().background(Theme.stroke)
             ScrollView {
                 VStack(spacing: 16) {
+                    storyDescriptionCard
                     content
                 }
                 .padding(18)
@@ -49,6 +50,54 @@ struct StoryForgeHelperPanel: View {
         case .scenes:     sceneHelper
         case .theme:      themeHelper
         }
+    }
+
+    // MARK: Story Description
+
+    private var storyDescriptionCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "doc.text.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.magenta)
+                Text("STORY DESCRIPTION")
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundStyle(Theme.magenta)
+                Spacer()
+            }
+            if vm.bible.pitch.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text("No description yet. Add one to enable AI-assisted regeneration.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textTertiary)
+                    .italic()
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text(vm.bible.pitch)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(4)
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Button(action: { vm.openBibleWizard(mode: .regenerateFromPitch) }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 10))
+                    Text(vm.bible.pitch.isEmpty ? "Add Description" : "Edit & Regenerate")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundStyle(.black)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(Theme.magenta)
+                .clipShape(Capsule())
+            }
+            .buttonStyle(.plainSolid)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
     }
 
     // MARK: Character Helper

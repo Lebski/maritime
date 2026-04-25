@@ -460,6 +460,7 @@ struct StoryBible: Identifiable, Hashable, Codable {
     let id: UUID
     var projectTitle: String
     var logline: String
+    var pitch: String
     var lastUpdated: Date
     var characterDrafts: [StoryCharacterDraft]
     var structure: StoryStructureDraft
@@ -470,6 +471,7 @@ struct StoryBible: Identifiable, Hashable, Codable {
     init(id: UUID = UUID(),
          projectTitle: String,
          logline: String,
+         pitch: String = "",
          lastUpdated: Date = Date(),
          characterDrafts: [StoryCharacterDraft] = [],
          structure: StoryStructureDraft,
@@ -479,12 +481,34 @@ struct StoryBible: Identifiable, Hashable, Codable {
         self.id = id
         self.projectTitle = projectTitle
         self.logline = logline
+        self.pitch = pitch
         self.lastUpdated = lastUpdated
         self.characterDrafts = characterDrafts
         self.structure = structure
         self.sceneBreakdowns = sceneBreakdowns
         self.theme = theme
         self.posterColors = posterColors
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, projectTitle, logline, pitch, lastUpdated
+        case characterDrafts, structure, sceneBreakdowns, theme, posterColors
+    }
+
+    /// `pitch` was added after the v2 schema; default to "" when missing so
+    /// existing `.mblaze` files keep loading without a schema bump.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id              = try c.decode(UUID.self, forKey: .id)
+        self.projectTitle    = try c.decode(String.self, forKey: .projectTitle)
+        self.logline         = try c.decode(String.self, forKey: .logline)
+        self.pitch           = (try c.decodeIfPresent(String.self, forKey: .pitch)) ?? ""
+        self.lastUpdated     = try c.decode(Date.self, forKey: .lastUpdated)
+        self.characterDrafts = try c.decode([StoryCharacterDraft].self, forKey: .characterDrafts)
+        self.structure       = try c.decode(StoryStructureDraft.self, forKey: .structure)
+        self.sceneBreakdowns = try c.decode([SceneBreakdown].self, forKey: .sceneBreakdowns)
+        self.theme           = try c.decode(ThemeTracker.self, forKey: .theme)
+        self.posterColors    = try c.decode([Color].self, forKey: .posterColors)
     }
 
     var characterCompletion: Double {
@@ -509,6 +533,20 @@ struct StoryBible: Identifiable, Hashable, Codable {
     var overallCompletion: Double {
         let parts = StoryForgeSection.allCases.map { completion(for: $0) }
         return parts.reduce(0, +) / Double(parts.count)
+    }
+
+    /// True when the user hasn't touched any facet of the bible. Used to
+    /// auto-present the onboarding wizard.
+    var isEmpty: Bool {
+        projectTitle.trimmingCharacters(in: .whitespaces).isEmpty
+            && logline.trimmingCharacters(in: .whitespaces).isEmpty
+            && pitch.trimmingCharacters(in: .whitespaces).isEmpty
+            && characterDrafts.isEmpty
+            && sceneBreakdowns.isEmpty
+            && structure.beats.allSatisfy { $0.userNotes.trimmingCharacters(in: .whitespaces).isEmpty }
+            && theme.themeStatement.trimmingCharacters(in: .whitespaces).isEmpty
+            && theme.motifs.isEmpty
+            && theme.palette.isEmpty
     }
 
     func mapLabRole(for draft: StoryCharacterDraft) -> String {
@@ -907,6 +945,9 @@ enum StoryForgeSamples {
         return StoryBible(
             projectTitle: "Neon Requiem",
             logline: "A cybernetic detective chases a ghost through a city that never sleeps.",
+            pitch: """
+            Elena's a memory-detective in a rain-drenched city where erasure is for sale on the black market. When her old partner is found memory-wiped on her watch, she breaks every rule trying to recover his last moments — and stumbles into a personal file she doesn't remember writing. The closer she gets to the cartel's ledger, the more she realizes the only way to know who she is is to face what she chose to forget.
+            """,
             lastUpdated: Date().addingTimeInterval(-7200),
             characterDrafts: [elena, marcus],
             structure: structure,
@@ -1035,6 +1076,9 @@ enum StoryForgeSamples {
         return StoryBible(
             projectTitle: "The Lantern Keeper",
             logline: "An old woman guards the last flame of memory in a world turning to silence.",
+            pitch: """
+            In a remote valley where keeping a small flame alive is the only thing standing between a community and forgetting its own name, an old keeper named Nan has guarded the lantern for fifty years. When a messenger arrives asking for her estranged granddaughter Wren — who's already packed for the coast — Nan takes the small lantern off the shelf and walks Wren toward the black-water crossing where the keeping is passed on, or not.
+            """,
             lastUpdated: Date().addingTimeInterval(-86_400),
             characterDrafts: [nan, wren],
             structure: structure,
@@ -1077,6 +1121,9 @@ enum StoryForgeSamples {
         return StoryBible(
             projectTitle: "Paper Moon 2049",
             logline: "Two strangers exchange dreams across a decaying lunar colony.",
+            pitch: """
+            On a decaying lunar colony where oxygen is currency and dreams are too, a courier named Oskar wants out of the route and a trader named Inés wants out of her debts. Both are about to discover that what they're trading away has been quietly defining who they are — and the colony's last functioning dreambox is about to make them a final offer.
+            """,
             lastUpdated: Date().addingTimeInterval(-259_200),
             characterDrafts: [ines, oskar],
             structure: StoryStructureDraft(template: .saveTheCat),
@@ -1171,6 +1218,9 @@ enum StoryForgeSamples {
         return StoryBible(
             projectTitle: "Tide & Bone",
             logline: "A biologist uncovers something ancient buried beneath her childhood beach.",
+            pitch: """
+            A biologist returns to the cove where her brother drowned, intent on identifying the skeleton a storm has surfaced in the tide pool before the village council can bury it. The teeth-marks don't match any local predator, and the deeper she digs, the clearer it becomes that the village's quiet has been holding something — and someone — for decades.
+            """,
             lastUpdated: Date(),
             characterDrafts: [mara, ewan],
             structure: structure,

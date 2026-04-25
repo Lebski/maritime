@@ -3,6 +3,7 @@ import SwiftUI
 struct StoryForgeView: View {
     @EnvironmentObject var project: MovieBlazeProject
     @EnvironmentObject var navigator: AppNavigator
+    @EnvironmentObject var settings: AppSettings
     @StateObject private var vm: StoryForgeViewModel
 
     init(project: MovieBlazeProject) {
@@ -23,6 +24,14 @@ struct StoryForgeView: View {
             .background(Theme.bg)
             .onAppear { consumePendingSceneBreakdownID() }
             .onChange(of: navigator.pendingSceneBreakdownID) { _, _ in consumePendingSceneBreakdownID() }
+            .sheet(item: $vm.bibleWizardMode) { mode in
+                StoryBibleWizardSheet(mode: mode, vm: vm)
+            }
+            .sheet(isPresented: $vm.showSceneDiff) {
+                if let proposal = vm.pendingSceneDiff {
+                    SceneRegenDiffSheet(vm: vm, proposal: proposal)
+                }
+            }
     }
 
     private var workspace: some View {
@@ -63,10 +72,24 @@ struct StoryForgeView: View {
                 }
             }
             Spacer()
+            editDescriptionButton
             overallCompletionBadge(value: bible.overallCompletion)
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 16)
+    }
+
+    private var editDescriptionButton: some View {
+        Button(action: { vm.openBibleWizard(mode: .regenerateFromPitch) }) {
+            Image(systemName: "pencil.and.scribble")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.textTertiary)
+                .frame(width: 30, height: 30)
+                .background(Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plainSolid)
+        .help("Edit Description & Regenerate")
     }
 
     private func overallCompletionBadge(value: Double) -> some View {

@@ -18,10 +18,26 @@ final class StoryForgeViewModel: ObservableObject {
     @Published var regeneratingField: StoryCharacterField?
     @Published var generationError: String?
 
+    // Bible wizard / scene-regen orchestration
+    @Published var bibleWizardMode: StoryBibleWizardMode?
+    @Published var pendingSceneDiff: SceneDiffProposal?
+    @Published var showSceneDiff = false
+    @Published var isRegeneratingScenes = false
+    @Published var hasPresentedInitialWizard = false
+
     /// Drives the confirmation dialog before deleting the active character draft.
     @Published var confirmingDraftDelete = false
     /// Drives the confirmation dialog before deleting a scene breakdown.
     @Published var pendingSceneDeletionID: UUID?
+
+    /// Snapshot of scenes at the moment the diff was proposed, plus the proposed scenes.
+    /// Held on the VM so the diff stays stable even if the user keeps editing the bible.
+    struct SceneDiffProposal {
+        let oldScenes: [SceneBreakdown]
+        let proposedScenes: [SceneBreakdown]
+        let oldTemplate: StoryStructureTemplate
+        let newTemplate: StoryStructureTemplate
+    }
 
     enum SceneField: String {
         case goal, conflict, emotionalBeat, visualMetaphor, transition
@@ -38,6 +54,14 @@ final class StoryForgeViewModel: ObservableObject {
         project.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
+
+        if project.bible.isEmpty {
+            Task { @MainActor [weak self] in
+                guard let self, !self.hasPresentedInitialWizard else { return }
+                self.bibleWizardMode = .initialEmpty
+                self.hasPresentedInitialWizard = true
+            }
+        }
     }
 
     // MARK: Lookups
@@ -287,5 +311,106 @@ final class StoryForgeViewModel: ObservableObject {
         var theme = bible.theme
         theme.palette.removeAll(where: { $0.id == id })
         project.updateTheme(theme)
+    }
+
+    // MARK: Bible wizard
+
+    func openBibleWizard(mode: StoryBibleWizardMode) {
+        bibleWizardMode = mode
+    }
+
+    /// Wholesale-replace the bible from a generated draft. Atomic at the document level.
+    func applyGeneratedBible(title: String,
+                             logline: String,
+                             pitch: String,
+                             characters: [StoryCharacterDraft],
+                             structure: StoryStructureDraft,
+                             scenes: [SceneBreakdown],
+                             theme: ThemeTracker) {
+        project.applyGeneratedBible(
+            title: title,
+            logline: logline,
+            pitch: pitch,
+            characters: characters,
+            structure: structure,
+            scenes: scenes,
+            theme: theme
+        )
+        activeDraftID = characters.first?.id
+        selectedBeatID = structure.beats.first?.id
+        expandedSceneID = nil
+        bibleWizardMode = nil
+    }
+
+    func updatePitch(_ text: String) {
+        project.updatePitch(text)
+    }
+
+    // MARK: Scene regeneration
+
+    /// Switch to a new structure template. If scenes already exist, kick off scene regeneration
+    /// in the background and surface the result via `pendingSceneDiff` for the diff sheet.
+    func chooseTemplateWithRegen(_ template: StoryStructureTemplate, settings: AppSettings) async {
+        let oldStructure = bible.structure
+        let oldScenes = bible.sceneBreakdowns
+
+        project.chooseTemplate(template)
+        selectedBeatID = bible.structure.beats.first?.id
+
+        guard !oldScenes.isEmpty, oldStructure.template != template else { return }
+        guard settings.isConfigured else {
+            generationError = "Add your Anthropic API key in Preferences (⌘,) first."
+            return
+        }
+
+        isRegeneratingScenes = true
+        defer { isRegeneratingScenes = false }
+        generationError = nil
+
+        let client = AnthropicClient(apiKey: settings.apiKey, model: settings.modelID)
+        let service = SceneRegenerationService(client: client)
+        let req = SceneRegenerationService.Request(
+            pitch: bible.pitch,
+            logline: bible.logline,
+            characters: bible.characterDrafts,
+            oldTemplate: oldStructure.template,
+            newTemplate: template,
+            oldBeats: oldStructure.beats,
+            newBeats: bible.structure.beats,
+            oldScenes: oldScenes,
+            theme: bible.theme
+        )
+
+        do {
+            let out = try await service.generate(req)
+            pendingSceneDiff = SceneDiffProposal(
+                oldScenes: oldScenes,
+                proposedScenes: out.scenes,
+                oldTemplate: oldStructure.template,
+                newTemplate: template
+            )
+            showSceneDiff = true
+        } catch {
+            generationError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    /// Apply a user-curated scene diff: replacements/additions/removals derived from the proposal.
+    func applySceneDiff(replacements: [Int: SceneBreakdown],
+                        removals: Set<Int>,
+                        additions: [SceneBreakdown]) {
+        project.applySceneDiff(replacements: replacements, removals: removals, additions: additions)
+        pendingSceneDiff = nil
+        showSceneDiff = false
+        expandedSceneID = nil
+    }
+
+    func dismissSceneDiff() {
+        showSceneDiff = false
+    }
+
+    func discardSceneDiff() {
+        pendingSceneDiff = nil
+        showSceneDiff = false
     }
 }
