@@ -71,6 +71,7 @@ struct AnthropicClient {
 
         var urlRequest = URLRequest(url: Self.endpoint)
         urlRequest.httpMethod = "POST"
+        urlRequest.timeoutInterval = 180
         urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
         urlRequest.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         urlRequest.setValue(Self.apiVersion, forHTTPHeaderField: "anthropic-version")
