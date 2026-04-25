@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct MovieBlazeApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var appSettings = AppSettings()
 
     var body: some Scene {
