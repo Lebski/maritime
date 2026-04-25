@@ -117,18 +117,21 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     private static func seedSnapshot() -> Snapshot {
-        // New projects ship The Lantern Keeper as the single showcase story so
-        // the app looks populated the first time a user launches it. Opening a
-        // saved .mblaze replaces all of this with the saved state.
+        // New projects open empty. Opening a saved .mblaze replaces this with
+        // the saved state.
         return Snapshot(
             schemaVersion: currentSchemaVersion,
-            bible: StoryForgeSamples.lanternKeeper,
-            storyboardPanels: StoryboardSamples.lanternKeeperPanels,
-            scenes: SceneBuilderSamples.scenes,
-            characters: CharacterLabSamples.libraryCharacters,
-            setPieces: SetDesignSamples.lanternKeeperPieces,
-            moodboard: MoodboardSamples.lanternKeeper,
-            cutSuggestions: VideoRendererSamples.cuts,
+            bible: StoryBible(
+                projectTitle: "",
+                logline: "",
+                structure: StoryStructureDraft(template: .threeAct)
+            ),
+            storyboardPanels: [],
+            scenes: [],
+            characters: [],
+            setPieces: [],
+            moodboard: ProjectMoodboard(),
+            cutSuggestions: [],
             favoritedAssetIDs: nil
         )
     }
