@@ -101,6 +101,8 @@
 		F8D5CE2F5277E4E2FCFBB83B /* StoryboardDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A099DB2271B3BDF5870804FD /* StoryboardDetailsView.swift */; };
 		F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E94C23EE73FCD9929FCA17 /* SetDesignStore.swift */; };
 		FFE8A53C73CEF09379EB0B73 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C99AC2666CB93197FC7271 /* PreferencesView.swift */; };
+		5E70C501010101010101AA01 /* SetPieceSuggestionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E70C501010101010101AA02 /* SetPieceSuggestionService.swift */; };
+		5E70C501010101010101AA03 /* SetDesignWizardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E70C501010101010101AA04 /* SetDesignWizardSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -201,6 +203,8 @@
 		F53F490D26233235CF96DE56 /* SceneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneStore.swift; sourceTree = "<group>"; };
 		FA59981C8C4EA65F2F88822D /* StoryboardHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardHelperPanel.swift; sourceTree = "<group>"; };
 		FFCC80BEE94CE861EA8A4E0B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		5E70C501010101010101AA02 /* SetPieceSuggestionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPieceSuggestionService.swift; sourceTree = "<group>"; };
+		5E70C501010101010101AA04 /* SetDesignWizardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetDesignWizardSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -241,6 +245,7 @@
 			children = (
 				060680BA1A3ED603EC9C8946 /* SetDesignView.swift */,
 				D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */,
+				5E70C501010101010101AA04 /* SetDesignWizardSheet.swift */,
 				B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */,
 				256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */,
 			);
@@ -280,6 +285,7 @@
 				F342B369AEFE6B6474A98720 /* FalaiSetPieceService.swift */,
 				7B61F126F20D1EEC2EE4BAF1 /* KeychainStore.swift */,
 				23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */,
+				5E70C501010101010101AA02 /* SetPieceSuggestionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -627,8 +633,10 @@
 				F93F34A905EBF7A3DA8BC0A7 /* SetDesignStore.swift in Sources */,
 				06E798EDA56CD88508CD1E1F /* SetDesignView.swift in Sources */,
 				CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */,
+				5E70C501010101010101AA03 /* SetDesignWizardSheet.swift in Sources */,
 				CEC43CA51731C055693BA9CF /* SetPieceCard.swift in Sources */,
 				B478133DB97DCF599EB3632C /* SetPiecePromptPanel.swift in Sources */,
+				5E70C501010101010101AA01 /* SetPieceSuggestionService.swift in Sources */,
 				BF31982E3D4B6D96A3B0FA7F /* ShotLibraryView.swift in Sources */,
 				09DAA95FB53A52DBB819697E /* SidebarView.swift in Sources */,
 				E7E7CDF11421DB96FBC9AF99 /* StoryForgeHelperPanel.swift in Sources */,
