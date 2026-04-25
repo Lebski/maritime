@@ -31,7 +31,7 @@ struct CharacterLabView: View {
         }
         .sheet(isPresented: $vm.showReferenceSheet) {
             if let char = vm.activeCharacter {
-                ReferenceSheetView(character: char)
+                ReferenceSheetView(character: char, vm: vm)
             }
         }
     }
@@ -199,7 +199,7 @@ struct CharacterRowView: View {
                     Text(character.name)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
-                    Text(character.isFinalized ? "Finalized" : "Round \(character.currentRound.rawValue)")
+                    Text(character.statusLabel)
                         .font(.system(size: 10))
                         .foregroundStyle(character.isFinalized ? Theme.teal : Theme.textTertiary)
                 }

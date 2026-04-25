@@ -378,7 +378,7 @@ private struct CharacterChip: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
-                    Text(character.isFinalized ? "Finalized" : "Round \(character.currentRound.rawValue)")
+                    Text(character.statusLabel)
                         .font(.system(size: 10))
                         .foregroundStyle(character.isFinalized ? Theme.lime : Theme.textTertiary)
                 }
