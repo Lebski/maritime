@@ -17,6 +17,7 @@ final class SetDesignViewModel: ObservableObject {
     @Published var categoryFilter: SetPieceCategory?
     @Published var sidebarCollapsed = false
     @Published var promptPanelCollapsed = false
+    @Published var showWizard: Bool = false
 
     let project: MovieBlazeProject
     private let service: SetPieceGenerationService
@@ -43,6 +44,8 @@ final class SetDesignViewModel: ObservableObject {
     }
 
     func select(_ id: UUID) { selectedPieceID = id }
+
+    func openWizard() { showWizard = true }
 
     // MARK: CRUD
 
