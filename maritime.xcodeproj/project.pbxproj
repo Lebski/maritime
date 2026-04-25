@@ -30,6 +30,7 @@
 		5CC7BE0D08F46B9D9100A3BE /* MoodboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF0138F5AD9C4F8E56EFAC4 /* MoodboardStore.swift */; };
 		616FF3ADDB80DA670B732060 /* VideoRendererModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D438C0B50BCB131567E223E7 /* VideoRendererModels.swift */; };
 		6286C73BBF265F8C449F7734 /* StoryboardComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EB975664FE681100B93DF7 /* StoryboardComposerView.swift */; };
+		64E06B9583338A0F0FC50D0D /* PhotoshopBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */; };
 		6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */; };
 		67B99DC2320479319DD1A7B7 /* StoryForgeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DBD3D60C4F98BE7E557FF39 /* StoryForgeViewModel.swift */; };
 		685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9853233341AACB1CB9A71CD /* PlaceholderView.swift */; };
@@ -97,6 +98,7 @@
 		1858E9AF31C3B92540075837 /* MoodboardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardModels.swift; sourceTree = "<group>"; };
 		1DC3B252001C630E7DDC279E /* StoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryStore.swift; sourceTree = "<group>"; };
 		1E6397C9F24ED3AE8DD1E653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoshopBridge.swift; sourceTree = "<group>"; };
 		255692AA3FF39F06974AE381 /* StoryboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardStore.swift; sourceTree = "<group>"; };
 		256A9ECD4EC64DB3016EDBB8 /* SetPiecePromptPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPiecePromptPanel.swift; sourceTree = "<group>"; };
 		265623AA8D68BC8CA43528BC /* VideoRendererViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRendererViewModel.swift; sourceTree = "<group>"; };
@@ -223,6 +225,14 @@
 				9D42572AB4278A3CA326C1A8 /* ExportTargetCard.swift */,
 			);
 			path = Exports;
+			sourceTree = "<group>";
+		};
+		2A727C13ED9645CE16AEF07A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				23965040C72EB12F9D67D082 /* PhotoshopBridge.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		52FD87BA54D152C397EFE83C /* Products */ = {
@@ -363,6 +373,7 @@
 				0EBB09B2A3C396CFDD0B9482 /* maritime.entitlements */,
 				7D59425C2C354F9FE3CBB10D /* App */,
 				7C3F7399FCD5A46F337D3773 /* Models */,
+				2A727C13ED9645CE16AEF07A /* Services */,
 				A87EAB47587EAC8319611EBF /* Views */,
 			);
 			path = maritime;
@@ -467,6 +478,7 @@
 				6619014A4682241661AAE757 /* MovieBlazeApp.swift in Sources */,
 				41593C4F838B92F21B4AA708 /* NewCharacterSheet.swift in Sources */,
 				CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */,
+				64E06B9583338A0F0FC50D0D /* PhotoshopBridge.swift in Sources */,
 				685F6EA3273DB161940A4408 /* PlaceholderView.swift in Sources */,
 				B920C9190B7EE3B61448F159 /* PremiereExportSettings.swift in Sources */,
 				CA21C7978697B4676056AA1F /* PremiereStillRenderer.swift in Sources */,

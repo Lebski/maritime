@@ -23,12 +23,13 @@ extension MovieBlazeProject {
             let tags = [ch.role, ch.isFinalized ? "finalized" : "in-lab"]
                 .map { $0.lowercased() }
                 .filter { !$0.isEmpty }
+            let baseVersions = max(1, ch.selectedVariations.count)
             result.append(Asset(
                 id: ch.id,
                 name: ch.name,
                 kind: .character,
                 tags: tags,
-                versions: max(1, ch.selectedVariations.count),
+                versions: baseVersions + (assetEditCounts[ch.id] ?? 0),
                 favorited: favoritedAssetIDs.contains(ch.id),
                 linkedProjects: linked,
                 updatedLabel: ch.isFinalized ? "Finalized" : "In Character Lab",
@@ -46,7 +47,7 @@ extension MovieBlazeProject {
                 name: bg.name,
                 kind: .background,
                 tags: [bg.tag.lowercased()].filter { !$0.isEmpty },
-                versions: usage,
+                versions: usage + (assetEditCounts[bg.id] ?? 0),
                 favorited: favoritedAssetIDs.contains(bg.id),
                 linkedProjects: linked,
                 updatedLabel: usage == 1 ? "1 scene" : "\(usage) scenes",
@@ -65,7 +66,7 @@ extension MovieBlazeProject {
                     name: prop.name,
                     kind: .prop,
                     tags: [prop.category.lowercased()].filter { !$0.isEmpty },
-                    versions: usage,
+                    versions: usage + (assetEditCounts[prop.id] ?? 0),
                     favorited: favoritedAssetIDs.contains(prop.id),
                     linkedProjects: linked,
                     updatedLabel: usage == 1 ? "1 scene" : "\(usage) scenes",
