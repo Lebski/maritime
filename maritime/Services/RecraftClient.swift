@@ -62,7 +62,7 @@ struct RecraftClient {
 
     /// Submit a generation. Returns the parsed response — call
     /// `downloadImage(url:)` per image to get the bytes.
-    func generate(_ request: GenerateRequest) async throws -> GenerateResponse {
+    func generate(_ request: GenerateRequest, label: String? = nil) async throws -> GenerateResponse {
         guard !apiKey.isEmpty else { throw ClientError.missingKey }
 
         let endpointString = "\(Self.runBase)/\(Self.modelID)"
@@ -82,30 +82,58 @@ struct RecraftClient {
             throw ClientError.decode("encode failed: \(error.localizedDescription)")
         }
 
+        let logID = await AIRequestLog.shared.begin(
+            provider: .recraft,
+            endpoint: endpointString,
+            model: Self.modelID,
+            label: label,
+            requestBody: AIRequestLog.prettyJSON(request)
+        )
+
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: urlRequest)
         } catch let err as URLError {
-            throw ClientError.network(err)
+            let clientErr = ClientError.network(err)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? err.localizedDescription)
+            throw clientErr
         }
 
         guard let http = response as? HTTPURLResponse else {
-            throw ClientError.decode("non-HTTP response")
+            let clientErr = ClientError.decode("non-HTTP response")
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "non-HTTP response")
+            throw clientErr
         }
 
         guard (200..<300).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? "<binary>"
-            throw ClientError.http(status: http.statusCode, body: body)
+            let bodyText = String(data: data, encoding: .utf8) ?? "<binary>"
+            let clientErr = ClientError.http(status: http.statusCode, body: bodyText)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "HTTP \(http.statusCode)")
+            throw clientErr
         }
 
         let decoded: GenerateResponse
         do {
             decoded = try JSONDecoder().decode(GenerateResponse.self, from: data)
         } catch {
-            throw ClientError.decode(error.localizedDescription)
+            let clientErr = ClientError.decode(error.localizedDescription)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? error.localizedDescription)
+            throw clientErr
         }
 
-        guard !decoded.images.isEmpty else { throw ClientError.empty }
+        guard !decoded.images.isEmpty else {
+            let clientErr = ClientError.empty
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "empty")
+            throw clientErr
+        }
+
+        let summary = "\(decoded.images.count) portrait\(decoded.images.count == 1 ? "" : "s")"
+        await AIRequestLog.shared.succeed(
+            id: logID,
+            summary: summary,
+            body: AIRequestLog.prettyJSON(data: data)
+        )
+
         return decoded
     }
 

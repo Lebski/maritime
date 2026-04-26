@@ -57,7 +57,7 @@ struct CharacterGenerationService {
                 messages: [.init(role: .user, content: userMessage)],
                 maxTokens: 800,
                 model: nil
-            ))
+            ), label: "Character psychology")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }
@@ -78,7 +78,7 @@ struct CharacterGenerationService {
                 ],
                 maxTokens: 800,
                 model: nil
-            ))
+            ), label: "Character psychology (retry)")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }

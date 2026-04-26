@@ -35,7 +35,7 @@ struct FalaiPortraitService: PortraitGenerationService {
             negative_prompt: "deformed, distorted, low quality, watermark, text, logo, multiple heads"
         )
 
-        let response = try await client.generate(payload)
+        let response = try await client.generate(payload, label: "Character portrait")
         let baseSeed = response.seed
 
         var out: [PortraitVariation] = []

@@ -56,7 +56,7 @@ struct StoryBibleGenerationService {
                 messages: [.init(role: .user, content: userMessage)],
                 maxTokens: 8000,
                 model: nil
-            ))
+            ), label: "Story Bible")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }
@@ -80,7 +80,7 @@ struct StoryBibleGenerationService {
                 ],
                 maxTokens: 8000,
                 model: nil
-            ))
+            ), label: "Story Bible (retry)")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }
