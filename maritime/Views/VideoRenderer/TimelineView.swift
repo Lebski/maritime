@@ -2,9 +2,20 @@ import SwiftUI
 
 struct TimelineView: View {
     @ObservedObject var vm: VideoRendererViewModel
+    @EnvironmentObject var project: MovieBlazeProject
 
     private let pixelsPerSecond: CGFloat = 70
     private let trackHeight: CGFloat = 72
+
+    private func panel(for clip: VideoClip) -> StoryboardPanel? {
+        project.storyboardPanels.first(where: { $0.id == clip.id })
+    }
+
+    private func sketchImage(for clip: VideoClip) -> NSImage? {
+        guard let assetID = panel(for: clip)?.pencilSketchAssetID,
+              let data = project.assetImageData(for: assetID) else { return nil }
+        return NSImage(data: data)
+    }
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
@@ -65,9 +76,24 @@ struct TimelineView: View {
     private func clipBlock(clip: VideoClip) -> some View {
         let width = max(60, CGFloat(clip.duration) * pixelsPerSecond)
         let isActive = vm.selectedClipID == clip.id
+        let sketch = sketchImage(for: clip)
         return Button(action: { vm.setActive(clip) }) {
             ZStack(alignment: .topLeading) {
-                LinearGradient(colors: clip.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                if let sketch {
+                    Image(nsImage: sketch)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.6), Color.black.opacity(0.15)],
+                        startPoint: .top, endPoint: .center
+                    )
+                    LinearGradient(
+                        colors: [Color.clear, Color.black.opacity(0.7)],
+                        startPoint: .center, endPoint: .bottom
+                    )
+                } else {
+                    LinearGradient(colors: clip.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
                         Text("#\(clip.number)")
@@ -76,6 +102,18 @@ struct TimelineView: View {
                             .padding(.horizontal, 4).padding(.vertical, 1)
                             .background(.black.opacity(0.5))
                             .clipShape(Capsule())
+                        if clip.keyframeCount > 1 {
+                            HStack(spacing: 2) {
+                                Image(systemName: "film.stack")
+                                    .font(.system(size: 7, weight: .bold))
+                                Text("\(clip.keyframeCount)")
+                                    .font(.system(size: 8, weight: .bold))
+                            }
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 4).padding(.vertical, 1)
+                            .background(Theme.teal.opacity(0.85))
+                            .clipShape(Capsule())
+                        }
                         Spacer()
                         Image(systemName: clip.motion.icon)
                             .font(.system(size: 8, weight: .bold))

@@ -5,7 +5,7 @@ struct SidebarView: View {
     @Environment(\.openSettings) private var openSettings
 
     private let productionModules: [AppModule] = [
-        .storyForge, .characterLab, .setDesign, .storyboard, .sceneBuilder, .videoRenderer
+        .storyForge, .characterLab, .setDesign, .storyboard, .frameBuilder, .videoRenderer
     ]
     private let libraryModules: [AppModule] = [.assetLibrary, .exports]
 

@@ -1,10 +1,21 @@
 import SwiftUI
 
-struct SceneCanvasView: View {
-    let scene: FilmScene
-    @ObservedObject var vm: SceneBuilderViewModel
+struct FrameCanvasView: View {
+    let frame: Frame
+    @ObservedObject var vm: FrameBuilderViewModel
     @EnvironmentObject var project: MovieBlazeProject
     @State private var isDropTargeted = false
+    @State private var showPencilUnderlay = true
+
+    private var parentPanel: StoryboardPanel? {
+        project.storyboardPanels.first(where: { $0.id == frame.panelID })
+    }
+
+    private var pencilUnderlay: NSImage? {
+        guard let assetID = parentPanel?.pencilSketchAssetID,
+              let data = project.assetImageData(for: assetID) else { return nil }
+        return NSImage(data: data)
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -21,11 +32,30 @@ struct SceneCanvasView: View {
             Image(systemName: "camera.aperture")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.accent)
-            Text("Start Frame Composition")
+            Text("Frame Composition")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
             Spacer()
-            if scene.frameApproved {
+            if pencilUnderlay != nil {
+                Button(action: { showPencilUnderlay.toggle() }) {
+                    HStack(spacing: 5) {
+                        Image(systemName: showPencilUnderlay ? "scribble.variable" : "scribble")
+                            .font(.system(size: 10, weight: .semibold))
+                        Text(showPencilUnderlay ? "Sketch on" : "Sketch off")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(showPencilUnderlay ? Theme.violet : Theme.textTertiary)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(showPencilUnderlay ? Theme.violet.opacity(0.14) : Color.white.opacity(0.05))
+                    .overlay(
+                        Capsule().stroke(showPencilUnderlay ? Theme.violet.opacity(0.4) : Theme.stroke, lineWidth: 1)
+                    )
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+                .help("Toggle the storyboard sketch underlay")
+            }
+            if frame.frameApproved {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.seal.fill")
                         .font(.system(size: 10))
@@ -46,6 +76,7 @@ struct SceneCanvasView: View {
         GeometryReader { geo in
             ZStack {
                 backgroundLayer
+                pencilUnderlayLayer
                 charactersLayer(size: geo.size)
                 guideOverlays(size: geo.size)
                 topBadges
@@ -95,7 +126,7 @@ struct SceneCanvasView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
             .transition(.opacity)
-        } else if scene.characters.isEmpty && !vm.isGenerating {
+        } else if frame.characters.isEmpty && !vm.isGenerating {
             VStack(spacing: 6) {
                 Image(systemName: "arrow.down.forward.and.arrow.up.backward")
                     .font(.system(size: 22, weight: .semibold))
@@ -112,8 +143,20 @@ struct SceneCanvasView: View {
     }
 
     @ViewBuilder
+    private var pencilUnderlayLayer: some View {
+        if showPencilUnderlay, let sketch = pencilUnderlay {
+            Image(nsImage: sketch)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .opacity(0.28)
+                .blendMode(.screen)
+                .allowsHitTesting(false)
+        }
+    }
+
+    @ViewBuilder
     private var backgroundLayer: some View {
-        if let bg = scene.background {
+        if let bg = frame.background {
             LinearGradient(colors: bg.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
             // atmospheric vignette
             RadialGradient(
@@ -140,7 +183,7 @@ struct SceneCanvasView: View {
     }
 
     private func charactersLayer(size: CGSize) -> some View {
-        ForEach(scene.characters) { ch in
+        ForEach(frame.characters) { ch in
             CharacterPin(character: ch)
                 .position(x: ch.xRatio * size.width, y: ch.yRatio * size.height)
                 .gesture(
@@ -159,20 +202,20 @@ struct SceneCanvasView: View {
 
     private func guideOverlays(size: CGSize) -> some View {
         ZStack {
-            if scene.activeGuides.contains(.ruleOfThirds) {
+            if frame.activeGuides.contains(.ruleOfThirds) {
                 RuleOfThirdsOverlay()
             }
-            if scene.activeGuides.contains(.goldenRatio) {
+            if frame.activeGuides.contains(.goldenRatio) {
                 GoldenRatioOverlay()
             }
-            if scene.activeGuides.contains(.leadingLines) {
+            if frame.activeGuides.contains(.leadingLines) {
                 LeadingLinesOverlay()
             }
-            if scene.activeGuides.contains(.headroom) {
+            if frame.activeGuides.contains(.headroom) {
                 HeadroomOverlay()
             }
-            if scene.activeGuides.contains(.axis180) && scene.characters.count >= 2 {
-                AxisLineOverlay(characters: scene.characters, size: size)
+            if frame.activeGuides.contains(.axis180) && frame.characters.count >= 2 {
+                AxisLineOverlay(characters: frame.characters, size: size)
             }
         }
         .allowsHitTesting(false)
@@ -184,9 +227,9 @@ struct SceneCanvasView: View {
         VStack {
             HStack {
                 HStack(spacing: 6) {
-                    Image(systemName: scene.timeOfDay.icon)
+                    Image(systemName: frame.timeOfDay.icon)
                         .font(.system(size: 10))
-                    Text(scene.locationLabel)
+                    Text(frame.locationLabel)
                         .font(.system(size: 10, weight: .semibold))
                 }
                 .foregroundStyle(.white)
@@ -197,7 +240,7 @@ struct SceneCanvasView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 10))
-                    Text(scene.shotType.shortLabel)
+                    Text(frame.shotType.shortLabel)
                         .font(.system(size: 10, weight: .bold))
                 }
                 .foregroundStyle(.white)
@@ -227,7 +270,7 @@ struct SceneCanvasView: View {
             }
             .buttonStyle(.plainSolid)
             Spacer()
-            if !scene.frameApproved {
+            if !frame.frameApproved {
                 Button(action: { vm.approveFrame() }) {
                     actionPill(icon: "checkmark.seal.fill", label: "Approve Frame", filled: true)
                 }

@@ -12,6 +12,13 @@ struct StoryboardPanelCard: View {
     let isSelected: Bool
     let onTap: () -> Void
     var onReturnToScene: (() -> Void)? = nil
+    @EnvironmentObject var project: MovieBlazeProject
+
+    private var sketchImage: NSImage? {
+        guard let assetID = panel.pencilSketchAssetID,
+              let data = project.assetImageData(for: assetID) else { return nil }
+        return NSImage(data: data)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -36,31 +43,37 @@ struct StoryboardPanelCard: View {
             let w = geo.size.width
             let h = geo.size.height
             ZStack {
-                // Gradient base
-                LinearGradient(colors: panel.thumbnailColors,
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                if let sketch = sketchImage {
+                    Image(nsImage: sketch)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    // Gradient base
+                    LinearGradient(colors: panel.thumbnailColors,
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
 
-                // Radial vignette
-                RadialGradient(colors: [Color.clear, Color.black.opacity(0.5)],
-                               center: .center,
-                               startRadius: min(w, h) * 0.25,
-                               endRadius: max(w, h) * 0.7)
+                    // Radial vignette
+                    RadialGradient(colors: [Color.clear, Color.black.opacity(0.5)],
+                                   center: .center,
+                                   startRadius: min(w, h) * 0.25,
+                                   endRadius: max(w, h) * 0.7)
 
-                // Faint symbol backdrop
-                Image(systemName: panel.thumbnailSymbol)
-                    .font(.system(size: h * 0.72, weight: .light))
-                    .foregroundStyle(Color.white.opacity(0.06))
-                    .offset(x: w * 0.08, y: h * 0.04)
+                    // Faint symbol backdrop
+                    Image(systemName: panel.thumbnailSymbol)
+                        .font(.system(size: h * 0.72, weight: .light))
+                        .foregroundStyle(Color.white.opacity(0.06))
+                        .offset(x: w * 0.08, y: h * 0.04)
 
-                // Character silhouettes positioned by shot type
-                silhouetteGroup(width: w, height: h)
-                    .rotationEffect(panel.shotType == .dutchAngle ? .degrees(-7) : .zero)
+                    // Character silhouettes positioned by shot type
+                    silhouetteGroup(width: w, height: h)
+                        .rotationEffect(panel.shotType == .dutchAngle ? .degrees(-7) : .zero)
 
-                // POV scope overlay
-                if panel.shotType == .pov {
-                    Image(systemName: "scope")
-                        .font(.system(size: h * 0.7, weight: .light))
-                        .foregroundStyle(Color.white.opacity(0.5))
+                    // POV scope overlay
+                    if panel.shotType == .pov {
+                        Image(systemName: "scope")
+                            .font(.system(size: h * 0.7, weight: .light))
+                            .foregroundStyle(Color.white.opacity(0.5))
+                    }
                 }
 
                 // Top row — number + duration
@@ -197,7 +210,7 @@ struct StoryboardPanelCard: View {
                 .tracking(0.6)
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
-            if panel.isPromoted {
+            if panel.hasFrames {
                 inBuilderChip
             } else {
                 Image(systemName: panel.timeOfDay.icon)

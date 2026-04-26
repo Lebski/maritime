@@ -11,7 +11,7 @@ import SwiftUI
 //
 // Drafts here are explicitly separate from domain objects in other modules.
 // Promotion is a one-way action: "Promote to Character Lab" creates a
-// LabCharacter; "Send to Scene Builder" creates a FilmScene. This keeps
+// LabCharacter; "Send to Storyboard" creates a SceneShotPlan stub. This keeps
 // modules independently usable.
 
 enum StoryForgeSection: String, CaseIterable, Identifiable, Hashable {
@@ -374,7 +374,6 @@ struct SceneBreakdown: Identifiable, Hashable, Codable {
     var emotionalBeat: String
     var visualMetaphor: String
     var transitionNote: String
-    var promotedFilmSceneID: UUID?
 
     init(id: UUID = UUID(),
          number: Int,
@@ -387,8 +386,7 @@ struct SceneBreakdown: Identifiable, Hashable, Codable {
          conflict: String = "",
          emotionalBeat: String = "",
          visualMetaphor: String = "",
-         transitionNote: String = "",
-         promotedFilmSceneID: UUID? = nil) {
+         transitionNote: String = "") {
         self.id = id
         self.number = number
         self.title = title
@@ -401,7 +399,6 @@ struct SceneBreakdown: Identifiable, Hashable, Codable {
         self.emotionalBeat = emotionalBeat
         self.visualMetaphor = visualMetaphor
         self.transitionNote = transitionNote
-        self.promotedFilmSceneID = promotedFilmSceneID
     }
 
     var locationLabel: String {
@@ -413,8 +410,6 @@ struct SceneBreakdown: Identifiable, Hashable, Codable {
         let filled = fields.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
         return Double(filled) / Double(fields.count)
     }
-
-    var isPromoted: Bool { promotedFilmSceneID != nil }
 }
 
 // MARK: - Theme & Motifs

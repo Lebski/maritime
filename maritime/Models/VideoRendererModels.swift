@@ -38,9 +38,12 @@ struct VideoClip: Identifiable, Hashable {
     var motion: MotionIntensity
     var gradientSeed: Int
     var isApproved: Bool
+    var keyframeCount: Int
+    var sourceFrames: [UUID]
 
     init(id: UUID = UUID(), number: Int, title: String, sceneNumber: Int,
-         duration: Double, motion: MotionIntensity, gradientSeed: Int, isApproved: Bool) {
+         duration: Double, motion: MotionIntensity, gradientSeed: Int,
+         isApproved: Bool, keyframeCount: Int = 0, sourceFrames: [UUID] = []) {
         self.id = id
         self.number = number
         self.title = title
@@ -49,6 +52,8 @@ struct VideoClip: Identifiable, Hashable {
         self.motion = motion
         self.gradientSeed = gradientSeed
         self.isApproved = isApproved
+        self.keyframeCount = keyframeCount
+        self.sourceFrames = sourceFrames
     }
 
     var gradientColors: [Color] {

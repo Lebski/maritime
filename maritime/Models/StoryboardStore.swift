@@ -2,10 +2,12 @@ import SwiftUI
 
 // MARK: - Storyboard mutators
 //
-// Extensions on MovieBlazeProject that replace the old singleton
-// StoryboardStore. Panels are a flat list on the project — one project =
-// one ordered panel sequence. Panels originating from a Story Forge
-// SceneBreakdown carry the source ID so the UI can still group by scene.
+// Extensions on MovieBlazeProject for the storyboard's shot catalogue. Panels
+// are a flat list — one project = one ordered shot sequence. Panels carry the
+// source SceneBreakdown ID so the UI can group by scene. AI shot-breakdown
+// status lives in `shotPlans` (one per scene); panels themselves remain the
+// authoritative shot list, with frame-builder keyframes attached via
+// `frameIDs`.
 
 @MainActor
 extension MovieBlazeProject {
@@ -23,7 +25,15 @@ extension MovieBlazeProject {
         storyboardPanels[i] = panel
     }
 
+    func mutatePanel(id: UUID, _ block: (inout StoryboardPanel) -> Void) {
+        guard let i = storyboardPanels.firstIndex(where: { $0.id == id }) else { return }
+        block(&storyboardPanels[i])
+    }
+
     func removePanel(id: UUID) {
+        if let panel = storyboardPanels.first(where: { $0.id == id }) {
+            cleanupAssets(forPanel: panel)
+        }
         storyboardPanels.removeAll(where: { $0.id == id })
         for i in storyboardPanels.indices { storyboardPanels[i].number = i + 1 }
     }
@@ -36,59 +46,76 @@ extension MovieBlazeProject {
         for i in storyboardPanels.indices { storyboardPanels[i].number = i + 1 }
     }
 
-    func markPanelPromoted(panelID: UUID, filmSceneID: UUID) {
-        guard let i = storyboardPanels.firstIndex(where: { $0.id == panelID }) else { return }
-        storyboardPanels[i].promotedFilmSceneID = filmSceneID
-    }
-
-    // MARK: Scene → Storyboard promotion
+    // MARK: Scene → Storyboard
 
     func panels(forSceneBreakdown sceneID: UUID) -> [StoryboardPanel] {
         storyboardPanels.filter { $0.sceneBreakdownID == sceneID }
     }
 
-    /// Append four starter panels (WS → CU → OTS → WS) seeded from a
-    /// Story Forge SceneBreakdown. Returns the newly appended panels so the
-    /// caller can scroll-to them.
+    // MARK: Shot Plan (AI-driven breakdown)
+
+    func shotPlan(forScene sceneID: UUID) -> SceneShotPlan? {
+        shotPlans.first(where: { $0.sceneBreakdownID == sceneID })
+    }
+
+    /// Idempotent — returns the existing plan for the scene if one exists,
+    /// else appends a fresh `.empty` stub.
     @discardableResult
-    func appendPanels(fromScene scene: SceneBreakdown) -> [StoryboardPanel] {
-        let colors = bible.posterColors
-        let symbol: String
-        switch scene.timeOfDay {
-        case .dawn:        symbol = "sunrise.fill"
-        case .day:         symbol = "sun.max.fill"
-        case .goldenHour:  symbol = "sun.horizon.fill"
-        case .dusk:        symbol = "sunset.fill"
-        case .night:       symbol = "moon.stars.fill"
+    func createShotPlanStub(forScene sceneID: UUID) -> SceneShotPlan {
+        if let existing = shotPlan(forScene: sceneID) { return existing }
+        let plan = SceneShotPlan(sceneBreakdownID: sceneID, status: .empty)
+        shotPlans.append(plan)
+        return plan
+    }
+
+    func updateShotPlan(_ plan: SceneShotPlan) {
+        guard let i = shotPlans.firstIndex(where: { $0.id == plan.id }) else { return }
+        shotPlans[i] = plan
+    }
+
+    /// Removes panels with the plan's `sceneBreakdownID`, appends `panels`,
+    /// renumbers the global list, and cleans up orphaned sketch assets.
+    func replaceShotPlanPanels(planID: UUID, panels: [StoryboardPanel]) {
+        guard let plan = shotPlans.first(where: { $0.id == planID }) else { return }
+        let sceneID = plan.sceneBreakdownID
+        let outgoing = storyboardPanels.filter { $0.sceneBreakdownID == sceneID }
+        for panel in outgoing { cleanupAssets(forPanel: panel) }
+        storyboardPanels.removeAll { $0.sceneBreakdownID == sceneID }
+        var stamped = panels
+        for i in stamped.indices { stamped[i].sceneBreakdownID = sceneID }
+        storyboardPanels.append(contentsOf: stamped)
+        for i in storyboardPanels.indices { storyboardPanels[i].number = i + 1 }
+    }
+
+    // MARK: Frame attachment
+
+    func appendFrame(_ frame: Frame, toPanel panelID: UUID) {
+        guard storyboardPanels.contains(where: { $0.id == panelID }) else { return }
+        var stamped = frame
+        stamped.panelID = panelID
+        if !frames.contains(where: { $0.id == stamped.id }) {
+            frames.append(stamped)
+        } else {
+            updateFrame(stamped)
         }
-        let base = storyboardPanels.count
-        let seed: [StoryboardPanel] = [
-            StoryboardPanel(number: base + 1, shotType: .wide, cameraMovement: .static, duration: 4.0,
-                            actionNote: "Establishing — \(scene.locationLabel).",
-                            timeOfDay: scene.timeOfDay, editingPriority: .rhythm,
-                            characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors,
-                            sceneBreakdownID: scene.id),
-            StoryboardPanel(number: base + 2, shotType: .closeUp, cameraMovement: .static, duration: 2.2,
-                            actionNote: scene.emotionalBeat.isEmpty ? "Reaction." : scene.emotionalBeat,
-                            timeOfDay: scene.timeOfDay, editingPriority: .emotion,
-                            characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors,
-                            sceneBreakdownID: scene.id),
-            StoryboardPanel(number: base + 3, shotType: .overTheShoulder, cameraMovement: .static, duration: 2.5,
-                            actionNote: scene.conflict.isEmpty ? "Conflict beat." : scene.conflict,
-                            timeOfDay: scene.timeOfDay, editingPriority: .story,
-                            characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors,
-                            sceneBreakdownID: scene.id),
-            StoryboardPanel(number: base + 4, shotType: .wide, cameraMovement: .zoomOut, duration: 3.2,
-                            actionNote: scene.transitionNote.isEmpty ? "Outro — release the tension." : scene.transitionNote,
-                            timeOfDay: scene.timeOfDay, editingPriority: .rhythm,
-                            characterDraftIDs: scene.characterDraftIDs,
-                            thumbnailSymbol: symbol, thumbnailColors: colors,
-                            sceneBreakdownID: scene.id)
-        ]
-        storyboardPanels.append(contentsOf: seed)
-        return seed
+        mutatePanel(id: panelID) {
+            if !$0.frameIDs.contains(stamped.id) {
+                $0.frameIDs.append(stamped.id)
+            }
+        }
+    }
+
+    // MARK: Asset cleanup
+
+    private func cleanupAssets(forPanel panel: StoryboardPanel) {
+        if let sketch = panel.pencilSketchAssetID {
+            assetImageBytes.removeValue(forKey: sketch)
+            assetEditCounts.removeValue(forKey: sketch)
+        }
+        for frameID in panel.frameIDs {
+            removeFrame(id: frameID)
+            assetImageBytes.removeValue(forKey: frameID)
+            assetEditCounts.removeValue(forKey: frameID)
+        }
     }
 }

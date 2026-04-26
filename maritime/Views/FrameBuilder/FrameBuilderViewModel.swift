@@ -2,8 +2,8 @@ import SwiftUI
 import Combine
 
 @MainActor
-final class SceneBuilderViewModel: ObservableObject {
-    @Published var activeSceneID: UUID?
+final class FrameBuilderViewModel: ObservableObject {
+    @Published var activeFrameID: UUID?
     @Published var isGenerating = false
     @Published var generationProgress: Double = 0
     @Published var showBackgroundPicker = false
@@ -16,32 +16,32 @@ final class SceneBuilderViewModel: ObservableObject {
     private let imageService: ImageGenerationService
     private var cancellables: Set<AnyCancellable> = []
 
-    var scenes: [FilmScene] { project.scenes }
+    var frames: [Frame] { project.frames }
 
     init(project: MovieBlazeProject,
          imageService: ImageGenerationService = FalaiSceneRenderService()) {
         self.project = project
         self.imageService = imageService
-        activeSceneID = project.scenes.first?.id
+        activeFrameID = project.frames.first?.id
         project.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
     }
 
-    var activeScene: FilmScene? {
-        project.scenes.first(where: { $0.id == activeSceneID })
+    var activeFrame: Frame? {
+        project.frames.first(where: { $0.id == activeFrameID })
     }
 
-    private func mutate(_ block: (inout FilmScene) -> Void) {
-        guard let id = activeSceneID else { return }
-        project.mutateFilmScene(id: id, block)
+    private func mutate(_ block: (inout Frame) -> Void) {
+        guard let id = activeFrameID else { return }
+        project.mutateFrame(id: id, block)
     }
 
-    func setActive(_ scene: FilmScene) {
-        activeSceneID = scene.id
+    func setActive(_ frame: Frame) {
+        activeFrameID = frame.id
     }
 
-    // MARK: Scene Setup
+    // MARK: Frame Setup
 
     func setTimeOfDay(_ time: TimeOfDay) { mutate { $0.timeOfDay = time } }
     func setMood(_ mood: LightingMood) { mutate { $0.lightingMood = mood } }
@@ -73,15 +73,13 @@ final class SceneBuilderViewModel: ObservableObject {
         }
     }
 
-    /// Adds a finalized LabCharacter to the active scene at the given
+    /// Adds a finalized LabCharacter to the active frame at the given
     /// normalized (0-1) canvas position. Returns true on success.
     @discardableResult
     func addCharacter(from lab: LabCharacter, at position: CGPoint) -> Bool {
-        guard project.scenes.firstIndex(where: { $0.id == activeSceneID }) != nil else { return false }
-        // Don't add duplicates by name in the same scene
-        if activeScene?.characters.contains(where: { $0.name == lab.name }) == true {
-            // Move existing instead
-            if let existing = activeScene?.characters.first(where: { $0.name == lab.name }) {
+        guard project.frames.firstIndex(where: { $0.id == activeFrameID }) != nil else { return false }
+        if activeFrame?.characters.contains(where: { $0.name == lab.name }) == true {
+            if let existing = activeFrame?.characters.first(where: { $0.name == lab.name }) {
                 moveCharacter(id: existing.id, x: position.x, y: position.y)
             }
             return false
@@ -117,7 +115,7 @@ final class SceneBuilderViewModel: ObservableObject {
 
     // MARK: Generation
 
-    /// Assembles the render package onto the active scene and kicks off the
+    /// Assembles the render package onto the active frame and kicks off the
     /// image generation service. Returns `true` on success (caller can dismiss).
     @discardableResult
     func render(package: RenderPackage) async -> Bool {
@@ -166,31 +164,77 @@ final class SceneBuilderViewModel: ObservableObject {
 
     func approveFrame() {
         mutate { $0.frameApproved = true }
+        rollUpClipApproval(forFrameID: activeFrameID)
+    }
+
+    func unapproveFrame() {
+        mutate { $0.frameApproved = false }
+        rollUpClipApproval(forFrameID: activeFrameID)
+    }
+
+    /// After a frame's approval flips, recompute the parent panel's
+    /// `clipApproved` so it matches "all frames approved".
+    private func rollUpClipApproval(forFrameID frameID: UUID?) {
+        guard let id = frameID,
+              let frame = project.frames.first(where: { $0.id == id }) else { return }
+        let siblings = project.frames(forPanel: frame.panelID)
+        guard !siblings.isEmpty else { return }
+        let allApproved = siblings.allSatisfy { $0.frameApproved }
+        project.mutatePanel(id: frame.panelID) { $0.clipApproved = allApproved }
     }
 
     func regenerateFrame() {
         mutate { $0.frameApproved = false }
+        rollUpClipApproval(forFrameID: activeFrameID)
         Task {
-            guard let scene = activeScene else { return }
-            let package = scene.renderPackage
-                ?? RenderPackage(sceneID: scene.id,
-                                 prompt: PromptBuilder.buildPrompt(scene: scene,
+            guard let frame = activeFrame else { return }
+            let package = frame.renderPackage
+                ?? RenderPackage(frameID: frame.id,
+                                 prompt: PromptBuilder.buildPrompt(frame: frame,
                                                                    characters: project.characters))
             await render(package: package)
         }
     }
 
-    func createNewScene() {
-        let nextNumber = (project.scenes.map { $0.number }.max() ?? 0) + 1
-        let scene = FilmScene(
-            number: nextNumber,
-            title: "New Scene",
-            location: "Untitled Location",
+    /// Convenience: appends a keyframe to whichever panel currently holds the
+    /// active frame. No-op if nothing is selected. Used by the sidebar's
+    /// "New Frame" button until the tree-style sidebar lands in Phase 6.
+    @discardableResult
+    func addKeyframeToActivePanel() -> Frame? {
+        guard let panelID = activeFrame?.panelID else { return nil }
+        return addKeyframe(toPanel: panelID)
+    }
+
+    /// Appends a keyframe to the given panel. Ordinal/role are derived from the
+    /// panel's existing frames: 0 → keyStart, 1 → keyEnd, 2+ → intermediate.
+    @discardableResult
+    func addKeyframe(toPanel panelID: UUID) -> Frame? {
+        guard let panel = project.storyboardPanels.first(where: { $0.id == panelID }) else {
+            return nil
+        }
+        let panelFrames = project.frames(forPanel: panelID)
+        let ordinal = panelFrames.count
+        let role: FrameRole
+        switch ordinal {
+        case 0:  role = .keyStart
+        case 1:  role = .keyEnd
+        default: role = .intermediate
+        }
+        let originScene = project.bible.sceneBreakdowns.first(where: { $0.id == panel.sceneBreakdownID })
+        let title = originScene.map { "Scene \($0.number) · Shot \(panel.number) · \(role.rawValue)" }
+            ?? "Shot \(panel.number) · \(role.rawValue)"
+        let location = originScene?.title ?? project.bible.projectTitle
+        let frame = Frame(
+            panelID: panelID,
+            ordinal: ordinal,
+            role: role,
+            title: title,
+            location: location,
             isInterior: true,
-            timeOfDay: .day,
+            timeOfDay: panel.timeOfDay,
             lightingMood: .neutral,
             keyLight: .frontal,
-            shotType: .medium,
+            shotType: panel.shotType,
             background: nil,
             props: [],
             characters: [],
@@ -198,7 +242,8 @@ final class SceneBuilderViewModel: ObservableObject {
             frameApproved: false,
             projectTitle: project.bible.projectTitle
         )
-        project.addFilmScene(scene)
-        activeSceneID = scene.id
+        project.appendFrame(frame, toPanel: panelID)
+        activeFrameID = frame.id
+        return frame
     }
 }

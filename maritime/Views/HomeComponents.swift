@@ -474,7 +474,7 @@ private struct SetPieceChip: View {
 }
 
 struct SceneStrip: View {
-    let scenes: [FilmScene]
+    let scenes: [Frame]
     let onViewAll: () -> Void
     let onOpenScene: (UUID) -> Void
 
@@ -503,7 +503,7 @@ struct SceneStrip: View {
 }
 
 private struct SceneChip: View {
-    let scene: FilmScene
+    let scene: Frame
     let onOpen: () -> Void
 
     var body: some View {
@@ -534,8 +534,9 @@ private struct SceneChip: View {
                     VStack {
                         Spacer()
                         HStack {
-                            Text("Scene \(scene.number)")
-                                .font(.system(size: 22, weight: .bold))
+                            Text(scene.role.rawValue.uppercased())
+                                .font(.system(size: 11, weight: .bold))
+                                .tracking(0.6)
                                 .foregroundStyle(.white)
                             Spacer()
                             if scene.frameApproved {

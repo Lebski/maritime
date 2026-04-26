@@ -1,31 +1,31 @@
 import SwiftUI
 
-struct SceneBuilderView: View {
+struct FrameBuilderView: View {
     @EnvironmentObject var project: MovieBlazeProject
     @EnvironmentObject var navigator: AppNavigator
-    @StateObject private var vm: SceneBuilderViewModel
+    @StateObject private var vm: FrameBuilderViewModel
     @State private var showHelper = false
     @State private var showInnerSidebar = true
     @State private var showRenderSheet = false
 
     init(project: MovieBlazeProject) {
-        _vm = StateObject(wrappedValue: SceneBuilderViewModel(project: project))
+        _vm = StateObject(wrappedValue: FrameBuilderViewModel(project: project))
     }
 
     var body: some View {
         HStack(spacing: 0) {
             if showInnerSidebar {
-                sceneList
+                frameList
                     .frame(width: 260)
                     .background(Theme.bgElevated)
                     .transition(.move(edge: .leading).combined(with: .opacity))
                 Divider().background(Theme.stroke)
             }
-            if let scene = vm.activeScene {
-                mainWorkspace(scene: scene)
+            if let frame = vm.activeFrame {
+                mainWorkspace(frame: frame)
                 if showHelper {
                     Divider().background(Theme.stroke)
-                    SceneSetupPanel(scene: scene, vm: vm)
+                    FrameInspectorPanel(frame: frame, vm: vm)
                         .frame(width: 320)
                         .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
@@ -44,21 +44,21 @@ struct SceneBuilderView: View {
             PropPickerSheet(vm: vm)
         }
         .sheet(isPresented: $showRenderSheet) {
-            if let scene = vm.activeScene {
-                PrepareRenderSheet(scene: scene, vm: vm)
+            if let frame = vm.activeFrame {
+                PrepareRenderSheet(frame: frame, vm: vm)
                     .environmentObject(project)
             }
         }
-        .onAppear { consumePendingSceneID() }
-        .onChange(of: navigator.pendingFilmSceneID) { _, _ in consumePendingSceneID() }
+        .onAppear { consumePendingFrameID() }
+        .onChange(of: navigator.pendingFrameID) { _, _ in consumePendingFrameID() }
     }
 
-    private func consumePendingSceneID() {
-        guard let id = navigator.pendingFilmSceneID else { return }
-        if project.scenes.contains(where: { $0.id == id }) {
-            vm.activeSceneID = id
+    private func consumePendingFrameID() {
+        guard let id = navigator.pendingFrameID else { return }
+        if project.frames.contains(where: { $0.id == id }) {
+            vm.activeFrameID = id
         }
-        navigator.pendingFilmSceneID = nil
+        navigator.pendingFrameID = nil
     }
 
     private var sidebarToggle: some View {
@@ -87,31 +87,38 @@ struct SceneBuilderView: View {
         .help(showHelper ? "Hide setup panel" : "Show setup panel")
     }
 
-    // MARK: Scene List Sidebar
+    // MARK: Frame List Sidebar (scene → panel → frame tree)
 
-    private var sceneList: some View {
+    private var frameList: some View {
         VStack(spacing: 0) {
             listHeader
             ScrollView {
-                VStack(spacing: 6) {
-                    ForEach(vm.scenes) { scene in
-                        SceneListRow(
-                            scene: scene,
-                            isActive: vm.activeSceneID == scene.id
-                        ) {
-                            vm.setActive(scene)
-                        }
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(sceneTreeGroups) { group in
+                        SceneTreeNode(
+                            group: group,
+                            activeFrameID: vm.activeFrameID,
+                            onSelectFrame: { frame in vm.setActive(frame) },
+                            onAddKeyframe: { panelID in vm.addKeyframe(toPanel: panelID) }
+                        )
+                    }
+                    if !orphanFrames.isEmpty {
+                        OrphanFramesNode(
+                            frames: orphanFrames,
+                            activeFrameID: vm.activeFrameID,
+                            onSelectFrame: { frame in vm.setActive(frame) }
+                        )
                     }
                 }
                 .padding(10)
             }
             Divider().background(Theme.stroke)
-            Button(action: { vm.createNewScene() }) {
+            Button(action: { vm.addKeyframeToActivePanel() }) {
                 HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 15))
                         .foregroundStyle(Theme.accent)
-                    Text("New Scene")
+                    Text("Add Keyframe")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Theme.accent)
                     Spacer()
@@ -120,7 +127,33 @@ struct SceneBuilderView: View {
                 .padding(.vertical, 14)
             }
             .buttonStyle(.plainSolid)
+            .disabled(vm.activeFrame == nil)
         }
+    }
+
+    // MARK: Tree grouping
+
+    struct SceneTreeGroup: Identifiable {
+        let scene: SceneBreakdown
+        let panels: [StoryboardPanel]
+        var id: UUID { scene.id }
+    }
+
+    private var sceneTreeGroups: [SceneTreeGroup] {
+        let panelsBySceneID = Dictionary(grouping: project.storyboardPanels.filter { $0.sceneBreakdownID != nil },
+                                         by: { $0.sceneBreakdownID! })
+        return project.bible.sceneBreakdowns
+            .sorted(by: { $0.number < $1.number })
+            .compactMap { scene in
+                let panels = (panelsBySceneID[scene.id] ?? []).sorted { $0.number < $1.number }
+                guard !panels.isEmpty else { return nil }
+                return SceneTreeGroup(scene: scene, panels: panels)
+            }
+    }
+
+    private var orphanFrames: [Frame] {
+        let knownPanelIDs = Set(project.storyboardPanels.map(\.id))
+        return project.frames.filter { !knownPanelIDs.contains($0.panelID) }
     }
 
     private var listHeader: some View {
@@ -135,7 +168,7 @@ struct SceneBuilderView: View {
                         .foregroundStyle(Theme.accent)
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Scene Builder")
+                    Text("Frame Builder")
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                     Text("Compose cinematic frames")
@@ -152,13 +185,13 @@ struct SceneBuilderView: View {
 
     // MARK: Main Workspace
 
-    private func mainWorkspace(scene: FilmScene) -> some View {
+    private func mainWorkspace(frame: Frame) -> some View {
         VStack(spacing: 0) {
-            workspaceHeader(scene: scene)
+            workspaceHeader(frame: frame)
             ScrollView {
                 VStack(spacing: 20) {
-                    SceneCanvasView(scene: scene, vm: vm)
-                    sceneMetaRow(scene: scene)
+                    FrameCanvasView(frame: frame, vm: vm)
+                    frameMetaRow(frame: frame)
                 }
                 .padding(24)
             }
@@ -166,46 +199,37 @@ struct SceneBuilderView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func workspaceHeader(scene: FilmScene) -> some View {
+    private func workspaceHeader(frame: Frame) -> some View {
         HStack(spacing: 14) {
             sidebarToggle
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Theme.accent.opacity(0.18))
                     .frame(width: 44, height: 44)
-                Text("\(scene.number)")
+                Text("\(frame.ordinal + 1)")
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(Theme.accent)
             }
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(scene.title)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text(scene.projectTitle)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Theme.textSecondary)
-                        .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(Color.white.opacity(0.06))
-                        .clipShape(Capsule())
-                }
-                Text(scene.locationLabel)
+                breadcrumbRow(frame: frame)
+                Text(frame.locationLabel)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Theme.textTertiary)
                     .tracking(0.5)
             }
             Spacer()
+            clipApprovalSummary(frame: frame)
             helperToggle
             Button(action: { showRenderSheet = true }) {
                 Label("Send to Renderer", systemImage: "arrow.right.circle.fill")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(scene.frameApproved ? .black : Theme.textTertiary)
+                    .foregroundStyle(frame.frameApproved ? .black : Theme.textTertiary)
                     .padding(.horizontal, 14).padding(.vertical, 8)
-                    .background(scene.frameApproved ? Theme.lime : Theme.card)
+                    .background(frame.frameApproved ? Theme.lime : Theme.card)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plainSolid)
-            .disabled(!scene.frameApproved)
+            .disabled(!frame.frameApproved)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
@@ -213,13 +237,96 @@ struct SceneBuilderView: View {
         .overlay(Divider().background(Theme.stroke), alignment: .bottom)
     }
 
-    private func sceneMetaRow(scene: FilmScene) -> some View {
+    @ViewBuilder
+    private func breadcrumbRow(frame: Frame) -> some View {
+        let panel = project.storyboardPanels.first(where: { $0.id == frame.panelID })
+        let scene = panel?.sceneBreakdownID.flatMap { sid in
+            project.bible.sceneBreakdowns.first(where: { $0.id == sid })
+        }
+        HStack(spacing: 6) {
+            if let scene {
+                breadcrumbCrumb(
+                    title: "Scene \(scene.number)",
+                    subtitle: scene.title,
+                    tint: Theme.violet
+                )
+                breadcrumbSeparator
+            }
+            if let panel {
+                breadcrumbCrumb(
+                    title: "Shot \(panel.number)",
+                    subtitle: panel.shotType.shortLabel,
+                    tint: Theme.teal
+                )
+                breadcrumbSeparator
+            }
+            breadcrumbCrumb(
+                title: "Frame \(frame.ordinal + 1)",
+                subtitle: frame.role.rawValue,
+                tint: Theme.accent,
+                strong: true
+            )
+        }
+    }
+
+    private func breadcrumbCrumb(title: String, subtitle: String, tint: Color, strong: Bool = false) -> some View {
+        HStack(spacing: 6) {
+            Text(title)
+                .font(.system(size: strong ? 16 : 13, weight: .bold))
+                .foregroundStyle(strong ? Theme.textPrimary : Theme.textSecondary)
+            Text(subtitle)
+                .font(.system(size: 9, weight: .bold))
+                .tracking(0.5)
+                .foregroundStyle(tint)
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(tint.opacity(0.16))
+                .clipShape(Capsule())
+        }
+    }
+
+    private var breadcrumbSeparator: some View {
+        Image(systemName: "chevron.right")
+            .font(.system(size: 9, weight: .bold))
+            .foregroundStyle(Theme.textTertiary)
+    }
+
+    @ViewBuilder
+    private func clipApprovalSummary(frame: Frame) -> some View {
+        let panel = project.storyboardPanels.first(where: { $0.id == frame.panelID })
+        if let panel {
+            let siblings = project.frames(forPanel: panel.id)
+            let approvedCount = siblings.filter(\.frameApproved).count
+            let total = siblings.count
+            HStack(spacing: 6) {
+                Image(systemName: panel.clipApproved ? "checkmark.seal.fill" : "seal")
+                    .font(.system(size: 11))
+                    .foregroundStyle(panel.clipApproved ? Theme.lime : Theme.textTertiary)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(panel.clipApproved ? "Clip approved" : "Clip pending")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(panel.clipApproved ? Theme.lime : Theme.textSecondary)
+                    Text("\(approvedCount)/\(total) frames")
+                        .font(.system(size: 9))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+            }
+            .padding(.horizontal, 10).padding(.vertical, 6)
+            .background(Color.white.opacity(0.04))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(panel.clipApproved ? Theme.lime.opacity(0.4) : Theme.stroke, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+    }
+
+    private func frameMetaRow(frame: Frame) -> some View {
         HStack(spacing: 10) {
-            metaStat(icon: scene.timeOfDay.icon, label: "Time", value: scene.timeOfDay.rawValue, tint: scene.timeOfDay.tint)
-            metaStat(icon: "paintpalette.fill", label: "Mood", value: scene.lightingMood.rawValue, tint: scene.lightingMood.tint)
-            metaStat(icon: "camera.fill", label: "Shot", value: scene.shotType.shortLabel, tint: Theme.violet)
-            metaStat(icon: "person.2.fill", label: "Cast", value: "\(scene.characters.count)", tint: Theme.magenta)
-            metaStat(icon: "shippingbox.fill", label: "Props", value: "\(scene.props.count)", tint: Theme.accent)
+            metaStat(icon: frame.timeOfDay.icon, label: "Time", value: frame.timeOfDay.rawValue, tint: frame.timeOfDay.tint)
+            metaStat(icon: "paintpalette.fill", label: "Mood", value: frame.lightingMood.rawValue, tint: frame.lightingMood.tint)
+            metaStat(icon: "camera.fill", label: "Shot", value: frame.shotType.shortLabel, tint: Theme.violet)
+            metaStat(icon: "person.2.fill", label: "Cast", value: "\(frame.characters.count)", tint: Theme.magenta)
+            metaStat(icon: "shippingbox.fill", label: "Props", value: "\(frame.props.count)", tint: Theme.accent)
         }
     }
 
@@ -255,7 +362,7 @@ struct SceneBuilderView: View {
             Image(systemName: "photo.stack.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(Theme.accent)
-            Text("Pick or create a scene")
+            Text("Pick or create a frame")
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
         }
@@ -263,86 +370,266 @@ struct SceneBuilderView: View {
     }
 }
 
-// MARK: - Scene List Row
+// MARK: - Tree Sidebar Nodes
 
-struct SceneListRow: View {
-    let scene: FilmScene
-    let isActive: Bool
-    let onTap: () -> Void
+struct SceneTreeNode: View {
+    let group: FrameBuilderView.SceneTreeGroup
+    let activeFrameID: UUID?
+    let onSelectFrame: (Frame) -> Void
+    let onAddKeyframe: (UUID) -> Void
     @EnvironmentObject var project: MovieBlazeProject
+    @State private var expanded: Bool = true
 
-    private var fromStoryboard: Bool {
-        project.storyboardPanels.contains { $0.promotedFilmSceneID == scene.id }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            DisclosureGroup(isExpanded: $expanded) {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(group.panels) { panel in
+                        PanelTreeNode(
+                            panel: panel,
+                            activeFrameID: activeFrameID,
+                            onSelectFrame: onSelectFrame,
+                            onAddKeyframe: onAddKeyframe
+                        )
+                    }
+                }
+                .padding(.leading, 4)
+            } label: {
+                HStack(spacing: 6) {
+                    Text("SCENE \(group.scene.number)")
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(0.6)
+                        .foregroundStyle(Theme.textTertiary)
+                    Text(group.scene.title)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    Spacer()
+                    Text("\(group.panels.count)")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(Theme.textTertiary)
+                        .padding(.horizontal, 5).padding(.vertical, 1)
+                        .background(Color.white.opacity(0.06))
+                        .clipShape(Capsule())
+                }
+            }
+            .disclosureGroupStyle(SidebarDisclosureStyle())
+        }
+    }
+}
+
+struct PanelTreeNode: View {
+    let panel: StoryboardPanel
+    let activeFrameID: UUID?
+    let onSelectFrame: (Frame) -> Void
+    let onAddKeyframe: (UUID) -> Void
+    @EnvironmentObject var project: MovieBlazeProject
+    @State private var expanded: Bool = true
+
+    private var frames: [Frame] {
+        project.frames(forPanel: panel.id).sorted(by: { $0.ordinal < $1.ordinal })
+    }
+
+    private var sketchImage: NSImage? {
+        guard let assetID = panel.pencilSketchAssetID,
+              let data = project.assetImageData(for: assetID) else { return nil }
+        return NSImage(data: data)
     }
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 10) {
-                ZStack {
-                    if let bg = scene.background {
-                        LinearGradient(colors: bg.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    } else {
-                        Theme.card
-                    }
-                    Text("\(scene.number)")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
+        DisclosureGroup(isExpanded: $expanded) {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(frames) { frame in
+                    FrameTreeLeaf(
+                        frame: frame,
+                        isActive: activeFrameID == frame.id,
+                        onTap: { onSelectFrame(frame) }
+                    )
                 }
-                .frame(width: 44, height: 32)
-                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(scene.title)
-                        .font(.system(size: 12, weight: .semibold))
+                Button(action: { onAddKeyframe(panel.id) }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus.circle")
+                            .font(.system(size: 10, weight: .semibold))
+                        Text("Add Keyframe")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Theme.accent.opacity(0.85))
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(Theme.accent.opacity(0.08))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+                .padding(.leading, 28)
+                .padding(.top, 2)
+            }
+            .padding(.leading, 4)
+        } label: {
+            HStack(spacing: 8) {
+                ZStack {
+                    if let sketch = sketchImage {
+                        Image(nsImage: sketch)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } else {
+                        LinearGradient(colors: panel.thumbnailColors,
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                }
+                .frame(width: 36, height: 22)
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .stroke(Theme.stroke, lineWidth: 0.5)
+                )
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Shot \(panel.number) · \(panel.shotType.shortLabel)")
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
                         .lineLimit(1)
-                    HStack(spacing: 4) {
-                        Image(systemName: scene.timeOfDay.icon)
-                            .font(.system(size: 8))
-                            .foregroundStyle(scene.timeOfDay.tint)
-                        Text(scene.location)
-                            .font(.system(size: 10))
-                            .foregroundStyle(Theme.textTertiary)
-                            .lineLimit(1)
-                    }
+                    Text("\(frames.count) keyframe\(frames.count == 1 ? "" : "s")")
+                        .font(.system(size: 9))
+                        .foregroundStyle(Theme.textTertiary)
                 }
                 Spacer()
-                if fromStoryboard {
-                    Image(systemName: "square.grid.3x2.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Theme.violet)
-                        .padding(4)
-                        .background(Theme.violet.opacity(0.14))
-                        .clipShape(Circle())
-                }
-                if scene.frameApproved {
+                if panel.clipApproved {
                     Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 11))
+                        .font(.system(size: 10))
                         .foregroundStyle(Theme.lime)
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+        }
+        .disclosureGroupStyle(SidebarDisclosureStyle())
+    }
+}
+
+struct FrameTreeLeaf: View {
+    let frame: Frame
+    let isActive: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(roleTint.opacity(0.18))
+                        .frame(width: 22, height: 22)
+                    Text("\(frame.ordinal + 1)")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(roleTint)
+                }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(frame.role.rawValue)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                    Text(frame.location)
+                        .font(.system(size: 9))
+                        .foregroundStyle(Theme.textTertiary)
+                        .lineLimit(1)
+                }
+                Spacer()
+                if frame.frameApproved {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(Theme.lime)
+                }
+            }
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .padding(.leading, 16)
             .background(isActive ? Theme.accent.opacity(0.12) : Color.clear)
             .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .stroke(isActive ? Theme.accent.opacity(0.35) : Color.clear, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plainSolid)
+    }
+
+    private var roleTint: Color {
+        switch frame.role {
+        case .keyStart:     return Theme.teal
+        case .keyEnd:       return Theme.magenta
+        case .hold:         return Theme.violet
+        case .intermediate: return Theme.accent
+        }
+    }
+}
+
+struct OrphanFramesNode: View {
+    let frames: [Frame]
+    let activeFrameID: UUID?
+    let onSelectFrame: (Frame) -> Void
+    @State private var expanded: Bool = false
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $expanded) {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(frames) { frame in
+                    FrameTreeLeaf(
+                        frame: frame,
+                        isActive: activeFrameID == frame.id,
+                        onTap: { onSelectFrame(frame) }
+                    )
+                }
+            }
+            .padding(.leading, 4)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "questionmark.folder")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textTertiary)
+                Text("ORPHANED FRAMES")
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundStyle(Theme.textTertiary)
+                Spacer()
+                Text("\(frames.count)")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+        }
+        .disclosureGroupStyle(SidebarDisclosureStyle())
+    }
+}
+
+private struct SidebarDisclosureStyle: DisclosureGroupStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    configuration.isExpanded.toggle()
+                }
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: configuration.isExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(Theme.textTertiary)
+                        .frame(width: 12)
+                    configuration.label
+                }
+                .contentShape(Rectangle())
+                .padding(.horizontal, 8).padding(.vertical, 5)
+            }
+            .buttonStyle(.plainSolid)
+            if configuration.isExpanded {
+                configuration.content
+            }
+        }
     }
 }
 
 // MARK: - Prepare Render Sheet
 //
-// Assembles a `RenderPackage` from the current FilmScene + project character
-// roster and hands it to the Scene Builder view model for rendering. Four
-// numbered sections mirror what Nano Banana 2 will receive: composition
-// snapshot, prompt, character references (from Character Lab), style refs.
+// Assembles a `RenderPackage` from the current Frame + project character roster
+// and hands it to the Frame Builder view model for rendering. Four numbered
+// sections mirror what Nano Banana 2 will receive: composition snapshot,
+// prompt, character references (from Character Lab), style refs.
 
 struct PrepareRenderSheet: View {
-    let scene: FilmScene
-    @ObservedObject var vm: SceneBuilderViewModel
+    let frame: Frame
+    @ObservedObject var vm: FrameBuilderViewModel
     @EnvironmentObject var project: MovieBlazeProject
     @Environment(\.dismiss) private var dismiss
 
@@ -352,10 +639,10 @@ struct PrepareRenderSheet: View {
     @State private var model: ImageModel
     @State private var errorMessage: String?
 
-    init(scene: FilmScene, vm: SceneBuilderViewModel) {
-        self.scene = scene
+    init(frame: Frame, vm: FrameBuilderViewModel) {
+        self.frame = frame
         self.vm = vm
-        let existing = scene.renderPackage
+        let existing = frame.renderPackage
         _prompt         = State(initialValue: existing?.prompt ?? "")
         _characterRefs  = State(initialValue: existing?.characterReferences ?? [])
         _aspectRatio    = State(initialValue: existing?.aspectRatio ?? .widescreen16x9)
@@ -396,7 +683,7 @@ struct PrepareRenderSheet: View {
                     .foregroundStyle(Theme.lime)
             }
             VStack(alignment: .leading, spacing: 3) {
-                Text("Prepare Render — Scene \(scene.number)")
+                Text("Prepare Render — \(frame.title)")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("Assemble prompt + up to \(model.maxReferenceImages) reference images for \(model.rawValue).")
@@ -422,18 +709,18 @@ struct PrepareRenderSheet: View {
     // MARK: Section 1 — Composition preview
 
     private var sectionCompositionPreview: some View {
-        sectionContainer(number: 1, title: "Scene Composition",
-                         subtitle: "\(scene.locationLabel) · \(scene.shotType.shortLabel)") {
+        sectionContainer(number: 1, title: "Frame Composition",
+                         subtitle: "\(frame.locationLabel) · \(frame.shotType.shortLabel)") {
             HStack(alignment: .top, spacing: 16) {
                 compositionThumbnail
                     .frame(width: 260)
                 VStack(alignment: .leading, spacing: 6) {
-                    compositionFact("Cast", "\(scene.characters.count) character\(scene.characters.count == 1 ? "" : "s")")
-                    compositionFact("Props", "\(scene.props.count)")
-                    compositionFact("Guides", scene.activeGuides.isEmpty
+                    compositionFact("Cast", "\(frame.characters.count) character\(frame.characters.count == 1 ? "" : "s")")
+                    compositionFact("Props", "\(frame.props.count)")
+                    compositionFact("Guides", frame.activeGuides.isEmpty
                                     ? "—"
-                                    : scene.activeGuides.map { $0.rawValue }.sorted().joined(separator: ", "))
-                    compositionFact("Lighting", "\(scene.lightingMood.rawValue) · \(scene.keyLight.rawValue)")
+                                    : frame.activeGuides.map { $0.rawValue }.sorted().joined(separator: ", "))
+                    compositionFact("Lighting", "\(frame.lightingMood.rawValue) · \(frame.keyLight.rawValue)")
                 }
                 Spacer()
             }
@@ -444,7 +731,7 @@ struct PrepareRenderSheet: View {
         GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height
             ZStack {
-                if let bg = scene.background {
+                if let bg = frame.background {
                     LinearGradient(colors: bg.gradientColors,
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                 } else {
@@ -454,7 +741,7 @@ struct PrepareRenderSheet: View {
                                center: .center,
                                startRadius: min(w, h) * 0.3,
                                endRadius: max(w, h) * 0.7)
-                ForEach(scene.characters) { ch in
+                ForEach(frame.characters) { ch in
                     Circle()
                         .fill(ch.tint.opacity(0.6))
                         .frame(width: 14 * ch.depthLayer.scale, height: 14 * ch.depthLayer.scale)
@@ -487,7 +774,7 @@ struct PrepareRenderSheet: View {
 
     private var sectionPrompt: some View {
         sectionContainer(number: 2, title: "Prompt",
-                         subtitle: "Edit freely. Re-seed to regenerate from scene parameters.") {
+                         subtitle: "Edit freely. Re-seed to regenerate from frame parameters.") {
             VStack(alignment: .trailing, spacing: 10) {
                 TextEditor(text: $prompt)
                     .font(.system(size: 12, design: .monospaced))
@@ -502,7 +789,7 @@ struct PrepareRenderSheet: View {
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 Button(action: reseedPrompt) {
-                    Label("Re-seed from scene", systemImage: "arrow.triangle.2.circlepath")
+                    Label("Re-seed from frame", systemImage: "arrow.triangle.2.circlepath")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(Theme.accent)
                         .padding(.horizontal, 12).padding(.vertical, 6)
@@ -519,11 +806,11 @@ struct PrepareRenderSheet: View {
     private var sectionCharacterReferences: some View {
         sectionContainer(number: 3, title: "Character References",
                          subtitle: "Lock character likeness using sheets from Character Lab.") {
-            if scene.characters.isEmpty {
+            if frame.characters.isEmpty {
                 emptyNote("No characters placed on the canvas yet.")
             } else {
                 VStack(spacing: 10) {
-                    ForEach(scene.characters) { ref in
+                    ForEach(frame.characters) { ref in
                         CharacterReferenceRow(
                             sceneRef: ref,
                             lab: project.characters.first(where: { $0.name == ref.name }),
@@ -664,21 +951,21 @@ struct PrepareRenderSheet: View {
     }
 
     private func reseedPrompt() {
-        prompt = PromptBuilder.buildPrompt(scene: scene, characters: project.characters)
+        prompt = PromptBuilder.buildPrompt(frame: frame, characters: project.characters)
     }
 
     private func renderTapped() {
         errorMessage = nil
         let package = RenderPackage(
-            id: scene.renderPackage?.id ?? UUID(),
-            sceneID: scene.id,
+            id: frame.renderPackage?.id ?? UUID(),
+            frameID: frame.id,
             prompt: prompt,
-            sceneCompositionImage: scene.renderPackage?.sceneCompositionImage,
+            sceneCompositionImage: frame.renderPackage?.sceneCompositionImage,
             characterReferences: characterRefs,
-            styleReferences: scene.renderPackage?.styleReferences ?? [],
+            styleReferences: frame.renderPackage?.styleReferences ?? [],
             model: model,
             aspectRatio: aspectRatio,
-            lastRenderedAt: scene.renderPackage?.lastRenderedAt
+            lastRenderedAt: frame.renderPackage?.lastRenderedAt
         )
         Task {
             let success = await vm.render(package: package)

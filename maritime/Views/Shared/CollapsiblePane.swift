@@ -132,7 +132,7 @@ struct StepIndicator: View {
             switch self {
             case .outline:    return .storyForge
             case .storyboard: return .storyboard
-            case .frame:      return .sceneBuilder
+            case .frame:      return .frameBuilder
             case .render:     return .videoRenderer
             }
         }

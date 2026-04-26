@@ -45,6 +45,7 @@ final class StoryboardComposerViewModel: ObservableObject {
     @Published var selectedPanelID: UUID?
     @Published var focusedField: PanelField?
     @Published var showNewPanelSheet = false
+    @Published var breakdownErrorMessage: String?
 
     private let project: MovieBlazeProject
     private var cancellables: Set<AnyCancellable> = []
@@ -131,19 +132,29 @@ final class StoryboardComposerViewModel: ObservableObject {
         project.reorderPanels(from: sourceIndex, to: destinationIndex)
     }
 
-    // MARK: Promotion → Scene Builder
+    // MARK: Frame Builder hand-off
 
+    /// Adds a fresh keyframe to the selected panel — first call seeds a
+    /// `.keyStart`, subsequent calls append `.keyEnd` then `.intermediate`.
     @discardableResult
-    func promoteSelectedPanelToSceneBuilder() -> (panel: StoryboardPanel, filmScene: FilmScene)? {
-        guard let panel = selectedPanel,
-              !panel.isPromoted else { return nil }
-        let number = (project.scenes.map(\.number).max() ?? 0) + 1
+    func addKeyframeToSelectedPanel() -> (panel: StoryboardPanel, frame: Frame)? {
+        guard let panel = selectedPanel else { return nil }
+        let panelFrames = project.frames(forPanel: panel.id)
+        let ordinal = panelFrames.count
+        let role: FrameRole
+        switch ordinal {
+        case 0:  role = .keyStart
+        case 1:  role = .keyEnd
+        default: role = .intermediate
+        }
         let originScene = originSceneBreakdown(for: panel)
-        let title = originScene.map { "Scene \($0.number) · Panel \(panel.number)" }
-            ?? "Panel \(panel.number)"
+        let title = originScene.map { "Scene \($0.number) · Shot \(panel.number) · \(role.rawValue)" }
+            ?? "Shot \(panel.number) · \(role.rawValue)"
         let location = originScene?.title ?? project.bible.projectTitle
-        let filmScene = FilmScene(
-            number: number,
+        let frame = Frame(
+            panelID: panel.id,
+            ordinal: ordinal,
+            role: role,
             title: title,
             location: location,
             isInterior: true,
@@ -158,9 +169,8 @@ final class StoryboardComposerViewModel: ObservableObject {
             frameApproved: false,
             projectTitle: project.bible.projectTitle
         )
-        project.addFilmScene(filmScene)
-        project.markPanelPromoted(panelID: panel.id, filmSceneID: filmScene.id)
-        return (panel, filmScene)
+        project.appendFrame(frame, toPanel: panel.id)
+        return (panel, frame)
     }
 
     // MARK: Scene lookup
@@ -168,5 +178,130 @@ final class StoryboardComposerViewModel: ObservableObject {
     func originSceneBreakdown(for panel: StoryboardPanel) -> SceneBreakdown? {
         guard let id = panel.sceneBreakdownID else { return nil }
         return project.bible.sceneBreakdowns.first(where: { $0.id == id })
+    }
+
+    // MARK: AI shot breakdown
+
+    /// Drives the two-phase shot breakdown for a single scene's shot plan:
+    /// Claude plans 3–6 shots, then Nano Banana 2 renders a pencil sketch per
+    /// shot. Updates `plan.status` as it progresses; UI observes via
+    /// `project.objectWillChange`.
+    func generateBreakdown(forPlan planID: UUID) async {
+        breakdownErrorMessage = nil
+
+        guard let plan = project.shotPlans.first(where: { $0.id == planID }),
+              let scene = project.bible.sceneBreakdowns.first(where: { $0.id == plan.sceneBreakdownID }) else {
+            return
+        }
+
+        let anthropicKey = KeychainStore.get(account: .anthropic) ?? ""
+        let falKey = KeychainStore.get(account: .fal) ?? ""
+
+        var working = plan
+        working.status = .generating
+        working.lastError = nil
+        project.updateShotPlan(working)
+
+        let service = StoryboardBreakdownService(
+            anthropic: AnthropicClient(apiKey: anthropicKey),
+            fal: FalaiClient(apiKey: falKey)
+        )
+        let request = StoryboardBreakdownService.Request(
+            scene: scene,
+            bible: project.bible,
+            characters: project.characters,
+            moodboard: project.moodboard
+        )
+
+        let plans: [StoryboardBreakdownService.ShotPlan]
+        do {
+            plans = try await service.planShots(request)
+        } catch {
+            failBreakdown(planID: planID, error: error)
+            return
+        }
+
+        let panels = plans.map { plan in
+            StoryboardPanel(
+                number: 0,
+                shotType: plan.shotType,
+                cameraMovement: plan.cameraMovement,
+                duration: plan.duration,
+                actionNote: plan.actionNote,
+                dialogue: plan.dialogue,
+                timeOfDay: scene.timeOfDay,
+                editingPriority: plan.editingPriority,
+                characterDraftIDs: plan.characterDraftIDs,
+                sceneBreakdownID: scene.id,
+                aiBreakdownReasoning: plan.reasoning
+            )
+        }
+        project.replaceShotPlanPanels(planID: planID, panels: panels)
+
+        let characterRefs = collectCharacterRefs(for: plans, scene: scene)
+        let moodRefs = collectMoodRefs()
+
+        let scenePanelIDs = project.storyboardPanels
+            .filter { $0.sceneBreakdownID == scene.id }
+            .map(\.id)
+
+        for (plan, panelID) in zip(plans, scenePanelIDs) {
+            do {
+                let png = try await service.renderSketch(
+                    plan: plan,
+                    characterRefs: characterRefs,
+                    moodRefs: moodRefs
+                )
+                let assetID = UUID()
+                project.setAssetImageData(png, for: assetID)
+                project.mutatePanel(id: panelID) {
+                    $0.pencilSketchAssetID = assetID
+                }
+            } catch {
+                failBreakdown(planID: planID, error: error)
+                return
+            }
+        }
+
+        var finished = working
+        finished.status = .ready
+        finished.lastGeneratedAt = Date()
+        finished.lastError = nil
+        project.updateShotPlan(finished)
+    }
+
+    private func failBreakdown(planID: UUID, error: Error) {
+        breakdownErrorMessage = error.localizedDescription
+        guard var plan = project.shotPlans.first(where: { $0.id == planID }) else { return }
+        plan.status = .failed
+        plan.lastError = error.localizedDescription
+        project.updateShotPlan(plan)
+    }
+
+    private func collectCharacterRefs(for plans: [StoryboardBreakdownService.ShotPlan],
+                                      scene: SceneBreakdown) -> [Data] {
+        let referencedDraftIDs = Set(plans.flatMap(\.characterDraftIDs))
+            .union(scene.characterDraftIDs)
+        let nameSet = Set(referencedDraftIDs.compactMap { id in
+            project.bible.characterDrafts.first(where: { $0.id == id })?.name.lowercased()
+        })
+
+        var refs: [Data] = []
+        for character in project.characters where character.isFinalized {
+            if !nameSet.isEmpty && !nameSet.contains(character.name.lowercased()) { continue }
+            if let portrait = character.selectedPortrait {
+                refs.append(portrait.imageData)
+            } else if let first = character.portraitVariations.first {
+                refs.append(first.imageData)
+            }
+        }
+        return refs
+    }
+
+    private func collectMoodRefs() -> [Data] {
+        Array(project.moodboard.items
+            .filter { $0.kind == .referenceImage || $0.kind == .characterRef || $0.kind == .setPieceRef }
+            .compactMap(\.imageData)
+            .prefix(2))
     }
 }
