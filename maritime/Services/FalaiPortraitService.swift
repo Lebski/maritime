@@ -20,31 +20,58 @@ protocol PortraitGenerationService {
 /// user has saved in Preferences.
 struct FalaiPortraitService: PortraitGenerationService {
 
+    /// recraft-v4-pro produces one image per submission, so we fan out N
+    /// parallel queue jobs (capped) and gather them as they finish.
+    private static let maxConcurrency = 5
+
     func generate(request: PortraitGenerationRequest) async throws -> [PortraitVariation] {
         let key = KeychainStore.get(account: .fal) ?? ""
         let client = RecraftClient(apiKey: key)
 
         let prompt = composedPrompt(for: request)
         let count = max(1, min(20, request.count))
-
         let payload = RecraftClient.GenerateRequest(
             prompt: prompt,
             image_size: "portrait_4_3",
-            style: "realistic_image",
-            num_images: count,
-            negative_prompt: "deformed, distorted, low quality, watermark, text, logo, multiple heads"
+            enable_safety_checker: true
         )
 
-        let response = try await client.generate(payload)
-        let baseSeed = response.seed
+        let concurrency = min(Self.maxConcurrency, count)
 
-        var out: [PortraitVariation] = []
-        out.reserveCapacity(response.images.count)
-        for (index, img) in response.images.enumerated() {
-            let bytes = try await client.downloadImage(url: img.url)
-            out.append(PortraitVariation(index: index, imageData: bytes, seed: baseSeed))
+        return try await withThrowingTaskGroup(of: (Int, Data).self) { group in
+            var nextIndex = 0
+            for _ in 0..<concurrency {
+                let i = nextIndex
+                nextIndex += 1
+                group.addTask {
+                    try await Self.runOne(index: i, client: client, payload: payload)
+                }
+            }
+            var out: [PortraitVariation] = []
+            out.reserveCapacity(count)
+            while let (index, bytes) = try await group.next() {
+                out.append(PortraitVariation(index: index, imageData: bytes, seed: nil))
+                if nextIndex < count {
+                    let i = nextIndex
+                    nextIndex += 1
+                    group.addTask {
+                        try await Self.runOne(index: i, client: client, payload: payload)
+                    }
+                }
+            }
+            return out.sorted { $0.index < $1.index }
         }
-        return out
+    }
+
+    private static func runOne(index: Int,
+                               client: RecraftClient,
+                               payload: RecraftClient.GenerateRequest) async throws -> (Int, Data) {
+        let response = try await client.submitAndAwait(payload)
+        guard let first = response.images.first else {
+            throw RecraftClient.ClientError.empty
+        }
+        let bytes = try await client.downloadImage(url: first.url)
+        return (index, bytes)
     }
 
     /// Compose a single prompt string for recraft-v4. The user's free-form

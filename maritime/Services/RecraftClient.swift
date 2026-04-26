@@ -1,8 +1,10 @@
 import Foundation
 
-/// Thin wrapper over fal.ai's HTTP API for the Recraft v4 model.
+/// Thin wrapper over fal.ai's queue API for the Recraft v4 Pro model. Each
+/// call submits one job, polls its status URL until it completes, then fetches
+/// the response. v4 Pro produces a single image per submission, so callers
+/// fan out multiple submissions in parallel for portrait grids.
 ///
-/// Used to generate the initial batch of character portrait variations.
 /// Constructed per-call with a fresh API key so the value is read from
 /// Keychain on demand (see AppSettings).
 struct RecraftClient {
@@ -10,9 +12,14 @@ struct RecraftClient {
     let apiKey: String
     var session: URLSession = .shared
 
-    private static let runBase = "https://fal.run"
+    static let modelID = "fal-ai/recraft/v4/pro/text-to-image"
+    static let queueBase = "https://queue.fal.run"
 
-    static let modelID = "fal-ai/recraft-v4"
+    /// Hard cap on how long we wait for a single submission to finish.
+    var pollTimeout: TimeInterval = 180
+    /// Initial poll delay; exponential up to ~2s.
+    var initialPollDelay: TimeInterval = 0.6
+    var maxPollDelay: TimeInterval = 2.0
 
     enum ClientError: Error, LocalizedError {
         case missingKey
@@ -20,93 +27,92 @@ struct RecraftClient {
         case decode(String)
         case network(URLError)
         case empty
+        case timedOut
+        case queueFailed(String)
 
         var errorDescription: String? {
             switch self {
             case .missingKey:
                 return "No fal.ai API key configured. Open Preferences (⌘,) to add one."
             case .http(let status, let body):
-                return "fal.ai (recraft-v4) returned \(status). \(body)"
+                return "fal.ai returned \(status). \(body)"
             case .decode(let detail):
-                return "Couldn't read recraft-v4 response: \(detail)"
+                return "Couldn't read recraft response: \(detail)"
             case .network(let err):
                 return "Network error: \(err.localizedDescription)"
             case .empty:
-                return "recraft-v4 returned no images."
+                return "recraft returned no images."
+            case .timedOut:
+                return "recraft job didn't finish in time."
+            case .queueFailed(let detail):
+                return "recraft job failed: \(detail)"
             }
         }
     }
 
-    /// Recraft v4 request shape. The model accepts a prompt + image_size +
-    /// optional style. We always ask for portrait_4_3 + realistic_image style
-    /// for character work; callers control prompt and num_images.
+    /// Recraft v4 Pro request shape. v4 Pro accepts prompt + image_size
+    /// (preset string) plus a few optional knobs we don't use yet (colors,
+    /// background_color, enable_safety_checker).
     struct GenerateRequest: Encodable {
         var prompt: String
         var image_size: String? = "portrait_4_3"
-        var style: String? = "realistic_image"
-        var num_images: Int? = 1
-        var negative_prompt: String?
-        var seed: Int?
+        var enable_safety_checker: Bool? = true
     }
 
+    /// Response shape from `GET {response_url}` once a queued job finishes.
     struct GenerateResponse: Decodable {
         struct Image: Decodable {
             let url: String
             let content_type: String?
-            let width: Int?
-            let height: Int?
+            let file_name: String?
+            let file_size: Int?
         }
         let images: [Image]
-        let seed: Int?
     }
 
-    /// Submit a generation. Returns the parsed response — call
-    /// `downloadImage(url:)` per image to get the bytes.
-    func generate(_ request: GenerateRequest) async throws -> GenerateResponse {
+    /// Submit ack returned by `POST {queueBase}/{modelID}`.
+    private struct QueueSubmitResponse: Decodable {
+        let request_id: String
+        let status_url: String
+        let response_url: String
+    }
+
+    /// Status response shape returned by `GET {status_url}`.
+    private struct QueueStatusResponse: Decodable {
+        let status: String   // IN_QUEUE | IN_PROGRESS | COMPLETED | FAILED ...
+        let response_url: String?
+    }
+
+    /// Submit one job, poll until it completes, return the parsed response.
+    /// Callers then call `downloadImage(url:)` per image to get bytes.
+    func submitAndAwait(_ request: GenerateRequest) async throws -> GenerateResponse {
         guard !apiKey.isEmpty else { throw ClientError.missingKey }
 
-        let endpointString = "\(Self.runBase)/\(Self.modelID)"
-        guard let endpoint = URL(string: endpointString) else {
-            throw ClientError.decode("bad endpoint URL")
+        let submitURL = URL(string: "\(Self.queueBase)/\(Self.modelID)")!
+        let submit = try await postJSON(submitURL, body: request, decodingTo: QueueSubmitResponse.self)
+
+        let statusURL = URL(string: submit.status_url) ?? submitURL
+        let responseURL = URL(string: submit.response_url) ?? submitURL
+
+        let deadline = Date().addingTimeInterval(pollTimeout)
+        var delay = initialPollDelay
+
+        while Date() < deadline {
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            delay = min(maxPollDelay, delay * 1.4)
+
+            let status = try await getJSON(statusURL, decodingTo: QueueStatusResponse.self)
+            switch status.status.uppercased() {
+            case "COMPLETED":
+                let resolved = status.response_url.flatMap(URL.init(string:)) ?? responseURL
+                return try await getJSON(resolved, decodingTo: GenerateResponse.self)
+            case "FAILED", "CANCELLED", "ERROR":
+                throw ClientError.queueFailed(status.status)
+            default:
+                continue
+            }
         }
-
-        var urlRequest = URLRequest(url: endpoint)
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("Key \(apiKey)", forHTTPHeaderField: "Authorization")
-        urlRequest.timeoutInterval = 120
-
-        do {
-            urlRequest.httpBody = try JSONEncoder.recraft.encode(request)
-        } catch {
-            throw ClientError.decode("encode failed: \(error.localizedDescription)")
-        }
-
-        let (data, response): (Data, URLResponse)
-        do {
-            (data, response) = try await session.data(for: urlRequest)
-        } catch let err as URLError {
-            throw ClientError.network(err)
-        }
-
-        guard let http = response as? HTTPURLResponse else {
-            throw ClientError.decode("non-HTTP response")
-        }
-
-        guard (200..<300).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? "<binary>"
-            throw ClientError.http(status: http.statusCode, body: body)
-        }
-
-        let decoded: GenerateResponse
-        do {
-            decoded = try JSONDecoder().decode(GenerateResponse.self, from: data)
-        } catch {
-            throw ClientError.decode(error.localizedDescription)
-        }
-
-        guard !decoded.images.isEmpty else { throw ClientError.empty }
-        return decoded
+        throw ClientError.timedOut
     }
 
     /// Download bytes from a fal CDN URL returned by the generate response.
@@ -126,12 +132,52 @@ struct RecraftClient {
             throw ClientError.network(err)
         }
     }
-}
 
-private extension JSONEncoder {
-    static let recraft: JSONEncoder = {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = []
-        return encoder
-    }()
+    // MARK: - HTTP helpers
+
+    private func postJSON<Body: Encodable, Out: Decodable>(_ url: URL,
+                                                           body: Body,
+                                                           decodingTo: Out.Type) async throws -> Out {
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("Key \(apiKey)", forHTTPHeaderField: "Authorization")
+        req.timeoutInterval = 60
+        do {
+            req.httpBody = try JSONEncoder().encode(body)
+        } catch {
+            throw ClientError.decode("encode failed: \(error.localizedDescription)")
+        }
+        return try await send(req, decodingTo: Out.self)
+    }
+
+    private func getJSON<Out: Decodable>(_ url: URL, decodingTo: Out.Type) async throws -> Out {
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET"
+        req.setValue("Key \(apiKey)", forHTTPHeaderField: "Authorization")
+        req.timeoutInterval = 60
+        return try await send(req, decodingTo: Out.self)
+    }
+
+    private func send<Out: Decodable>(_ req: URLRequest, decodingTo: Out.Type) async throws -> Out {
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: req)
+        } catch let err as URLError {
+            throw ClientError.network(err)
+        }
+        guard let http = response as? HTTPURLResponse else {
+            throw ClientError.decode("non-HTTP response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "<binary>"
+            throw ClientError.http(status: http.statusCode, body: body)
+        }
+        do {
+            return try JSONDecoder().decode(Out.self, from: data)
+        } catch {
+            throw ClientError.decode(error.localizedDescription)
+        }
+    }
 }

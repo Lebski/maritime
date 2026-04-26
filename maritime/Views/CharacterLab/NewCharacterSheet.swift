@@ -15,8 +15,16 @@ struct NewCharacterSheet: View {
     @State private var role = "Protagonist"
     @State private var answers = CharacterSetupAnswers()
     @State private var portraitCount: Int = 10
+    @State private var didPrefill = false
 
     private let roles = ["Protagonist", "Antagonist", "Supporting", "Mentor", "Love Interest", "Comic Relief"]
+
+    private var editingCharacter: LabCharacter? {
+        guard let id = vm.editingCharacterID else { return nil }
+        return vm.characters.first(where: { $0.id == id })
+    }
+
+    private var isEditing: Bool { editingCharacter != nil }
 
     private var storyDrafts: [StoryCharacterDraft] {
         project.bible.characterDrafts
@@ -27,7 +35,8 @@ struct NewCharacterSheet: View {
     }
 
     private var canProceedFromDescribe: Bool {
-        source == .new && !trimmedName.isEmpty
+        if isEditing { return !trimmedName.isEmpty }
+        return source == .new && !trimmedName.isEmpty
     }
 
     private var composedPromptPreview: String {
@@ -49,10 +58,22 @@ struct NewCharacterSheet: View {
                     .padding(24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .navigationTitle("New Character")
+            .navigationTitle(isEditing ? "Set up character" : "New Character")
             .toolbar { toolbar }
         }
         .frame(minWidth: 560, minHeight: 560)
+        .onAppear(perform: prefillIfNeeded)
+    }
+
+    private func prefillIfNeeded() {
+        guard !didPrefill, let char = editingCharacter else { return }
+        didPrefill = true
+        source = .new
+        name = char.name
+        description = char.description
+        role = char.role
+        answers = char.setupAnswers
+        portraitCount = char.portraitCount
     }
 
     // MARK: Content router
@@ -72,9 +93,13 @@ struct NewCharacterSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 progressDots(current: 0, total: 3)
-                sourceSelector
-                if source == .storyForge { storyForgePicker }
-                if source == .new { describeForm }
+                if isEditing {
+                    describeForm
+                } else {
+                    sourceSelector
+                    if source == .storyForge { storyForgePicker }
+                    if source == .new { describeForm }
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -452,8 +477,11 @@ struct NewCharacterSheet: View {
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") { dismiss() }
-                .foregroundStyle(Theme.textSecondary)
+            Button("Cancel") {
+                vm.editingCharacterID = nil
+                dismiss()
+            }
+            .foregroundStyle(Theme.textSecondary)
         }
         ToolbarItem(placement: .confirmationAction) {
             primaryButton
