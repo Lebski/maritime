@@ -25,7 +25,7 @@ struct FalaiSetPieceService: SetPieceGenerationService {
             resolution: "1K"
         )
 
-        return try await client.generateAndFetch(payload, edit: imageURLs != nil)
+        return try await client.generateAndFetch(payload, edit: imageURLs != nil, label: "Set piece image")
     }
 
     /// Append a category hint to the prompt seed so generated pieces stay on-style

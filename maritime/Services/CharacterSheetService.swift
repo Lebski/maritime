@@ -22,7 +22,17 @@ struct CharacterSheetService {
             resolution: "1K"
         )
 
-        return try await client.generateAndFetch(payload, edit: true)
+        return try await client.generateAndFetch(payload, edit: true, label: "Character sheet · \(label(for: sheet))")
+    }
+
+    private func label(for sheet: ReferenceSheetType) -> String {
+        switch sheet {
+        case .portrait:    return "portrait"
+        case .turnaround:  return "turnaround"
+        case .fullBody:    return "full body"
+        case .expressions: return "expressions"
+        case .actionPoses: return "action poses"
+        }
     }
 
     /// 16:9 for full-body / poses / turnaround (wide multi-view layouts);

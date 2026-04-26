@@ -39,6 +39,6 @@ struct FalaiSceneRenderService: ImageGenerationService {
             resolution: "1K"
         )
 
-        return try await client.generateAndFetch(payload, edit: !imageURLs.isEmpty)
+        return try await client.generateAndFetch(payload, edit: !imageURLs.isEmpty, label: "Scene render")
     }
 }

@@ -55,7 +55,7 @@ struct SetPieceSuggestionService {
                 messages: [.init(role: .user, content: userMessage)],
                 maxTokens: 1500,
                 model: nil
-            ))
+            ), label: "Set piece suggestions")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }
@@ -76,7 +76,7 @@ struct SetPieceSuggestionService {
                 ],
                 maxTokens: 1500,
                 model: nil
-            ))
+            ), label: "Set piece suggestions (retry)")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }

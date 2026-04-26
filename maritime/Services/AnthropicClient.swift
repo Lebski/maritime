@@ -66,7 +66,7 @@ struct AnthropicClient {
 
     // MARK: Public API
 
-    func send(_ request: Request) async throws -> Response {
+    func send(_ request: Request, label: String? = nil) async throws -> Response {
         guard !apiKey.isEmpty else { throw ClientError.missingKey }
 
         var urlRequest = URLRequest(url: Self.endpoint)
@@ -76,8 +76,9 @@ struct AnthropicClient {
         urlRequest.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         urlRequest.setValue(Self.apiVersion, forHTTPHeaderField: "anthropic-version")
 
+        let resolvedModel = request.model ?? model
         let body = RequestBody(
-            model: request.model ?? model,
+            model: resolvedModel,
             maxTokens: request.maxTokens ?? maxTokens,
             system: [SystemBlock(text: request.system)],
             messages: request.messages
@@ -89,34 +90,68 @@ struct AnthropicClient {
             throw ClientError.decode("encode failed: \(error.localizedDescription)")
         }
 
+        let logID = await AIRequestLog.shared.begin(
+            provider: .anthropic,
+            endpoint: Self.endpoint.absoluteString,
+            model: resolvedModel,
+            label: label,
+            requestBody: AIRequestLog.prettyJSON(body)
+        )
+
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: urlRequest)
         } catch let err as URLError {
-            throw ClientError.network(err)
+            let clientErr = ClientError.network(err)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? err.localizedDescription)
+            throw clientErr
         }
 
         guard let http = response as? HTTPURLResponse else {
-            throw ClientError.decode("non-HTTP response")
+            let clientErr = ClientError.decode("non-HTTP response")
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "non-HTTP response")
+            throw clientErr
         }
 
         guard (200..<300).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? "<binary>"
-            throw ClientError.http(status: http.statusCode, body: body)
+            let bodyText = String(data: data, encoding: .utf8) ?? "<binary>"
+            let clientErr = ClientError.http(status: http.statusCode, body: bodyText)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "HTTP \(http.statusCode)")
+            throw clientErr
         }
 
         let decoded: ResponseBody
         do {
             decoded = try JSONDecoder.anthropic.decode(ResponseBody.self, from: data)
         } catch {
-            throw ClientError.decode(error.localizedDescription)
+            let clientErr = ClientError.decode(error.localizedDescription)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? error.localizedDescription)
+            throw clientErr
         }
 
         let text = decoded.content
             .compactMap { $0.type == "text" ? $0.text : nil }
             .joined()
 
-        guard !text.isEmpty else { throw ClientError.empty }
+        guard !text.isEmpty else {
+            let clientErr = ClientError.empty
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "empty")
+            throw clientErr
+        }
+
+        let usage = AIRequestLog.TokenUsage(
+            input: decoded.usage?.inputTokens,
+            output: decoded.usage?.outputTokens,
+            cacheRead: decoded.usage?.cacheReadInputTokens,
+            cacheWrite: decoded.usage?.cacheCreationInputTokens
+        )
+        let summary = "\(text.count) chars · stop: \(decoded.stopReason ?? "—")"
+        await AIRequestLog.shared.succeed(
+            id: logID,
+            summary: summary,
+            body: AIRequestLog.prettyJSON(data: data),
+            tokens: usage
+        )
 
         return Response(
             text: text,
