@@ -11,6 +11,9 @@ final class CharacterLabViewModel: ObservableObject {
     @Published var generationProgress: Double = 0
     @Published var generationError: String? = nil
     @Published var sidebarCollapsed = false
+    /// When set, NewCharacterSheet prefills from this character and
+    /// `createAndGenerate` updates the existing record instead of appending.
+    @Published var editingCharacterID: UUID? = nil
 
     private let project: MovieBlazeProject
     private let portraitService: PortraitGenerationService
@@ -65,19 +68,58 @@ final class CharacterLabViewModel: ObservableObject {
         }
     }
 
-    /// Called by NewCharacterSheet step 3. Creates the LabCharacter, kicks
-    /// off recraft-v4 portrait generation, and routes to the active workspace.
+    /// Open the setup wizard for an existing character (e.g. one that was
+    /// auto-synced from Story Forge and never went through onboarding).
+    func openSetup(for id: UUID) {
+        editingCharacterID = id
+        showNewCharacter = true
+    }
+
+    func cancelSetup() {
+        editingCharacterID = nil
+        showNewCharacter = false
+    }
+
+    /// Called by NewCharacterSheet step 3. If `editingCharacterID` is set the
+    /// matching character is updated in place; otherwise a new LabCharacter is
+    /// appended. Either way, recraft-v4 generation is then kicked off and the
+    /// workspace routes to the (now active) character.
     func createAndGenerate(name: String,
                            description: String,
                            role: String,
                            answers: CharacterSetupAnswers,
                            portraitCount: Int) {
+        let clampedCount = max(1, min(20, portraitCount))
+
+        if let editingID = editingCharacterID,
+           let idx = characters.firstIndex(where: { $0.id == editingID }) {
+            characters[idx].name = name
+            characters[idx].description = description
+            characters[idx].role = role
+            characters[idx].setupAnswers = answers
+            characters[idx].portraitCount = clampedCount
+            characters[idx].phase = .generating
+            if characters[idx].finalVariation == nil {
+                characters[idx].finalVariation = CharacterTint.variation(
+                    for: characters[idx].id,
+                    name: characters[idx].name,
+                    role: characters[idx].role,
+                    style: description
+                )
+            }
+            activeCharacter = characters[idx]
+            editingCharacterID = nil
+            showNewCharacter = false
+            startGeneration(characterID: editingID)
+            return
+        }
+
         var char = LabCharacter(name: name,
                                 description: description,
                                 role: role,
                                 setupAnswers: answers,
                                 phase: .generating,
-                                portraitCount: max(1, min(20, portraitCount)))
+                                portraitCount: clampedCount)
         char.finalVariation = CharacterTint.variation(for: char.id, name: char.name,
                                                       role: char.role,
                                                       style: description)
