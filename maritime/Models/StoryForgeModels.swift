@@ -265,6 +265,21 @@ enum StoryStructureTemplate: String, CaseIterable, Identifiable, Hashable, Codab
         }
     }
 
+    var whenToUse: String {
+        switch self {
+        case .threeAct:
+            return "Setup → Confrontation → Resolution. The default Western narrative spine. Use for most stories — it's versatile, audience-friendly, and works across genres."
+        case .saveTheCat:
+            return "Blake Snyder's 15-beat commercial framework with precise page-count targets. Use for tightly-paced genre films, rom-coms, or anything aimed at a mainstream Hollywood audience."
+        case .herosJourney:
+            return "Campbell's 12-stage monomyth: ordinary world → call to adventure → trials → return transformed. Use for myths, epics, fantasy, sci-fi, and coming-of-age stories driven by a single protagonist's transformation."
+        case .kishotenketsu:
+            return "Four-act Japanese structure (Ki–Shō–Ten–Ketsu) that builds without a central conflict — the turn comes from a surprising shift, not opposition. Use for slice-of-life, contemplative, or mood-driven pieces."
+        case .inMediasRes:
+            return "Open mid-action, then reveal context through flashback or layered exposition. Use for thrillers, mysteries, or any story that benefits from a hooky cold open."
+        }
+    }
+
     var filmExamples: [String] {
         switch self {
         case .threeAct:      return ["The Shawshank Redemption", "Casablanca", "Back to the Future"]

@@ -193,6 +193,8 @@ struct StoryBibleWizardSheet: View {
 
     private func templateTile(_ t: StoryStructureTemplate?, label: String) -> some View {
         let isActive = preferredTemplate == t
+        let tooltip = t?.whenToUse
+            ?? "Let Claude pick the structure that best fits your premise, genre, and tone. Use when you're unsure or want to be surprised."
         return Button(action: { preferredTemplate = t }) {
             HStack(spacing: 8) {
                 Image(systemName: isActive ? "largecircle.fill.circle" : "circle")
@@ -212,6 +214,7 @@ struct StoryBibleWizardSheet: View {
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plainSolid)
+        .help(tooltip)
     }
 
     private var modelToggle: some View {
