@@ -71,6 +71,16 @@
 				</array>
 			</dict>
 		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>MovieBlaze Character</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.movieblaze.character</string>
+		</dict>
 	</array>
 </dict>
 </plist>
