@@ -52,19 +52,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         }
     }
 
-    var tint: Color {
-        switch self {
-        case .home: return Theme.accent
-        case .storyForge: return Theme.magenta
-        case .storyboard: return Theme.violet
-        case .characterLab: return Theme.teal
-        case .setDesign: return Theme.coral
-        case .frameBuilder: return Theme.accent
-        case .videoRenderer: return Theme.lime
-        case .assetLibrary: return Color.white.opacity(0.7)
-        case .exports: return Color.white.opacity(0.7)
-        }
-    }
+    var tint: Color { Theme.accent }
 
     var tagline: String {
         switch self {
@@ -103,14 +91,7 @@ enum ProjectStatus: String {
     case shooting = "Rendering"
     case finishing = "Finishing"
 
-    var tint: Color {
-        switch self {
-        case .story: return Theme.magenta
-        case .storyboard: return Theme.violet
-        case .shooting: return Theme.lime
-        case .finishing: return Theme.accent
-        }
-    }
+    var tint: Color { Theme.accent }
 }
 
 // MARK: - Sample Data

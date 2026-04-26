@@ -45,13 +45,10 @@ struct WelcomeContent: View {
         Button(action: action) {
             Label(title, systemImage: icon)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.black)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 11)
-                .background(Theme.accent)
-                .clipShape(Capsule())
+                .padding(.horizontal, 4)
+                .padding(.vertical, 1)
         }
-        .buttonStyle(.plainSolid)
+        .buttonStyle(.maritimePrimary)
     }
 
     private func secondaryAction(title: String, icon: String, action: @escaping () -> Void) -> some View {

@@ -40,7 +40,7 @@ struct PlaceholderView: View {
             Button(action: {}) {
                 Label("New", systemImage: "plus")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .background(module.tint)
@@ -93,7 +93,7 @@ struct PlaceholderView: View {
                 Button(action: {}) {
                     Text("Start tutorial")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 9)
                         .background(module.tint)

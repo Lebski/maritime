@@ -51,7 +51,7 @@ struct CharacterWorkspaceView: View {
                 Button(action: { vm.showReferenceSheet = true }) {
                     Label("Reference Sheets", systemImage: "square.grid.2x2.fill")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                         .background(Theme.teal)
@@ -143,7 +143,7 @@ struct CharacterSetupPlaceholderView: View {
             Button(action: { vm.openSetup(for: character.id) }) {
                 Label("Set up character", systemImage: "wand.and.stars")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 18)
                     .padding(.vertical, 10)
                     .background(Theme.teal)

@@ -243,7 +243,7 @@ struct SetDesignView: View {
                 Button(action: { vm.openWizard() }) {
                     Label("Start with AI", systemImage: "sparkles")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                         .background(Theme.coral)

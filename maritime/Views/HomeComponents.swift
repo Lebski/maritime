@@ -11,31 +11,15 @@ struct HeroCard: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            Theme.heroGradient
-            decoration
+            Theme.card
             content
         }
         .frame(height: 220)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
         )
-    }
-
-    private var decoration: some View {
-        ZStack {
-            Circle()
-                .fill(Color.white.opacity(0.12))
-                .frame(width: 340, height: 340)
-                .blur(radius: 40)
-                .offset(x: 380, y: -80)
-            Circle()
-                .fill(Color.black.opacity(0.25))
-                .frame(width: 260, height: 260)
-                .blur(radius: 60)
-                .offset(x: 520, y: 120)
-        }
     }
 
     private var content: some View {
@@ -48,42 +32,37 @@ struct HeroCard: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 10, weight: .bold))
                 }
-                .foregroundStyle(.white)
+                .foregroundStyle(Theme.accent)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(Color.white.opacity(0.18))
+                .background(Theme.accent.opacity(0.14))
+                .overlay(Capsule().stroke(Theme.accent.opacity(0.3), lineWidth: 1))
                 .clipShape(Capsule())
 
                 Text(projectTitle)
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Theme.textPrimary)
                     .lineSpacing(2)
                     .lineLimit(2)
 
-                Text("Story Forge • Storyboard • Character Lab • Scene Builder • Renderer")
+                Text("Story Forge • Storyboard • Character Lab • Frame Builder • Renderer")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(Theme.textSecondary)
 
                 HStack(spacing: 10) {
                     Button(action: onContinue) {
                         Label(nextStepLabel, systemImage: nextStepIcon)
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.black)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(Color.white)
-                            .clipShape(Capsule())
                     }
-                    .buttonStyle(.plainSolid)
+                    .buttonStyle(.maritimePrimary)
 
                     Button(action: onOpenBible) {
                         Label("Open Story Bible", systemImage: "text.book.closed.fill")
                             .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Theme.textPrimary)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.18))
-                            .overlay(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1))
+                            .background(Theme.cardHover)
+                            .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.plainSolid)

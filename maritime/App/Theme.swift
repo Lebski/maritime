@@ -1,37 +1,40 @@
 import SwiftUI
 
 enum Theme {
-    // Cinematic palette: deep indigo backdrops + warm amber accent
-    static let bg = Color(red: 0.05, green: 0.06, blue: 0.09)
-    static let bgElevated = Color(red: 0.09, green: 0.10, blue: 0.14)
-    static let card = Color(red: 0.12, green: 0.13, blue: 0.18)
-    static let cardHover = Color(red: 0.16, green: 0.17, blue: 0.22)
+    // Maritime palette: near-black surfaces + saturated cobalt accent
+    static let bg = Color(red: 0.031, green: 0.035, blue: 0.047)         // #08090C
+    static let bgElevated = Color(red: 0.055, green: 0.063, blue: 0.082) // #0E1015
+    static let card = Color(red: 0.086, green: 0.098, blue: 0.133)       // #161922
+    static let cardHover = Color(red: 0.106, green: 0.122, blue: 0.165)  // #1B1F2A
     static let stroke = Color.white.opacity(0.08)
 
     static let textPrimary = Color.white
-    static let textSecondary = Color.white.opacity(0.65)
-    static let textTertiary = Color.white.opacity(0.4)
+    static let textSecondary = Color.white.opacity(0.7)
+    static let textTertiary = Color.white.opacity(0.45)
 
-    static let accent = Color(red: 1.0, green: 0.72, blue: 0.29)       // amber
-    static let accentSoft = Color(red: 1.0, green: 0.85, blue: 0.55)
-    static let magenta = Color(red: 0.92, green: 0.35, blue: 0.62)
-    static let teal = Color(red: 0.28, green: 0.78, blue: 0.82)
-    static let violet = Color(red: 0.56, green: 0.43, blue: 0.95)
-    static let lime = Color(red: 0.62, green: 0.88, blue: 0.42)
-    static let coral = Color(red: 1.00, green: 0.54, blue: 0.46)
+    // Single primary accent — saturated cobalt
+    static let accent = Color(red: 0.204, green: 0.471, blue: 0.965)     // #3478F6
 
+    // Legacy color names retained as aliases of `accent` so existing call
+    // sites continue to compile after the maritime-blue refresh. New UI
+    // should reference `accent` directly.
+    static let accentSoft = accent
+    static let magenta = accent
+    static let teal = accent
+    static let violet = accent
+    static let lime = accent
+    static let coral = accent
+
+    // Hero "gradient" is now a flat card surface — kept as a LinearGradient
+    // so existing `.fill(Theme.heroGradient)` call sites compile unchanged.
     static let heroGradient = LinearGradient(
-        colors: [
-            Color(red: 0.25, green: 0.12, blue: 0.40),
-            Color(red: 0.55, green: 0.18, blue: 0.35),
-            Color(red: 0.95, green: 0.45, blue: 0.25)
-        ],
+        colors: [card, card],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
     static let cardGradient = LinearGradient(
-        colors: [Color.white.opacity(0.06), Color.white.opacity(0.02)],
+        colors: [Color.white.opacity(0.02), Color.clear],
         startPoint: .top,
         endPoint: .bottom
     )
@@ -59,4 +62,21 @@ struct FullHitPlainButtonStyle: ButtonStyle {
 
 extension ButtonStyle where Self == FullHitPlainButtonStyle {
     static var plainSolid: FullHitPlainButtonStyle { FullHitPlainButtonStyle() }
+}
+
+struct MaritimePrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Theme.accent.opacity(configuration.isPressed ? 0.85 : 1.0))
+            .clipShape(Capsule())
+            .contentShape(Capsule())
+    }
+}
+
+extension ButtonStyle where Self == MaritimePrimaryButtonStyle {
+    static var maritimePrimary: MaritimePrimaryButtonStyle { MaritimePrimaryButtonStyle() }
 }

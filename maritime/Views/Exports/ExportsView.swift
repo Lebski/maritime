@@ -150,7 +150,7 @@ struct ExportsView: View {
             Button(action: { vm.generate() }) {
                 Label("Generate Exports", systemImage: "wand.and.stars")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 18).padding(.vertical, 10)
                     .background(vm.selectedFormats.isEmpty ? Theme.card : AppModule.exports.tint)
                     .clipShape(Capsule())

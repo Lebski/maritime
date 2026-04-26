@@ -183,7 +183,7 @@ struct PortraitTile: View {
                         Circle().fill(accent).frame(width: 24, height: 24)
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.white)
                     }
                     .padding(10)
                 }

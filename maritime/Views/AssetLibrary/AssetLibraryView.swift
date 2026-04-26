@@ -241,7 +241,7 @@ struct AssetLibraryView: View {
             Button(action: {}) {
                 Label("Import", systemImage: "square.and.arrow.down.fill")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 14).padding(.vertical, 8)
                     .background(AppModule.assetLibrary.tint)
                     .clipShape(Capsule())

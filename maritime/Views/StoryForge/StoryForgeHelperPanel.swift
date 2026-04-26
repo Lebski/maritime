@@ -87,7 +87,7 @@ struct StoryForgeHelperPanel: View {
                     Text(vm.bible.pitch.isEmpty ? "Add Description" : "Edit & Regenerate")
                         .font(.system(size: 11, weight: .semibold))
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 7)
                 .background(Theme.magenta)

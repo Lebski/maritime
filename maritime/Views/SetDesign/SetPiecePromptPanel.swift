@@ -256,7 +256,7 @@ struct SetPiecePromptPanel: View {
         Button(action: { vm.regenerate(piece) }) {
             HStack(spacing: 8) {
                 if busy {
-                    ProgressView().controlSize(.small).tint(.black)
+                    ProgressView().controlSize(.small).tint(.white)
                 } else {
                     Image(systemName: "sparkles")
                         .font(.system(size: 13, weight: .bold))
@@ -267,14 +267,14 @@ struct SetPiecePromptPanel: View {
                 if piece.hasReferenceImage && !busy {
                     Text("with reference")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.black.opacity(0.55))
+                        .foregroundStyle(.white.opacity(0.7))
                 }
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(canGenerate ? .white : Theme.textTertiary)
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
-            .background(canGenerate ? Theme.coral : Color.white.opacity(0.12))
+            .background(canGenerate ? Theme.accent : Color.white.opacity(0.08))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)

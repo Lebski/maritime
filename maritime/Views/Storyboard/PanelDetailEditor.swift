@@ -464,7 +464,7 @@ struct PanelDetailEditor: View {
                         Text("Open in Frame Builder · \(panel.frameIDs.count) keyframe\(panel.frameIDs.count == 1 ? "" : "s")")
                             .font(.system(size: 13, weight: .semibold))
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(Theme.teal)
@@ -479,7 +479,7 @@ struct PanelDetailEditor: View {
                         Text("Add Keyframe in Frame Builder")
                             .font(.system(size: 13, weight: .semibold))
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(Theme.teal)

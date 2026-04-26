@@ -130,7 +130,7 @@ struct StoryboardPanelsGridView: View {
                 Text(isGenerating ? "Generating…" : (isReady ? "Regenerate breakdown" : "Generate breakdown"))
                     .font(.system(size: 12, weight: .semibold))
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(.white)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(isGenerating ? Theme.accent.opacity(0.6) : Theme.accent)
@@ -243,7 +243,7 @@ struct StoryboardPanelsGridView: View {
                 Text(label)
                     .font(.system(size: 12, weight: .semibold))
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(.white)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(Theme.violet)
@@ -299,7 +299,7 @@ struct StoryboardPanelsGridView: View {
                     Text("Plan a sequence →")
                         .font(.system(size: 13, weight: .semibold))
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 9)
                 .background(Theme.violet)

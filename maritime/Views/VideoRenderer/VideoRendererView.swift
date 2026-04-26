@@ -69,7 +69,7 @@ struct VideoRendererView: View {
                 Label(vm.isRendering ? "Rendering…" : "Render",
                       systemImage: vm.isRendering ? "hourglass" : "play.fill")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 14).padding(.vertical, 8)
                     .background(AppModule.videoRenderer.tint)
                     .clipShape(Capsule())
