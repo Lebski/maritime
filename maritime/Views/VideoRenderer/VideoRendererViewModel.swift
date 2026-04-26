@@ -4,10 +4,12 @@ import Combine
 // MARK: - Video Renderer view model
 //
 // Binds the renderer to the open MovieBlazeProject. Clip list is derived from
-// project.scenes (one FilmScene → one VideoClip), and per-clip mutations write
-// back to the FilmScene so Scene Builder and the renderer stay in lockstep.
-// Cuts live on the project document. Local-only state — selection, playhead,
-// transient render progress, panel collapse — stays on the view model.
+// project.storyboardPanels (one shot → one VideoClip), and per-clip mutations
+// write back to the panel via VideoStore helpers, so Storyboard, Frame Builder,
+// and the renderer all stay in lockstep. Each panel's frameIDs are the
+// keyframes the motion model interpolates between. Cuts live on the project
+// document. Local-only state — selection, playhead, transient render progress,
+// panel collapse — stays on the view model.
 
 @MainActor
 final class VideoRendererViewModel: ObservableObject {

@@ -53,8 +53,9 @@ final class MovieBlazeProject: ReferenceFileDocument {
     @Published var bible: StoryBible
 
     @Published var storyboardPanels: [StoryboardPanel]
+    @Published var shotPlans: [SceneShotPlan]
 
-    @Published var scenes: [FilmScene]
+    @Published var frames: [Frame]
     @Published var characters: [LabCharacter]
     @Published var setPieces: [SetPiece]
     @Published var moodboard: ProjectMoodboard
@@ -81,7 +82,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         var schemaVersion: Int
         var bible: StoryBible
         var storyboardPanels: [StoryboardPanel]
-        var scenes: [FilmScene]
+        var shotPlans: [SceneShotPlan]
+        var frames: [Frame]
         var characters: [LabCharacter]
         var setPieces: [SetPiece]?
         var moodboard: ProjectMoodboard?
@@ -96,7 +98,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
         var lastModified: Date
     }
 
-    private static let currentSchemaVersion = 2
+    private static let currentSchemaVersion = 3
     private static let manifestFilename = "manifest.json"
     private static let projectFilename  = "project.json"
     static let assetsDirname            = "assets"
@@ -107,7 +109,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         let seed = MovieBlazeProject.seedSnapshot()
         self.bible             = seed.bible
         self.storyboardPanels  = seed.storyboardPanels
-        self.scenes            = seed.scenes
+        self.shotPlans         = seed.shotPlans
+        self.frames            = seed.frames
         self.characters        = seed.characters
         self.setPieces         = seed.setPieces ?? []
         self.moodboard         = seed.moodboard ?? ProjectMoodboard()
@@ -127,7 +130,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 structure: StoryStructureDraft(template: .threeAct)
             ),
             storyboardPanels: [],
-            scenes: [],
+            shotPlans: [],
+            frames: [],
             characters: [],
             setPieces: [],
             moodboard: ProjectMoodboard(),
@@ -155,6 +159,10 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 projectLog.error("Refusing to open project with newer schemaVersion=\(manifest.schemaVersion)")
                 throw CocoaError(.fileReadUnknown)
             }
+            if manifest.schemaVersion < Self.currentSchemaVersion {
+                projectLog.error("Refusing to open project with older schemaVersion=\(manifest.schemaVersion); current=\(Self.currentSchemaVersion)")
+                throw CocoaError(.fileReadUnknown)
+            }
         }
 
         guard let projectWrapper = children[Self.projectFilename],
@@ -165,7 +173,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
         let snapshot = try decoder.decode(Snapshot.self, from: projectData)
         self.bible             = snapshot.bible
         self.storyboardPanels  = snapshot.storyboardPanels
-        self.scenes            = snapshot.scenes
+        self.shotPlans         = snapshot.shotPlans
+        self.frames            = snapshot.frames
         self.characters        = snapshot.characters
         self.setPieces         = snapshot.setPieces ?? []
         self.moodboard         = snapshot.moodboard ?? ProjectMoodboard()
@@ -188,9 +197,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     /// Older `.mblaze` documents (and pre-auto-sync seed data) may contain
-    /// drafts/scenes whose link IDs are nil or point to entities that no
-    /// longer exist. Pair every draft with a real LabCharacter and every
-    /// scene breakdown with a real FilmScene, in place, on load.
+    /// drafts whose link IDs are nil or point to entities that no longer
+    /// exist. Pair every draft with a real LabCharacter, in place, on load.
     private func backfillStoryForgeLinks() {
         var bibleChanged = false
 
@@ -213,36 +221,6 @@ final class MovieBlazeProject: ReferenceFileDocument {
             bibleChanged = true
         }
 
-        for i in bible.sceneBreakdowns.indices {
-            let scene = bible.sceneBreakdowns[i]
-            let needsLink: Bool
-            if let id = scene.promotedFilmSceneID {
-                needsLink = !scenes.contains(where: { $0.id == id })
-            } else {
-                needsLink = true
-            }
-            guard needsLink else { continue }
-            let film = FilmScene(
-                number: (scenes.map(\.number).max() ?? 0) + 1,
-                title: scene.title,
-                location: scene.location,
-                isInterior: scene.isInterior,
-                timeOfDay: scene.timeOfDay,
-                lightingMood: .neutral,
-                keyLight: .frontal,
-                shotType: .medium,
-                background: nil,
-                props: [],
-                characters: [],
-                activeGuides: [.ruleOfThirds],
-                frameApproved: false,
-                projectTitle: bible.projectTitle
-            )
-            scenes.append(film)
-            bible.sceneBreakdowns[i].promotedFilmSceneID = film.id
-            bibleChanged = true
-        }
-
         if bibleChanged {
             bible.lastUpdated = Date()
         }
@@ -255,7 +233,8 @@ final class MovieBlazeProject: ReferenceFileDocument {
             schemaVersion: Self.currentSchemaVersion,
             bible: bible,
             storyboardPanels: storyboardPanels,
-            scenes: scenes,
+            shotPlans: shotPlans,
+            frames: frames,
             characters: characters,
             setPieces: setPieces,
             moodboard: moodboard,
@@ -407,26 +386,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
     }
 
     func addScene(_ scene: SceneBreakdown) {
-        var stored = scene
-        let film = FilmScene(
-            number: (scenes.map(\.number).max() ?? 0) + 1,
-            title: stored.title,
-            location: stored.location,
-            isInterior: stored.isInterior,
-            timeOfDay: stored.timeOfDay,
-            lightingMood: .neutral,
-            keyLight: .frontal,
-            shotType: .medium,
-            background: nil,
-            props: [],
-            characters: [],
-            activeGuides: [.ruleOfThirds],
-            frameApproved: false,
-            projectTitle: bible.projectTitle
-        )
-        stored.promotedFilmSceneID = film.id
-        mutateBible { $0.sceneBreakdowns.append(stored) }
-        addFilmScene(film)
+        mutateBible { $0.sceneBreakdowns.append(scene) }
     }
 
     func updateScene(_ scene: SceneBreakdown) {
@@ -435,26 +395,10 @@ final class MovieBlazeProject: ReferenceFileDocument {
                 bible.sceneBreakdowns[i] = scene
             }
         }
-        syncLinkedFilmScene(for: scene)
     }
 
     func removeScene(id: UUID) {
-        // Unlink only — the linked FilmScene stays in `scenes`.
         mutateBible { $0.sceneBreakdowns.removeAll(where: { $0.id == id }) }
-    }
-
-    /// Propagate one-way story-level edits from a SceneBreakdown to the linked
-    /// FilmScene (title/location/interior/timeOfDay). Production-side fields
-    /// (lighting, shot type, props) are untouched.
-    private func syncLinkedFilmScene(for scene: SceneBreakdown) {
-        guard let filmID = scene.promotedFilmSceneID,
-              let idx = scenes.firstIndex(where: { $0.id == filmID }) else { return }
-        var film = scenes[idx]
-        film.title = scene.title
-        film.location = scene.location
-        film.isInterior = scene.isInterior
-        film.timeOfDay = scene.timeOfDay
-        scenes[idx] = film
     }
 
     func updateTheme(_ theme: ThemeTracker) {
@@ -487,9 +431,9 @@ final class MovieBlazeProject: ReferenceFileDocument {
 
     /// Apply a partial scene update (used by the regen diff sheet).
     /// `replacements[number]` writes a new scene over the existing one with
-    /// the same `number`, preserving the existing scene's `id` and
-    /// `promotedFilmSceneID` so downstream FilmScene links don't break.
-    /// `removals` deletes scenes by `number`. `additions` are appended.
+    /// the same `number`, preserving the existing scene's `id` so downstream
+    /// shot-plan links stay intact. `removals` deletes scenes by `number`.
+    /// `additions` are appended.
     func applySceneDiff(replacements: [Int: SceneBreakdown],
                         removals: Set<Int>,
                         additions: [SceneBreakdown]) {
@@ -498,8 +442,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
             for i in bible.sceneBreakdowns.indices {
                 let n = bible.sceneBreakdowns[i].number
                 if let replacement = replacements[n] {
-                    var s = replacement
-                    s = SceneBreakdown(
+                    let s = SceneBreakdown(
                         id: bible.sceneBreakdowns[i].id,
                         number: replacement.number,
                         title: replacement.title,
@@ -511,8 +454,7 @@ final class MovieBlazeProject: ReferenceFileDocument {
                         conflict: replacement.conflict,
                         emotionalBeat: replacement.emotionalBeat,
                         visualMetaphor: replacement.visualMetaphor,
-                        transitionNote: replacement.transitionNote,
-                        promotedFilmSceneID: bible.sceneBreakdowns[i].promotedFilmSceneID
+                        transitionNote: replacement.transitionNote
                     )
                     bible.sceneBreakdowns[i] = s
                 }

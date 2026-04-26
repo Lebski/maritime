@@ -263,20 +263,14 @@ final class StoryForgeViewModel: ObservableObject {
         pendingSceneDeletionID = nil
     }
 
-    func sceneHasFilmSceneLink(_ id: UUID) -> Bool {
-        guard let scene = bible.sceneBreakdowns.first(where: { $0.id == id }) else { return false }
-        return scene.promotedFilmSceneID != nil
-    }
-
     // MARK: Storyboard cross-module
 
-    func hasStoryboard(scene: SceneBreakdown) -> Bool {
-        !project.panels(forSceneBreakdown: scene.id).isEmpty
+    func hasShotPlan(scene: SceneBreakdown) -> Bool {
+        project.shotPlan(forScene: scene.id) != nil
     }
 
-    func storyboardScene(_ scene: SceneBreakdown) {
-        guard !hasStoryboard(scene: scene) else { return }
-        _ = project.appendPanels(fromScene: scene)
+    func sendSceneToStoryboard(_ scene: SceneBreakdown) {
+        _ = project.createShotPlanStub(forScene: scene.id)
     }
 
     // MARK: Theme

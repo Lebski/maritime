@@ -4,10 +4,40 @@ import SwiftUI
 //
 // Panels describe shot type, camera movement, duration, action note, dialogue,
 // and the editing priority driving the cut (Murch's simplified triad:
-// emotion / story / rhythm). A panel can be promoted into Scene Builder as
-// a FilmScene — the stamp is kept on promotedFilmSceneID. Panels that
-// originated from a Story Forge SceneBreakdown carry the source ID on
-// sceneBreakdownID so the UI can still group by scene.
+// emotion / story / rhythm). Panels are the unit of "shot": each one carries
+// its own clip-time metadata (motion + approval) and a 1:N list of Frame IDs
+// for keyframes. Panels that originated from a Story Forge SceneBreakdown
+// carry the source ID on sceneBreakdownID so the UI can group by scene.
+
+// MARK: - AI shot-breakdown plan
+//
+// Tracks AI generation state for a scene's shot breakdown. Panels still belong
+// to the scene via `sceneBreakdownID`; the plan stores plumbing for the
+// Storyboard "Generate breakdown" action.
+
+enum AIBreakdownStatus: String, Codable, Hashable {
+    case empty, generating, ready, failed
+}
+
+struct SceneShotPlan: Identifiable, Codable, Hashable {
+    let id: UUID
+    var sceneBreakdownID: UUID
+    var status: AIBreakdownStatus
+    var lastError: String?
+    var lastGeneratedAt: Date?
+
+    init(id: UUID = UUID(),
+         sceneBreakdownID: UUID,
+         status: AIBreakdownStatus = .empty,
+         lastError: String? = nil,
+         lastGeneratedAt: Date? = nil) {
+        self.id = id
+        self.sceneBreakdownID = sceneBreakdownID
+        self.status = status
+        self.lastError = lastError
+        self.lastGeneratedAt = lastGeneratedAt
+    }
+}
 
 enum CameraMovement: String, CaseIterable, Identifiable, Hashable, Codable {
     case `static` = "Static"
@@ -103,7 +133,7 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
     var number: Int
     var shotType: CameraShotType
     var cameraMovement: CameraMovement
-    var duration: Double              // seconds
+    var duration: Double              // seconds — drives the rendered clip length
     var actionNote: String
     var dialogue: String
     var timeOfDay: TimeOfDay
@@ -112,7 +142,11 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
     var thumbnailSymbol: String       // SF Symbol for atmospheric backdrop
     var thumbnailColors: [Color]      // gradient stops for the thumbnail background
     var sceneBreakdownID: UUID?
-    var promotedFilmSceneID: UUID?
+    var pencilSketchAssetID: UUID?
+    var aiBreakdownReasoning: String?
+    var frameIDs: [UUID]              // 1:N keyframes — start, end, holds
+    var clipMotion: MotionIntensity
+    var clipApproved: Bool
 
     init(id: UUID = UUID(),
          number: Int,
@@ -127,7 +161,11 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
          thumbnailSymbol: String = "square.grid.3x2",
          thumbnailColors: [Color] = [Theme.violet, Theme.magenta],
          sceneBreakdownID: UUID? = nil,
-         promotedFilmSceneID: UUID? = nil) {
+         pencilSketchAssetID: UUID? = nil,
+         aiBreakdownReasoning: String? = nil,
+         frameIDs: [UUID] = [],
+         clipMotion: MotionIntensity = .subtle,
+         clipApproved: Bool = false) {
         self.id = id
         self.number = number
         self.shotType = shotType
@@ -141,10 +179,14 @@ struct StoryboardPanel: Identifiable, Hashable, Codable {
         self.thumbnailSymbol = thumbnailSymbol
         self.thumbnailColors = thumbnailColors
         self.sceneBreakdownID = sceneBreakdownID
-        self.promotedFilmSceneID = promotedFilmSceneID
+        self.pencilSketchAssetID = pencilSketchAssetID
+        self.aiBreakdownReasoning = aiBreakdownReasoning
+        self.frameIDs = frameIDs
+        self.clipMotion = clipMotion
+        self.clipApproved = clipApproved
     }
 
-    var isPromoted: Bool { promotedFilmSceneID != nil }
+    var hasFrames: Bool { !frameIDs.isEmpty }
 
     var durationLabel: String {
         String(format: "%.1fs", duration)
@@ -183,7 +225,7 @@ extension Array where Element == StoryboardPanel {
     }
 
     var promotedCount: Int {
-        filter(\.isPromoted).count
+        filter(\.hasFrames).count
     }
 
     var unpromotedCount: Int {

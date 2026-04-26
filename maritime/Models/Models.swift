@@ -8,7 +8,7 @@ enum AppModule: String, CaseIterable, Identifiable {
     case characterLab
     case setDesign
     case storyboard
-    case sceneBuilder
+    case frameBuilder
     case videoRenderer
     case assetLibrary
     case exports
@@ -22,7 +22,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyboard: return "Storyboard Composer"
         case .characterLab: return "Character Lab"
         case .setDesign: return "Set Design"
-        case .sceneBuilder: return "Scene Builder"
+        case .frameBuilder: return "Frame Builder"
         case .videoRenderer: return "Video Renderer"
         case .assetLibrary: return "Asset Library"
         case .exports: return "Exports"
@@ -45,7 +45,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyboard: return "square.grid.3x2.fill"
         case .characterLab: return "person.crop.artframe"
         case .setDesign: return "cube.transparent.fill"
-        case .sceneBuilder: return "photo.stack.fill"
+        case .frameBuilder: return "photo.stack.fill"
         case .videoRenderer: return "film.stack.fill"
         case .assetLibrary: return "tray.full.fill"
         case .exports: return "square.and.arrow.up.on.square.fill"
@@ -59,7 +59,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyboard: return Theme.violet
         case .characterLab: return Theme.teal
         case .setDesign: return Theme.coral
-        case .sceneBuilder: return Theme.accent
+        case .frameBuilder: return Theme.accent
         case .videoRenderer: return Theme.lime
         case .assetLibrary: return Color.white.opacity(0.7)
         case .exports: return Color.white.opacity(0.7)
@@ -73,7 +73,7 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .storyboard: return "Visualize shot sequences"
         case .characterLab: return "Design consistent heroes"
         case .setDesign: return "Build the world's vocabulary"
-        case .sceneBuilder: return "Compose cinematic frames"
+        case .frameBuilder: return "Compose cinematic frames"
         case .videoRenderer: return "Bring scenes to motion"
         case .assetLibrary: return "All your creative assets"
         case .exports: return "Deliver to Premiere & more"

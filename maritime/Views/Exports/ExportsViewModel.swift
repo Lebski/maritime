@@ -35,17 +35,17 @@ final class ExportsViewModel: ObservableObject {
     /// chip + summary UI keeps working without a hardcoded sample list.
     var currentProject: MovieProject {
         let bible = project.bible
-        let totalSeconds = project.scenes.reduce(0) { $0 + $1.clipDuration }
-        let approved = project.scenes.filter(\.frameApproved).count
-        let progress = project.scenes.isEmpty
+        let totalSeconds = project.storyboardPanels.reduce(0) { $0 + $1.duration }
+        let approved = project.frames.filter(\.frameApproved).count
+        let progress = project.frames.isEmpty
             ? 0
-            : Double(approved) / Double(project.scenes.count)
+            : Double(approved) / Double(project.frames.count)
         return MovieProject(
             title: bible.projectTitle,
             genre: bible.theme.themeStatement.isEmpty ? "Untitled" : bible.theme.themeStatement,
             logline: bible.logline,
             progress: progress,
-            scenes: project.scenes.count,
+            scenes: project.storyboardPanels.count,
             characters: project.characters.count,
             durationMinutes: max(1, Int((totalSeconds / 60).rounded(.up))),
             updatedLabel: bibleUpdatedLabel(bible.lastUpdated),

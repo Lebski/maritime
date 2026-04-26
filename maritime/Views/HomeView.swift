@@ -2,15 +2,15 @@ import SwiftUI
 
 struct HomeView: View {
     let onNavigate: (AppModule) -> Void
-    let onJumpToScene: (UUID) -> Void
+    let onJumpToFrame: (UUID) -> Void
     @EnvironmentObject var project: MovieBlazeProject
     @State private var query: String = ""
 
     private var status: ProjectStatus {
-        if !project.cutSuggestions.isEmpty || project.scenes.contains(where: { $0.clipDuration > 0 && $0.frameApproved }) {
+        if !project.cutSuggestions.isEmpty || project.storyboardPanels.contains(where: { $0.clipApproved }) {
             return .finishing
         }
-        if project.scenes.contains(where: { $0.frameApproved }) {
+        if project.frames.contains(where: { $0.frameApproved }) {
             return .shooting
         }
         if !project.storyboardPanels.isEmpty {
@@ -23,7 +23,7 @@ struct HomeView: View {
         switch status {
         case .story:      return .storyForge
         case .storyboard: return .storyboard
-        case .shooting:   return .sceneBuilder
+        case .shooting:   return .frameBuilder
         case .finishing:  return .videoRenderer
         }
     }
@@ -32,7 +32,7 @@ struct HomeView: View {
         switch status {
         case .story:      return "Continue in Story Forge"
         case .storyboard: return "Continue in Storyboard"
-        case .shooting:   return "Continue in Scene Builder"
+        case .shooting:   return "Continue in Frame Builder"
         case .finishing:  return "Continue in Renderer"
         }
     }
@@ -62,9 +62,9 @@ struct HomeView: View {
                                onViewAll: { onNavigate(.characterLab) })
                 SetPieceStrip(setPieces: project.setPieces,
                               onViewAll: { onNavigate(.setDesign) })
-                SceneStrip(scenes: project.scenes,
-                           onViewAll: { onNavigate(.sceneBuilder) },
-                           onOpenScene: onJumpToScene)
+                SceneStrip(scenes: project.frames,
+                           onViewAll: { onNavigate(.frameBuilder) },
+                           onOpenScene: onJumpToFrame)
                 TipsCard(tips: SampleData.tips)
                 Color.clear.frame(height: 16)
             }
@@ -166,9 +166,9 @@ struct HomeView: View {
                 tint: Theme.coral
             )
             StatCard(
-                title: "Scenes",
-                value: "\(project.scenes.count)",
-                delta: "\(project.scenes.filter(\.frameApproved).count) approved",
+                title: "Frames",
+                value: "\(project.frames.count)",
+                delta: "\(project.frames.filter(\.frameApproved).count) approved",
                 icon: "photo.stack.fill",
                 tint: Theme.accent
             )
@@ -188,7 +188,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Production Pipeline", subtitle: "Six modules. One cinematic workflow.")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 230), spacing: 14)], spacing: 14) {
-                ForEach([AppModule.storyForge, .characterLab, .setDesign, .storyboard, .sceneBuilder, .videoRenderer], id: \.self) { m in
+                ForEach([AppModule.storyForge, .characterLab, .setDesign, .storyboard, .frameBuilder, .videoRenderer], id: \.self) { m in
                     ModuleTile(module: m, isFeatured: m == nextStepModule) {
                         onNavigate(m)
                     }

@@ -11,13 +11,19 @@ struct PanelDetailEditor: View {
     @EnvironmentObject var project: MovieBlazeProject
     @EnvironmentObject var navigator: AppNavigator
 
+    @State private var reasoningExpanded: Bool = false
+
     var body: some View {
         if let panel = vm.selectedPanel {
             VStack(alignment: .leading, spacing: 16) {
                 header(panel)
+                if panel.aiBreakdownReasoning?.isEmpty == false {
+                    reasoningRow(panel)
+                }
                 fieldGrid(panel)
                 shotAndMovement(panel)
                 priorityRow(panel)
+                clipControlsRow(panel)
                 characterRow(panel)
                 footer(panel)
             }
@@ -290,6 +296,108 @@ struct PanelDetailEditor: View {
         .buttonStyle(.plainSolid)
     }
 
+    // MARK: Clip controls (motion + approval)
+
+    private func clipControlsRow(_ panel: StoryboardPanel) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("CLIP MOTION")
+                    .font(.system(size: 10, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundStyle(Theme.textTertiary)
+                HStack(spacing: 8) {
+                    ForEach(MotionIntensity.allCases) { motion in
+                        motionChip(panel, motion: motion)
+                    }
+                }
+            }
+            Spacer()
+            VStack(alignment: .leading, spacing: 8) {
+                Text("CLIP STATUS")
+                    .font(.system(size: 10, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundStyle(Theme.textTertiary)
+                Button(action: {
+                    var p = panel; p.clipApproved.toggle(); vm.updatePanel(p)
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: panel.clipApproved ? "checkmark.seal.fill" : "seal")
+                            .font(.system(size: 12))
+                        Text(panel.clipApproved ? "Approved" : "Pending")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .foregroundStyle(panel.clipApproved ? .black : Theme.textSecondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(panel.clipApproved ? Theme.teal : Color.white.opacity(0.06))
+                    .overlay(Capsule().stroke(panel.clipApproved ? Color.clear : Theme.stroke, lineWidth: 1))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+            }
+        }
+    }
+
+    private func motionChip(_ panel: StoryboardPanel, motion: MotionIntensity) -> some View {
+        let selected = panel.clipMotion == motion
+        return Button(action: {
+            var p = panel; p.clipMotion = motion; vm.updatePanel(p)
+        }) {
+            HStack(spacing: 5) {
+                Image(systemName: motion.icon)
+                    .font(.system(size: 10, weight: .semibold))
+                Text(motion.rawValue)
+                    .font(.system(size: 10, weight: .bold))
+                    .tracking(0.5)
+            }
+            .foregroundStyle(selected ? .black : Theme.textSecondary)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .background(selected ? Theme.magenta : Color.white.opacity(0.06))
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plainSolid)
+    }
+
+    // MARK: AI breakdown reasoning
+
+    private func reasoningRow(_ panel: StoryboardPanel) -> some View {
+        let text = panel.aiBreakdownReasoning ?? ""
+        return VStack(alignment: .leading, spacing: 6) {
+            Button(action: { reasoningExpanded.toggle() }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.violet)
+                    Text("AI BREAKDOWN REASONING")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.8)
+                        .foregroundStyle(Theme.textTertiary)
+                    Spacer()
+                    Image(systemName: reasoningExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+            }
+            .buttonStyle(.plainSolid)
+            if reasoningExpanded {
+                Text(text)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+            }
+        }
+        .padding(12)
+        .background(Theme.violet.opacity(0.06))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Theme.violet.opacity(0.3), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
     // MARK: Characters
 
     private func characterRow(_ panel: StoryboardPanel) -> some View {
@@ -348,24 +456,27 @@ struct PanelDetailEditor: View {
 
     private func footer(_ panel: StoryboardPanel) -> some View {
         HStack(spacing: 10) {
-            if panel.isPromoted {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 12))
-                    Text("Sent to Scene Builder")
-                        .font(.system(size: 12, weight: .semibold))
-                }
-                .foregroundStyle(Theme.teal)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(Theme.teal.opacity(0.15))
-                .clipShape(Capsule())
-            } else {
-                Button(action: { promoteAndToast() }) {
+            if panel.hasFrames {
+                Button(action: { openInFrameBuilder(panel) }) {
                     HStack(spacing: 8) {
-                        Image(systemName: "arrow.up.right.square.fill")
+                        Image(systemName: "photo.stack.fill")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Send Panel to Scene Builder")
+                        Text("Open in Frame Builder · \(panel.frameIDs.count) keyframe\(panel.frameIDs.count == 1 ? "" : "s")")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Theme.teal)
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plainSolid)
+            } else {
+                Button(action: { addKeyframeAndToast() }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.rectangle.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Add Keyframe in Frame Builder")
                             .font(.system(size: 13, weight: .semibold))
                     }
                     .foregroundStyle(.black)
@@ -395,16 +506,20 @@ struct PanelDetailEditor: View {
         }
     }
 
-    // MARK: Promotion helper
+    // MARK: Frame Builder hand-off
 
-    private func promoteAndToast() {
-        guard let result = vm.promoteSelectedPanelToSceneBuilder() else { return }
-        let filmSceneID = result.filmScene.id
+    private func openInFrameBuilder(_ panel: StoryboardPanel) {
+        navigator.openFrameBuilder(panelID: panel.id)
+    }
+
+    private func addKeyframeAndToast() {
+        guard let result = vm.addKeyframeToSelectedPanel() else { return }
+        let frameID = result.frame.id
         let nav = navigator
         navigator.showToast(ToastContent(
-            message: "Sent panel #\(result.panel.number) to Scene Builder",
-            actionLabel: "View in Scene Builder",
-            action: { nav.openSceneBuilder(sceneID: filmSceneID) }
+            message: "Added keyframe to panel #\(result.panel.number)",
+            actionLabel: "Open in Frame Builder",
+            action: { nav.openFrameBuilder(frameID: frameID) }
         ))
     }
 

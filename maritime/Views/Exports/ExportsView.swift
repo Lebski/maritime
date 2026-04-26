@@ -201,7 +201,7 @@ private struct ProjectChip: View {
                     Text(project.title)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("\(project.scenes) scenes · \(project.durationMinutes)m")
+                    Text("\(project.scenes) frames · \(project.durationMinutes)m")
                         .font(.system(size: 10))
                         .foregroundStyle(Theme.textTertiary)
                 }

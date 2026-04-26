@@ -1,10 +1,10 @@
 import SwiftUI
 
-// MARK: - Scene Setup Panel (right column)
+// MARK: - Frame Inspector Panel (right column)
 
-struct SceneSetupPanel: View {
-    let scene: FilmScene
-    @ObservedObject var vm: SceneBuilderViewModel
+struct FrameInspectorPanel: View {
+    let frame: Frame
+    @ObservedObject var vm: FrameBuilderViewModel
     @EnvironmentObject var project: MovieBlazeProject
 
     var body: some View {
@@ -27,7 +27,7 @@ struct SceneSetupPanel: View {
 
     private var backgroundSection: some View {
         PanelCard(title: "Background", icon: "photo.fill", tint: Theme.teal) {
-            if let bg = scene.background {
+            if let bg = frame.background {
                 HStack(spacing: 10) {
                     ZStack {
                         LinearGradient(colors: bg.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -51,7 +51,7 @@ struct SceneSetupPanel: View {
             Button(action: { vm.showBackgroundPicker = true }) {
                 HStack(spacing: 6) {
                     Image(systemName: "rectangle.stack.fill")
-                    Text(scene.background == nil ? "Choose Background" : "Change Background")
+                    Text(frame.background == nil ? "Choose Background" : "Change Background")
                 }
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.teal)
@@ -79,7 +79,7 @@ struct SceneSetupPanel: View {
                     ForEach(finalized) { lab in
                         LabCharacterDragChip(
                             lab: lab,
-                            isInScene: scene.characters.contains(where: { $0.name == lab.name })
+                            isInScene: frame.characters.contains(where: { $0.name == lab.name })
                         ) {
                             // Fallback "add" button drops at default center-right
                             let pos = CGPoint(x: 0.5, y: 0.6)
@@ -104,14 +104,14 @@ struct SceneSetupPanel: View {
 
     private var propsSection: some View {
         PanelCard(title: "Props", icon: "shippingbox.fill", tint: Theme.accent) {
-            if scene.props.isEmpty {
+            if frame.props.isEmpty {
                 Text("No props added yet")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textTertiary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 VStack(spacing: 6) {
-                    ForEach(scene.props) { prop in
+                    ForEach(frame.props) { prop in
                         propRow(prop)
                     }
                 }
@@ -167,14 +167,14 @@ struct SceneSetupPanel: View {
 
     private var charactersSection: some View {
         PanelCard(title: "In Scene", icon: "person.2.fill", tint: Theme.magenta) {
-            if scene.characters.isEmpty {
+            if frame.characters.isEmpty {
                 Text("Drag from Character Lab above onto the canvas")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
                 VStack(spacing: 6) {
-                    ForEach(scene.characters) { ch in
+                    ForEach(frame.characters) { ch in
                         HStack(spacing: 8) {
                             Circle()
                                 .fill(ch.tint.opacity(0.25))
@@ -223,21 +223,21 @@ struct SceneSetupPanel: View {
                 Text("Time of Day")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
-                ChipRow(items: TimeOfDay.allCases, selected: scene.timeOfDay) { t in
+                ChipRow(items: TimeOfDay.allCases, selected: frame.timeOfDay) { t in
                     ChipContent(label: t.rawValue, icon: t.icon, tint: t.tint)
                 } onSelect: { vm.setTimeOfDay($0) }
 
                 Text("Mood")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
-                ChipRow(items: LightingMood.allCases, selected: scene.lightingMood) { m in
+                ChipRow(items: LightingMood.allCases, selected: frame.lightingMood) { m in
                     ChipContent(label: m.rawValue, icon: nil, tint: m.tint)
                 } onSelect: { vm.setMood($0) }
 
                 Text("Key Light Direction")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
-                ChipRow(items: KeyLightDirection.allCases, selected: scene.keyLight) { k in
+                ChipRow(items: KeyLightDirection.allCases, selected: frame.keyLight) { k in
                     ChipContent(label: k.rawValue, icon: k.icon, tint: Theme.accent)
                 } onSelect: { vm.setKeyLight($0) }
             }
@@ -252,11 +252,11 @@ struct SceneSetupPanel: View {
                 Text("Shot Type")
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.textTertiary)
-                WrappedChips(items: CameraShotType.allCases, selected: scene.shotType) { s in
+                WrappedChips(items: CameraShotType.allCases, selected: frame.shotType) { s in
                     Text(s.shortLabel)
                         .font(.system(size: 10, weight: .bold))
                 } onSelect: { vm.setShot($0) }
-                Text(scene.shotType.rawValue)
+                Text(frame.shotType.rawValue)
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textSecondary)
             }
@@ -269,7 +269,7 @@ struct SceneSetupPanel: View {
         PanelCard(title: "Composition Guides", icon: "grid", tint: Theme.lime) {
             VStack(spacing: 6) {
                 ForEach(CompositionGuide.allCases) { guide in
-                    let isOn = scene.activeGuides.contains(guide)
+                    let isOn = frame.activeGuides.contains(guide)
                     Button(action: { vm.toggleGuide(guide) }) {
                         HStack(spacing: 8) {
                             Image(systemName: guide.icon)
@@ -509,7 +509,7 @@ struct LabCharacterDragChip: View {
 // MARK: - Pickers (sheets)
 
 struct BackgroundPickerSheet: View {
-    @ObservedObject var vm: SceneBuilderViewModel
+    @ObservedObject var vm: FrameBuilderViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -534,7 +534,7 @@ struct BackgroundPickerSheet: View {
             ScrollView {
                 let cols = [GridItem(.adaptive(minimum: 180, maximum: 240), spacing: 12)]
                 LazyVGrid(columns: cols, spacing: 12) {
-                    ForEach(SceneBuilderSamples.backgrounds) { bg in
+                    ForEach(FrameBuilderSamples.backgrounds) { bg in
                         Button(action: {
                             vm.setBackground(bg); dismiss()
                         }) {
@@ -576,7 +576,7 @@ struct BackgroundPickerSheet: View {
 }
 
 struct PropPickerSheet: View {
-    @ObservedObject var vm: SceneBuilderViewModel
+    @ObservedObject var vm: FrameBuilderViewModel
     @EnvironmentObject var project: MovieBlazeProject
     @Environment(\.dismiss) private var dismiss
 
@@ -626,12 +626,12 @@ struct PropPickerSheet: View {
             LazyVGrid(columns: cols, spacing: 10) {
                 ForEach(project.setPieces) { piece in
                     let prop = piece.asSceneProp()
-                    let isAdded = vm.activeScene?.props.contains(where: {
+                    let isAdded = vm.activeFrame?.props.contains(where: {
                         $0.sourceSetPieceID == piece.id
                     }) ?? false
                     Button(action: {
                         if isAdded {
-                            if let existing = vm.activeScene?.props.first(where: { $0.sourceSetPieceID == piece.id }) {
+                            if let existing = vm.activeFrame?.props.first(where: { $0.sourceSetPieceID == piece.id }) {
                                 vm.removeProp(existing)
                             }
                         } else {
@@ -656,8 +656,8 @@ struct PropPickerSheet: View {
             )
             let cols = [GridItem(.adaptive(minimum: 140, maximum: 200), spacing: 10)]
             LazyVGrid(columns: cols, spacing: 10) {
-                ForEach(SceneBuilderSamples.props) { prop in
-                    let isAdded = vm.activeScene?.props.contains(prop) ?? false
+                ForEach(FrameBuilderSamples.props) { prop in
+                    let isAdded = vm.activeFrame?.props.contains(prop) ?? false
                     Button(action: {
                         if isAdded { vm.removeProp(prop) } else { vm.addProp(prop) }
                     }) {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Scene Builder Models
+// MARK: - Frame Builder Models
 
 enum TimeOfDay: String, CaseIterable, Identifiable, Codable {
     case dawn = "Dawn"
@@ -208,11 +208,29 @@ enum DepthLayer: String, CaseIterable, Codable {
     }
 }
 
-// MARK: - Film Scene
+// MARK: - Frame
 
-struct FilmScene: Identifiable, Codable {
+enum FrameRole: String, Codable, CaseIterable, Hashable {
+    case keyStart = "Start"
+    case keyEnd = "End"
+    case hold = "Hold"
+    case intermediate = "Intermediate"
+
+    var icon: String {
+        switch self {
+        case .keyStart:     return "play.fill"
+        case .keyEnd:       return "stop.fill"
+        case .hold:         return "pause.fill"
+        case .intermediate: return "circle.fill"
+        }
+    }
+}
+
+struct Frame: Identifiable, Codable {
     let id: UUID
-    var number: Int
+    var panelID: UUID
+    var ordinal: Int
+    var role: FrameRole
     var title: String
     var location: String
     var isInterior: Bool
@@ -227,19 +245,17 @@ struct FilmScene: Identifiable, Codable {
     var frameApproved: Bool
     var projectTitle: String
     var renderPackage: RenderPackage?
-    // Video Renderer state — the same scene carries its motion cue and clip length,
-    // so the Renderer timeline is a strict projection of project.scenes.
-    var clipDuration: Double
-    var clipMotion: MotionIntensity
 
-    init(id: UUID = UUID(), number: Int, title: String, location: String, isInterior: Bool,
+    init(id: UUID = UUID(), panelID: UUID, ordinal: Int = 0, role: FrameRole = .keyStart,
+         title: String, location: String, isInterior: Bool,
          timeOfDay: TimeOfDay, lightingMood: LightingMood, keyLight: KeyLightDirection,
          shotType: CameraShotType, background: SceneBackground? = nil, props: [SceneProp] = [],
          characters: [SceneCharacterRef] = [], activeGuides: Set<CompositionGuide> = [],
-         frameApproved: Bool = false, projectTitle: String, renderPackage: RenderPackage? = nil,
-         clipDuration: Double = 3.0, clipMotion: MotionIntensity = .subtle) {
+         frameApproved: Bool = false, projectTitle: String, renderPackage: RenderPackage? = nil) {
         self.id = id
-        self.number = number
+        self.panelID = panelID
+        self.ordinal = ordinal
+        self.role = role
         self.title = title
         self.location = location
         self.isInterior = isInterior
@@ -254,59 +270,6 @@ struct FilmScene: Identifiable, Codable {
         self.frameApproved = frameApproved
         self.projectTitle = projectTitle
         self.renderPackage = renderPackage
-        self.clipDuration = clipDuration
-        self.clipMotion = clipMotion
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case id, number, title, location, isInterior, timeOfDay, lightingMood
-        case keyLight, shotType, background, props, characters, activeGuides
-        case frameApproved, projectTitle, renderPackage, clipDuration, clipMotion
-    }
-
-    // Older .mblaze files predate clipDuration/clipMotion — decode them with defaults.
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try c.decode(UUID.self, forKey: .id)
-        self.number = try c.decode(Int.self, forKey: .number)
-        self.title = try c.decode(String.self, forKey: .title)
-        self.location = try c.decode(String.self, forKey: .location)
-        self.isInterior = try c.decode(Bool.self, forKey: .isInterior)
-        self.timeOfDay = try c.decode(TimeOfDay.self, forKey: .timeOfDay)
-        self.lightingMood = try c.decode(LightingMood.self, forKey: .lightingMood)
-        self.keyLight = try c.decode(KeyLightDirection.self, forKey: .keyLight)
-        self.shotType = try c.decode(CameraShotType.self, forKey: .shotType)
-        self.background = try c.decodeIfPresent(SceneBackground.self, forKey: .background)
-        self.props = try c.decode([SceneProp].self, forKey: .props)
-        self.characters = try c.decode([SceneCharacterRef].self, forKey: .characters)
-        self.activeGuides = try c.decode(Set<CompositionGuide>.self, forKey: .activeGuides)
-        self.frameApproved = try c.decode(Bool.self, forKey: .frameApproved)
-        self.projectTitle = try c.decode(String.self, forKey: .projectTitle)
-        self.renderPackage = try c.decodeIfPresent(RenderPackage.self, forKey: .renderPackage)
-        self.clipDuration = try c.decodeIfPresent(Double.self, forKey: .clipDuration) ?? 3.0
-        self.clipMotion = try c.decodeIfPresent(MotionIntensity.self, forKey: .clipMotion) ?? .subtle
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(id, forKey: .id)
-        try c.encode(number, forKey: .number)
-        try c.encode(title, forKey: .title)
-        try c.encode(location, forKey: .location)
-        try c.encode(isInterior, forKey: .isInterior)
-        try c.encode(timeOfDay, forKey: .timeOfDay)
-        try c.encode(lightingMood, forKey: .lightingMood)
-        try c.encode(keyLight, forKey: .keyLight)
-        try c.encode(shotType, forKey: .shotType)
-        try c.encodeIfPresent(background, forKey: .background)
-        try c.encode(props, forKey: .props)
-        try c.encode(characters, forKey: .characters)
-        try c.encode(activeGuides, forKey: .activeGuides)
-        try c.encode(frameApproved, forKey: .frameApproved)
-        try c.encode(projectTitle, forKey: .projectTitle)
-        try c.encodeIfPresent(renderPackage, forKey: .renderPackage)
-        try c.encode(clipDuration, forKey: .clipDuration)
-        try c.encode(clipMotion, forKey: .clipMotion)
     }
 
     var locationLabel: String {
@@ -316,10 +279,10 @@ struct FilmScene: Identifiable, Codable {
 
 // MARK: - Render Package
 //
-// Everything Nano Banana 2 (Gemini 3 Pro Image) needs to render a final frame
-// from the composed scene: prompt text + up to 14 reference images.
-// Saved per-scene inside the project document so re-opens preserve the exact
-// prompt + selected character sheets the user last chose.
+// Everything Nano Banana 2 (Gemini 3 Pro Image) needs to render a final frame:
+// prompt text + up to 14 reference images. Saved per-frame inside the project
+// document so re-opens preserve the exact prompt + selected character sheets
+// the user last chose.
 
 enum ImageModel: String, CaseIterable, Codable, Identifiable {
     case nanoBanana2 = "Nano Banana 2"
@@ -377,7 +340,7 @@ struct StyleReference: Identifiable, Codable, Hashable {
 
 struct RenderPackage: Identifiable, Codable {
     let id: UUID
-    let sceneID: UUID
+    let frameID: UUID
     var prompt: String
     var sceneCompositionImage: Data?
     var characterReferences: [CharacterReference]
@@ -387,7 +350,7 @@ struct RenderPackage: Identifiable, Codable {
     var lastRenderedAt: Date?
 
     init(id: UUID = UUID(),
-         sceneID: UUID,
+         frameID: UUID,
          prompt: String = "",
          sceneCompositionImage: Data? = nil,
          characterReferences: [CharacterReference] = [],
@@ -396,7 +359,7 @@ struct RenderPackage: Identifiable, Codable {
          aspectRatio: AspectRatio = .widescreen16x9,
          lastRenderedAt: Date? = nil) {
         self.id = id
-        self.sceneID = sceneID
+        self.frameID = frameID
         self.prompt = prompt
         self.sceneCompositionImage = sceneCompositionImage
         self.characterReferences = characterReferences
@@ -420,29 +383,25 @@ struct RenderPackage: Identifiable, Codable {
 // MARK: - Prompt Builder
 //
 // Pure, deterministic function that composes a Nano Banana 2 prompt from the
-// current scene + project character roster. Users get a seeded prompt they can
-// freely edit; hitting "Re-seed from scene" recomposes.
+// current frame + project character roster. Users get a seeded prompt they can
+// freely edit; hitting "Re-seed from frame" recomposes.
 
 enum PromptBuilder {
-    static func buildPrompt(scene: FilmScene, characters: [LabCharacter]) -> String {
+    static func buildPrompt(frame: Frame, characters: [LabCharacter]) -> String {
         var lines: [String] = []
 
-        // Scene establishing line
-        let venue = scene.isInterior ? "interior" : "exterior"
-        lines.append("A cinematic \(scene.shotType.rawValue.lowercased()) of a \(venue) scene at \(scene.location.lowercased()), \(scene.timeOfDay.rawValue.lowercased()).")
+        let venue = frame.isInterior ? "interior" : "exterior"
+        lines.append("A cinematic \(frame.shotType.rawValue.lowercased()) of a \(venue) scene at \(frame.location.lowercased()), \(frame.timeOfDay.rawValue.lowercased()).")
 
-        // Mood & lighting
-        let moodLine = "\(scene.lightingMood.rawValue.lowercased()) lighting with key light from \(scene.keyLight.rawValue.lowercased())"
+        let moodLine = "\(frame.lightingMood.rawValue.lowercased()) lighting with key light from \(frame.keyLight.rawValue.lowercased())"
         lines.append(moodLine + ".")
 
-        // Background mood
-        if let bg = scene.background {
+        if let bg = frame.background {
             lines.append("Setting: \(bg.name) — \(bg.tag).")
         }
 
-        // Characters
-        if !scene.characters.isEmpty {
-            let charLines = scene.characters.compactMap { ref -> String? in
+        if !frame.characters.isEmpty {
+            let charLines = frame.characters.compactMap { ref -> String? in
                 let labMatch = characters.first(where: { $0.name == ref.name })
                 let descriptor = labMatch?.description ?? ref.role
                 let position = positionLabel(xRatio: ref.xRatio, yRatio: ref.yRatio)
@@ -452,22 +411,19 @@ enum PromptBuilder {
             lines.append("Cast: " + charLines.joined(separator: "; ") + ".")
         }
 
-        // Props
-        if !scene.props.isEmpty {
-            let propNames = scene.props.map { $0.name.lowercased() }.joined(separator: ", ")
+        if !frame.props.isEmpty {
+            let propNames = frame.props.map { $0.name.lowercased() }.joined(separator: ", ")
             lines.append("Props: \(propNames).")
         }
 
-        // Composition hints
-        if !scene.activeGuides.isEmpty {
-            let guides = scene.activeGuides
+        if !frame.activeGuides.isEmpty {
+            let guides = frame.activeGuides
                 .map { $0.rawValue.lowercased() }
                 .sorted()
                 .joined(separator: ", ")
             lines.append("Composition: \(guides).")
         }
 
-        // Finishing cinematic cues
         lines.append("35mm anamorphic look, film grain, balanced exposure, sharp focus on primary subject, production-quality framing.")
 
         return lines.joined(separator: " ")
@@ -513,8 +469,6 @@ struct StubImageGenerationService: ImageGenerationService {
 
     func generate(package: RenderPackage) async throws -> Data {
         try await Task.sleep(nanoseconds: UInt64(simulatedLatencySeconds * 1_000_000_000))
-        // Return an empty PNG-like placeholder; Scene Builder shows the existing
-        // programmatic canvas while the stub is in place.
         return Data()
     }
 }
@@ -534,7 +488,7 @@ enum ImageGenerationError: LocalizedError {
 
 // MARK: - Samples
 
-enum SceneBuilderSamples {
+enum FrameBuilderSamples {
     static let backgrounds: [SceneBackground] = [
         .init(name: "Rain-slick Alley", tag: "noir · ext", gradientColors: [Color(red: 0.10, green: 0.12, blue: 0.20), Color(red: 0.30, green: 0.35, blue: 0.55)], symbol: "cloud.rain.fill"),
         .init(name: "Neon Tokyo Street", tag: "cyberpunk · ext", gradientColors: [Color(red: 0.35, green: 0.08, blue: 0.45), Color(red: 0.92, green: 0.35, blue: 0.62)], symbol: "building.2.fill"),
@@ -564,70 +518,5 @@ enum SceneBuilderSamples {
         .init(name: "Marcus", role: "Antagonist", tint: Theme.accent, xRatio: 0.68, yRatio: 0.58, gazeDegrees: -170, depthLayer: .midground)
     ]
 
-    static let scenes: [FilmScene] = [
-        FilmScene(
-            number: 1,
-            title: "The Confrontation",
-            location: "Warehouse",
-            isInterior: true,
-            timeOfDay: .night,
-            lightingMood: .highContrast,
-            keyLight: .leftSide,
-            shotType: .medium,
-            background: backgrounds[2],
-            props: [props[1], props[5]],
-            characters: characters,
-            activeGuides: [.ruleOfThirds, .axis180],
-            frameApproved: false,
-            projectTitle: "Neon Requiem"
-        ),
-        FilmScene(
-            number: 2,
-            title: "Elena's Arrival",
-            location: "Tokyo Street",
-            isInterior: false,
-            timeOfDay: .night,
-            lightingMood: .cold,
-            keyLight: .backlit,
-            shotType: .wide,
-            background: backgrounds[1],
-            props: [props[7]],
-            characters: [characters[0]],
-            activeGuides: [.ruleOfThirds],
-            frameApproved: true,
-            projectTitle: "Neon Requiem"
-        ),
-        FilmScene(
-            number: 3,
-            title: "The Letter",
-            location: "Candlelit Study",
-            isInterior: true,
-            timeOfDay: .night,
-            lightingMood: .warm,
-            keyLight: .rightSide,
-            shotType: .closeUp,
-            background: backgrounds[4],
-            props: [props[2], props[0]],
-            characters: [characters[0]],
-            activeGuides: [.ruleOfThirds, .headroom],
-            frameApproved: false,
-            projectTitle: "The Lantern Keeper"
-        ),
-        FilmScene(
-            number: 4,
-            title: "Edge of the World",
-            location: "Coastal Cliff",
-            isInterior: false,
-            timeOfDay: .goldenHour,
-            lightingMood: .warm,
-            keyLight: .frontal,
-            shotType: .wide,
-            background: backgrounds[3],
-            props: [],
-            characters: [characters[0]],
-            activeGuides: [.goldenRatio, .headroom],
-            frameApproved: false,
-            projectTitle: "Tide & Bone"
-        )
-    ]
+    static let frames: [Frame] = []
 }

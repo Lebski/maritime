@@ -142,7 +142,7 @@ struct PlaceholderView: View {
         case .storyForge: return "Craft characters, beats, and themes. Story Forge will guide you through proven structures like Save the Cat and the Hero's Journey."
         case .storyboard: return "Compose shot sequences with a smart shot library, 180° rule checks, and AI-assisted pacing suggestions."
         case .characterLab: return "Iteratively design consistent characters across multiple rounds — then auto-generate turnarounds, expressions, and action poses."
-        case .sceneBuilder: return "Assemble cinematic start frames with composition guides, lighting presets, and round-trip editing."
+        case .frameBuilder: return "Assemble cinematic keyframes for each shot with composition guides, lighting presets, and round-trip editing."
         case .videoRenderer: return "Turn frames into motion. Murch's Rule of Six powers intelligent cut suggestions for your timeline."
         case .assetLibrary: return "All your characters, props, and backgrounds — tagged, searchable, and reusable across every project."
         case .exports: return "Deliver production-ready packages to Premiere Pro, Photoshop, and raw formats with a single click."
@@ -158,7 +158,7 @@ struct PlaceholderView: View {
             return ["10+ shot type library", "Sequence builder", "Rhythm & timing planner", "AI thumbnail sketches"]
         case .characterLab:
             return ["Round 1 — 12 broad variations", "Round 2 — 6 focused refinements", "Round 3 — final polish", "Auto reference sheets"]
-        case .sceneBuilder:
+        case .frameBuilder:
             return ["Rule of thirds overlay", "Lighting presets", "Depth layers: FG · MG · BG", "Inpaint & Photoshop round-trip"]
         case .videoRenderer:
             return ["Motion intensity controls", "Murch-powered cut engine", "Timeline assembly", "Premiere XML export"]

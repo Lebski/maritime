@@ -4,7 +4,7 @@ import SwiftUI
 //
 // Per-window navigation coordinator. Owns the selected module and the
 // cross-module "intents" that let one module open another on a specific
-// entity (e.g. Storyboard → Scene Builder with a chosen FilmScene).
+// entity (e.g. Storyboard → Frame Builder with a chosen Frame or panel).
 // Modules observe the relevant `pending…ID` and clear it once consumed.
 
 struct ToastContent: Identifiable {
@@ -18,7 +18,8 @@ struct ToastContent: Identifiable {
 final class AppNavigator: ObservableObject {
     @Published var selection: AppModule = .home
 
-    @Published var pendingFilmSceneID: UUID?
+    @Published var pendingFrameID: UUID?
+    @Published var pendingPanelID: UUID?
     @Published var pendingSceneBreakdownID: UUID?
 
     @Published var toast: ToastContent?
@@ -27,9 +28,14 @@ final class AppNavigator: ObservableObject {
         selection = module
     }
 
-    func openSceneBuilder(sceneID: UUID) {
-        pendingFilmSceneID = sceneID
-        selection = .sceneBuilder
+    func openFrameBuilder(frameID: UUID) {
+        pendingFrameID = frameID
+        selection = .frameBuilder
+    }
+
+    func openFrameBuilder(panelID: UUID) {
+        pendingPanelID = panelID
+        selection = .frameBuilder
     }
 
     func openStoryForge(sceneBreakdownID: UUID? = nil) {
@@ -42,9 +48,14 @@ final class AppNavigator: ObservableObject {
         selection = .storyboard
     }
 
-    func consumePendingFilmSceneID() -> UUID? {
-        defer { pendingFilmSceneID = nil }
-        return pendingFilmSceneID
+    func consumePendingFrameID() -> UUID? {
+        defer { pendingFrameID = nil }
+        return pendingFrameID
+    }
+
+    func consumePendingPanelID() -> UUID? {
+        defer { pendingPanelID = nil }
+        return pendingPanelID
     }
 
     func consumePendingSceneBreakdownID() -> UUID? {
@@ -102,7 +113,7 @@ struct RootView: View {
         case .home:
             HomeView(
                 onNavigate: { navigator.go(to: $0) },
-                onJumpToScene: { navigator.openSceneBuilder(sceneID: $0) }
+                onJumpToFrame: { navigator.openFrameBuilder(frameID: $0) }
             )
         case .storyForge:
             StoryForgeView(project: project)
@@ -112,8 +123,8 @@ struct RootView: View {
             CharacterLabView(project: project)
         case .setDesign:
             SetDesignView(project: project)
-        case .sceneBuilder:
-            SceneBuilderView(project: project)
+        case .frameBuilder:
+            FrameBuilderView(project: project)
         case .videoRenderer:
             VideoRendererView(project: project)
         case .assetLibrary:

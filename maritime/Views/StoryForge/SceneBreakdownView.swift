@@ -34,11 +34,7 @@ struct SceneBreakdownView: View {
             Button("Delete", role: .destructive) { vm.confirmPendingSceneDeletion() }
             Button("Cancel", role: .cancel) { vm.pendingSceneDeletionID = nil }
         } message: {
-            if let id = vm.pendingSceneDeletionID, vm.sceneHasFilmSceneLink(id) {
-                Text("The Scene Builder scene will be kept but unlinked.")
-            } else {
-                Text("This action cannot be undone.")
-            }
+            Text("This action cannot be undone.")
         }
     }
 
@@ -186,14 +182,14 @@ struct SceneBreakdownView: View {
                 }
                 Spacer()
                 CompletionRing(value: scene.completion, size: 18, color: Theme.magenta)
-                if vm.hasStoryboard(scene: scene) {
+                if vm.hasShotPlan(scene: scene) {
                     storyboardedBadge
                 } else {
-                    Button(action: { vm.storyboardScene(scene) }) {
+                    Button(action: { vm.sendSceneToStoryboard(scene) }) {
                         HStack(spacing: 4) {
                             Image(systemName: "square.grid.3x2.fill")
                                 .font(.system(size: 10))
-                            Text("Storyboard")
+                            Text("Send to Storyboard")
                                 .font(.system(size: 11, weight: .semibold))
                         }
                         .foregroundStyle(.black)

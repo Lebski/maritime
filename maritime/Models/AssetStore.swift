@@ -4,7 +4,7 @@ import SwiftUI
 //
 // The Asset Library is a derived view over the open project. Each asset
 // borrows the underlying entity's UUID (LabCharacter / SceneBackground /
-// SceneProp / FilmScene) so favorites, selection, and SwiftUI diffing stay
+// SceneProp / Frame) so favorites, selection, and SwiftUI diffing stay
 // stable across re-derivations. The library always reflects the current
 // document — there is no parallel sample catalogue.
 
@@ -36,11 +36,11 @@ extension MovieBlazeProject {
             ))
         }
 
-        // Backgrounds — unique by id across all scenes
+        // Backgrounds — unique by id across all frames
         var seenBg = Set<UUID>()
-        for scene in scenes {
-            guard let bg = scene.background, seenBg.insert(bg.id).inserted else { continue }
-            let usage = scenes.filter { $0.background?.id == bg.id }.count
+        for frame in frames {
+            guard let bg = frame.background, seenBg.insert(bg.id).inserted else { continue }
+            let usage = frames.filter { $0.background?.id == bg.id }.count
             result.append(Asset(
                 id: bg.id,
                 name: bg.name,
@@ -49,17 +49,17 @@ extension MovieBlazeProject {
                 versions: usage + (assetEditCounts[bg.id] ?? 0),
                 favorited: favoritedAssetIDs.contains(bg.id),
                 linkedProjects: linked,
-                updatedLabel: usage == 1 ? "1 scene" : "\(usage) scenes",
+                updatedLabel: usage == 1 ? "1 frame" : "\(usage) frames",
                 gradientColors: bg.gradientColors
             ))
         }
 
-        // Props — unique by id across all scenes
+        // Props — unique by id across all frames
         var seenProp = Set<UUID>()
-        for scene in scenes {
-            for prop in scene.props {
+        for frame in frames {
+            for prop in frame.props {
                 guard seenProp.insert(prop.id).inserted else { continue }
-                let usage = scenes.filter { $0.props.contains(where: { $0.id == prop.id }) }.count
+                let usage = frames.filter { $0.props.contains(where: { $0.id == prop.id }) }.count
                 result.append(Asset(
                     id: prop.id,
                     name: prop.name,
@@ -68,7 +68,7 @@ extension MovieBlazeProject {
                     versions: usage + (assetEditCounts[prop.id] ?? 0),
                     favorited: favoritedAssetIDs.contains(prop.id),
                     linkedProjects: linked,
-                    updatedLabel: usage == 1 ? "1 scene" : "\(usage) scenes",
+                    updatedLabel: usage == 1 ? "1 frame" : "\(usage) frames",
                     gradientColors: [prop.tint.opacity(0.85), prop.tint.opacity(0.35)]
                 ))
             }
