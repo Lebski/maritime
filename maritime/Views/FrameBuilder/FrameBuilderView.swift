@@ -4,7 +4,7 @@ struct FrameBuilderView: View {
     @EnvironmentObject var project: MovieBlazeProject
     @EnvironmentObject var navigator: AppNavigator
     @StateObject private var vm: FrameBuilderViewModel
-    @State private var showHelper = false
+    @State private var showHelper = true
     @State private var showInnerSidebar = true
     @State private var showRenderSheet = false
 
@@ -929,7 +929,7 @@ struct PrepareRenderSheet: View {
                     Text(vm.isGenerating ? "Rendering…" : "Render with \(model.rawValue)")
                         .font(.system(size: 12, weight: .bold))
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.white)
                 .padding(.horizontal, 16).padding(.vertical, 9)
                 .background(Theme.lime)
                 .clipShape(Capsule())

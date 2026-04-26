@@ -73,7 +73,7 @@ struct FinalizedCharacterView: View {
                 Button(action: { vm.showReferenceSheet = true }) {
                     Label("View Sheets", systemImage: "square.grid.2x2.fill")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                         .background(Theme.teal)

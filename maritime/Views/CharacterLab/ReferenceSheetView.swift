@@ -35,7 +35,7 @@ struct ReferenceSheetView: View {
                     Button(action: {}) {
                         Label("Export All", systemImage: "square.and.arrow.up")
                             .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.white)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 7)
                             .background(Theme.teal)
@@ -247,7 +247,7 @@ struct SheetDetailRow: View {
             Button(action: { if !isBusy { onGenerate() } }) {
                 Text("Generate")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(Theme.teal)

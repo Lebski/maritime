@@ -42,7 +42,7 @@ struct SidebarView: View {
         HStack(spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Theme.heroGradient)
+                    .fill(Theme.accent)
                     .frame(width: 34, height: 34)
                 Image(systemName: "film.fill")
                     .font(.system(size: 16, weight: .bold))
@@ -83,7 +83,7 @@ struct SidebarView: View {
     private var userFooter: some View {
         HStack(spacing: 10) {
             Circle()
-                .fill(Theme.heroGradient)
+                .fill(Theme.accent)
                 .frame(width: 30, height: 30)
                 .overlay(Text("AR").font(.system(size: 11, weight: .bold)).foregroundStyle(.white))
             VStack(alignment: .leading, spacing: 1) {

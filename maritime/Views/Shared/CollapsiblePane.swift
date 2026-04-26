@@ -172,11 +172,11 @@ struct StepIndicator: View {
                     if isPast {
                         Image(systemName: "checkmark")
                             .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.white)
                     } else {
                         Text("\(step.rawValue + 1)")
                             .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(isCurrent ? .black : Theme.textTertiary)
+                            .foregroundStyle(isCurrent ? .white : Theme.textTertiary)
                     }
                 }
                 Text(step.title)
@@ -218,10 +218,10 @@ struct ToastView: View {
                 }) {
                     Text(label)
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Theme.lime)
+                        .background(Theme.accent)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(.plainSolid)

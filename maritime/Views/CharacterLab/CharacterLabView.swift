@@ -149,7 +149,7 @@ struct CharacterLabView: View {
             Button(action: { vm.showNewCharacter = true }) {
                 Label("New Character", systemImage: "plus")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
                     .background(Theme.teal)

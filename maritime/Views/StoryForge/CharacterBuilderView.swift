@@ -309,7 +309,7 @@ struct CharacterBuilderView: View {
                         Image(systemName: "sparkles").font(.system(size: 12))
                         Text("Start with AI").font(.system(size: 12, weight: .semibold))
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(Theme.magenta)

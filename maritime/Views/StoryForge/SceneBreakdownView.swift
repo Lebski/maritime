@@ -64,7 +64,7 @@ struct SceneBreakdownView: View {
             Button(action: { vm.showSceneDiff = true }) {
                 Text("Review changes →")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 7)
                     .background(Theme.magenta)
@@ -102,7 +102,7 @@ struct SceneBreakdownView: View {
             Button(action: { vm.showNewSceneSheet = true }) {
                 Label("New Scene", systemImage: "plus")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .background(Theme.magenta)
@@ -192,7 +192,7 @@ struct SceneBreakdownView: View {
                             Text("Send to Storyboard")
                                 .font(.system(size: 11, weight: .semibold))
                         }
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
                         .background(Theme.violet)
