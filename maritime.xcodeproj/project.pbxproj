@@ -16,6 +16,7 @@
 		0DBAE2E3CDA39893DC4F2086 /* SceneBuilderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9700253081D8DBAC4AC82AA1 /* SceneBuilderModels.swift */; };
 		0F638C7CC82E644DCDA8D262 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB02EB9477D860FFB55C7F7 /* TimelineView.swift */; };
 		146F05F4C74FF53B68DF5A9E /* CharacterLabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91907C76B1873FB713267A5F /* CharacterLabViewModel.swift */; };
+		1B27B8BF711B4230D074921B /* AIRequestLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00618A3F41ED7CF00FEF3C5 /* AIRequestLog.swift */; };
 		1CAE90A82823961B280470D1 /* LoadingVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32550784872640D6731AC0FC /* LoadingVideoView.swift */; };
 		1E792C6BA48ADBFB04E6951F /* SceneBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790CC7A590B10A287972B40D /* SceneBuilderView.swift */; };
 		26599A213BC21B0E8618A40E /* MoodboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCE948AD47C332631272 /* MoodboardViewModel.swift */; };
@@ -86,6 +87,7 @@
 		CA21C7978697B4676056AA1F /* PremiereStillRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5CF27F6A14B395A67CBF61 /* PremiereStillRenderer.swift */; };
 		CAC306CAE8038BFB41971A98 /* SetDesignViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E3D7DB0F1665A21F32B07D /* SetDesignViewModel.swift */; };
 		CC5CF07CB7285F84C7CF8493 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A257DD4F9E660BE9793F14FE /* Assets.xcassets */; };
+		CE2F6DCCF3199D65B11BD0FF /* DebugPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C771162C977F35D3CF83EB /* DebugPane.swift */; };
 		CE9C9FEF6B79A25492973091 /* PanelDetailEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE8AE806454D07A2D2526CA /* PanelDetailEditor.swift */; };
 		CEC43CA51731C055693BA9CF /* SetPieceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0796BCF027E1CDCCFFC6024 /* SetPieceCard.swift */; };
 		CFCAADD3D3C032CB1ACB2C2C /* SceneBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDEC2683631A214E1CE9E27 /* SceneBuilderViewModel.swift */; };
@@ -162,6 +164,7 @@
 		67E2562501968B81FEBE4ED6 /* MoodboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodboardView.swift; sourceTree = "<group>"; };
 		68DEF5552DCBE1E4C5352EE6 /* MovieBlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieBlazeApp.swift; sourceTree = "<group>"; };
 		69149F2885DA454FF7A556BA /* NewCharacterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCharacterSheet.swift; sourceTree = "<group>"; };
+		69C771162C977F35D3CF83EB /* DebugPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugPane.swift; sourceTree = "<group>"; };
 		6C2B1849A09A925BD5F786E9 /* PremiereExportSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiereExportSettings.swift; sourceTree = "<group>"; };
 		6CE0D300525A353DFC8A7819 /* CharacterLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLabView.swift; sourceTree = "<group>"; };
 		6E0905FB0E298DD8FC1CD23E /* StoryboardComposerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardComposerViewModel.swift; sourceTree = "<group>"; };
@@ -216,6 +219,7 @@
 		E8E16F3D76AA0D4E9CEFFB5D /* StoryForgeHelperPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryForgeHelperPanel.swift; sourceTree = "<group>"; };
 		EAE3DD5660C2C61E4DF8390B /* FalaiSceneRenderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FalaiSceneRenderService.swift; sourceTree = "<group>"; };
 		EC6B54F7B39A31DF6EB53019 /* StoryBibleWizardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryBibleWizardSheet.swift; sourceTree = "<group>"; };
+		F00618A3F41ED7CF00FEF3C5 /* AIRequestLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRequestLog.swift; sourceTree = "<group>"; };
 		F2A9D4321B8EB3C1A93D22C1 /* VideoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoStore.swift; sourceTree = "<group>"; };
 		F342B369AEFE6B6474A98720 /* FalaiSetPieceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FalaiSetPieceService.swift; sourceTree = "<group>"; };
 		F53F490D26233235CF96DE56 /* SceneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneStore.swift; sourceTree = "<group>"; };
@@ -295,6 +299,7 @@
 		2A727C13ED9645CE16AEF07A /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F00618A3F41ED7CF00FEF3C5 /* AIRequestLog.swift */,
 				1B61C8AFB8A078F711067ED1 /* AnthropicClient.swift */,
 				0872D9805A415E8268579FE7 /* CharacterGenerationService.swift */,
 				3FD3D625AE0350452C0867B8 /* CharacterSheetService.swift */,
@@ -382,6 +387,7 @@
 		9D61454958BB2033D3918781 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				69C771162C977F35D3CF83EB /* DebugPane.swift */,
 				27C99AC2666CB93197FC7271 /* PreferencesView.swift */,
 			);
 			path = Preferences;
@@ -592,6 +598,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B27B8BF711B4230D074921B /* AIRequestLog.swift in Sources */,
 				F04899C3BD48091D08727A55 /* AnthropicClient.swift in Sources */,
 				47B5E59CE3FC32F19D360967 /* AppDelegate.swift in Sources */,
 				F88132523E243486D86281D7 /* AppSettings.swift in Sources */,
@@ -613,6 +620,7 @@
 				F70FFA9DCCBBAB4AF4610AAE /* CharacterWorkspaceView.swift in Sources */,
 				DCE6A53FCC91BE70A12DB813 /* CollapsiblePane.swift in Sources */,
 				3A36013CB46D6547BCA0BD5E /* CutSuggestionsList.swift in Sources */,
+				CE2F6DCCF3199D65B11BD0FF /* DebugPane.swift in Sources */,
 				E2E3BB5B2EDDFC9182066F62 /* ExportHistoryList.swift in Sources */,
 				9222187CA48DCAC3ED52B8FD /* ExportTargetCard.swift in Sources */,
 				BC774BAB2B8908B2F9A75791 /* ExportsModels.swift in Sources */,

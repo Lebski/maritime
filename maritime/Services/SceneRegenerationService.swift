@@ -51,7 +51,7 @@ struct SceneRegenerationService {
                 messages: [.init(role: .user, content: userMessage)],
                 maxTokens: 6000,
                 model: nil
-            ))
+            ), label: "Scene regen (template swap)")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }
@@ -75,7 +75,7 @@ struct SceneRegenerationService {
                 ],
                 maxTokens: 6000,
                 model: nil
-            ))
+            ), label: "Scene regen (retry)")
         } catch let err as AnthropicClient.ClientError {
             throw GenerationError.client(err)
         }

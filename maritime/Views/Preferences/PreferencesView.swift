@@ -66,6 +66,7 @@ struct PreferencesView: View {
                 switch section {
                 case .anthropic: anthropicPane
                 case .fal:       falPane
+                case .debug:     DebugPane()
                 case .about:     aboutPane
                 }
             }
@@ -203,7 +204,7 @@ struct PreferencesView: View {
                 messages: [.init(role: .user, content: "ping")],
                 maxTokens: 8,
                 model: nil
-            ))
+            ), label: "Test connection")
             return .success(())
         } catch {
             return .failure(error)
@@ -226,6 +227,7 @@ struct PreferencesView: View {
 private enum PrefsSection: String, CaseIterable, Identifiable {
     case anthropic
     case fal
+    case debug
     case about
 
     var id: String { rawValue }
@@ -234,6 +236,7 @@ private enum PrefsSection: String, CaseIterable, Identifiable {
         switch self {
         case .anthropic: return "Anthropic"
         case .fal:       return "fal.ai"
+        case .debug:     return "Debug"
         case .about:     return "About"
         }
     }
@@ -242,6 +245,7 @@ private enum PrefsSection: String, CaseIterable, Identifiable {
         switch self {
         case .anthropic: return "Claude API key and model selection. Powers character writing and story generation."
         case .fal:       return "fal.ai API key. Powers Nano Banana 2 image generation in Set Design and Scene Builder."
+        case .debug:     return "Every AI request — full request body, response, tokens, duration. Persisted across launches."
         case .about:     return "Where to get keys, and how MovieBlaze uses them."
         }
     }
@@ -250,6 +254,7 @@ private enum PrefsSection: String, CaseIterable, Identifiable {
         switch self {
         case .anthropic: return "brain"
         case .fal:       return "photo.stack"
+        case .debug:     return "ladybug"
         case .about:     return "info.circle"
         }
     }
@@ -258,6 +263,7 @@ private enum PrefsSection: String, CaseIterable, Identifiable {
         switch self {
         case .anthropic: return Theme.magenta
         case .fal:       return Theme.coral
+        case .debug:     return Theme.teal
         case .about:     return Theme.accent
         }
     }

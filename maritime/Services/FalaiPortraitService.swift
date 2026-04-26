@@ -44,7 +44,7 @@ struct FalaiPortraitService: PortraitGenerationService {
                 let i = nextIndex
                 nextIndex += 1
                 group.addTask {
-                    try await Self.runOne(index: i, client: client, payload: payload)
+                    try await Self.runOne(index: i, total: count, client: client, payload: payload)
                 }
             }
             var out: [PortraitVariation] = []
@@ -55,7 +55,7 @@ struct FalaiPortraitService: PortraitGenerationService {
                     let i = nextIndex
                     nextIndex += 1
                     group.addTask {
-                        try await Self.runOne(index: i, client: client, payload: payload)
+                        try await Self.runOne(index: i, total: count, client: client, payload: payload)
                     }
                 }
             }
@@ -64,9 +64,11 @@ struct FalaiPortraitService: PortraitGenerationService {
     }
 
     private static func runOne(index: Int,
+                               total: Int,
                                client: RecraftClient,
                                payload: RecraftClient.GenerateRequest) async throws -> (Int, Data) {
-        let response = try await client.submitAndAwait(payload)
+        let label = "Character portrait \(index + 1)/\(total)"
+        let response = try await client.submitAndAwait(payload, label: label)
         guard let first = response.images.first else {
             throw RecraftClient.ClientError.empty
         }

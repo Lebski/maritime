@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 @main
 struct MovieBlazeApp: App {
@@ -19,6 +20,14 @@ struct MovieBlazeApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
+        .commands {
+            CommandGroup(after: .saveItem) {
+                Button("Save As…") {
+                    NSApp.sendAction(#selector(NSDocument.saveAs(_:)), to: nil, from: nil)
+                }
+                .keyboardShortcut("s", modifiers: [.command, .shift])
+            }
+        }
 
         Settings {
             PreferencesView()

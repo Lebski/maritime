@@ -84,35 +84,69 @@ struct RecraftClient {
     }
 
     /// Submit one job, poll until it completes, return the parsed response.
-    /// Callers then call `downloadImage(url:)` per image to get bytes.
-    func submitAndAwait(_ request: GenerateRequest) async throws -> GenerateResponse {
+    /// Callers then call `downloadImage(url:)` per image to get bytes. The
+    /// submit + final response are recorded as a single AIRequestLog entry;
+    /// poll requests aren't logged individually to avoid spamming the log.
+    func submitAndAwait(_ request: GenerateRequest, label: String? = nil) async throws -> GenerateResponse {
         guard !apiKey.isEmpty else { throw ClientError.missingKey }
 
         let submitURL = URL(string: "\(Self.queueBase)/\(Self.modelID)")!
-        let submit = try await postJSON(submitURL, body: request, decodingTo: QueueSubmitResponse.self)
 
-        let statusURL = URL(string: submit.status_url) ?? submitURL
-        let responseURL = URL(string: submit.response_url) ?? submitURL
+        let logID = await AIRequestLog.shared.begin(
+            provider: .recraft,
+            endpoint: submitURL.absoluteString,
+            model: Self.modelID,
+            label: label,
+            requestBody: AIRequestLog.prettyJSON(request)
+        )
 
-        let deadline = Date().addingTimeInterval(pollTimeout)
-        var delay = initialPollDelay
+        do {
+            let submit = try await postJSON(submitURL, body: request, decodingTo: QueueSubmitResponse.self)
+            let statusURL = URL(string: submit.status_url) ?? submitURL
+            let responseURL = URL(string: submit.response_url) ?? submitURL
 
-        while Date() < deadline {
-            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-            delay = min(maxPollDelay, delay * 1.4)
+            let deadline = Date().addingTimeInterval(pollTimeout)
+            var delay = initialPollDelay
 
-            let status = try await getJSON(statusURL, decodingTo: QueueStatusResponse.self)
-            switch status.status.uppercased() {
-            case "COMPLETED":
-                let resolved = status.response_url.flatMap(URL.init(string:)) ?? responseURL
-                return try await getJSON(resolved, decodingTo: GenerateResponse.self)
-            case "FAILED", "CANCELLED", "ERROR":
-                throw ClientError.queueFailed(status.status)
-            default:
-                continue
+            while Date() < deadline {
+                try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                delay = min(maxPollDelay, delay * 1.4)
+
+                let status = try await getJSON(statusURL, decodingTo: QueueStatusResponse.self)
+                switch status.status.uppercased() {
+                case "COMPLETED":
+                    let resolved = status.response_url.flatMap(URL.init(string:)) ?? responseURL
+                    let (decoded, raw) = try await getJSONWithBody(resolved, decodingTo: GenerateResponse.self)
+                    guard !decoded.images.isEmpty else {
+                        let err = ClientError.empty
+                        await AIRequestLog.shared.fail(id: logID, error: err.errorDescription ?? "empty")
+                        throw err
+                    }
+                    let summary = "\(decoded.images.count) portrait\(decoded.images.count == 1 ? "" : "s")"
+                    await AIRequestLog.shared.succeed(
+                        id: logID,
+                        summary: summary,
+                        body: AIRequestLog.prettyJSON(data: raw)
+                    )
+                    return decoded
+                case "FAILED", "CANCELLED", "ERROR":
+                    let err = ClientError.queueFailed(status.status)
+                    await AIRequestLog.shared.fail(id: logID, error: err.errorDescription ?? status.status)
+                    throw err
+                default:
+                    continue
+                }
             }
+            let err = ClientError.timedOut
+            await AIRequestLog.shared.fail(id: logID, error: err.errorDescription ?? "timed out")
+            throw err
+        } catch let err as ClientError {
+            await AIRequestLog.shared.fail(id: logID, error: err.errorDescription ?? "recraft error")
+            throw err
+        } catch {
+            await AIRequestLog.shared.fail(id: logID, error: error.localizedDescription)
+            throw error
         }
-        throw ClientError.timedOut
     }
 
     /// Download bytes from a fal CDN URL returned by the generate response.
@@ -148,7 +182,8 @@ struct RecraftClient {
         } catch {
             throw ClientError.decode("encode failed: \(error.localizedDescription)")
         }
-        return try await send(req, decodingTo: Out.self)
+        let (decoded, _): (Out, Data) = try await send(req)
+        return decoded
     }
 
     private func getJSON<Out: Decodable>(_ url: URL, decodingTo: Out.Type) async throws -> Out {
@@ -156,10 +191,20 @@ struct RecraftClient {
         req.httpMethod = "GET"
         req.setValue("Key \(apiKey)", forHTTPHeaderField: "Authorization")
         req.timeoutInterval = 60
-        return try await send(req, decodingTo: Out.self)
+        let (decoded, _): (Out, Data) = try await send(req)
+        return decoded
     }
 
-    private func send<Out: Decodable>(_ req: URLRequest, decodingTo: Out.Type) async throws -> Out {
+    private func getJSONWithBody<Out: Decodable>(_ url: URL,
+                                                 decodingTo: Out.Type) async throws -> (Out, Data) {
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET"
+        req.setValue("Key \(apiKey)", forHTTPHeaderField: "Authorization")
+        req.timeoutInterval = 60
+        return try await send(req)
+    }
+
+    private func send<Out: Decodable>(_ req: URLRequest) async throws -> (Out, Data) {
         let data: Data
         let response: URLResponse
         do {
@@ -175,7 +220,8 @@ struct RecraftClient {
             throw ClientError.http(status: http.statusCode, body: body)
         }
         do {
-            return try JSONDecoder().decode(Out.self, from: data)
+            let decoded = try JSONDecoder().decode(Out.self, from: data)
+            return (decoded, data)
         } catch {
             throw ClientError.decode(error.localizedDescription)
         }

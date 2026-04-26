@@ -18,6 +18,7 @@ final class CharacterLabViewModel: ObservableObject {
     private let project: MovieBlazeProject
     private let portraitService: PortraitGenerationService
     private let sheetService: CharacterSheetService
+    private var cancellables: Set<AnyCancellable> = []
 
     init(project: MovieBlazeProject,
          portraitService: PortraitGenerationService = FalaiPortraitService(),
@@ -26,6 +27,37 @@ final class CharacterLabViewModel: ObservableObject {
         self.portraitService = portraitService
         self.sheetService = sheetService
         self.characters = project.characters
+
+        project.$characters
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] updated in
+                self?.mergeFromProject(updated)
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Pull in characters added by other modules (Story Forge auto-sync) and
+    /// apply upstream edits to name/role/description, while preserving locally
+    /// held in-flight state (phase, portraitVariations, sheetImages, …) that
+    /// hasn't been upserted yet. Mirrors the one-way contract enforced in
+    /// `StoryStore.syncLinkedCharacter`.
+    private func mergeFromProject(_ updated: [LabCharacter]) {
+        var merged = characters
+        for incoming in updated {
+            if let idx = merged.firstIndex(where: { $0.id == incoming.id }) {
+                merged[idx].name = incoming.name
+                merged[idx].role = incoming.role
+                merged[idx].description = incoming.description
+            } else {
+                merged.append(incoming)
+            }
+        }
+        merged.removeAll { local in !updated.contains(where: { $0.id == local.id }) }
+        characters = merged
+        if let activeID = activeCharacter?.id,
+           let idx = characters.firstIndex(where: { $0.id == activeID }) {
+            activeCharacter = characters[idx]
+        }
     }
 
     func setActive(_ character: LabCharacter) {

@@ -83,7 +83,7 @@ struct CharacterLabView: View {
                         }
                     }
                 }
-                SidebarSection(label: "Library") {
+                SidebarSection(label: "Library", collapsible: true, initiallyCollapsed: true) {
                     ForEach(CharacterLabSamples.libraryCharacters) { char in
                         CharacterRowView(character: char, isActive: vm.activeCharacter?.id == char.id) {
                             vm.setActive(char)
@@ -165,16 +165,51 @@ struct CharacterLabView: View {
 
 struct SidebarSection<Content: View>: View {
     let label: String
+    var collapsible: Bool
+    var initiallyCollapsed: Bool
     @ViewBuilder let content: Content
+    @State private var isCollapsed: Bool
+
+    init(label: String,
+         collapsible: Bool = false,
+         initiallyCollapsed: Bool = false,
+         @ViewBuilder content: () -> Content) {
+        self.label = label
+        self.collapsible = collapsible
+        self.initiallyCollapsed = initiallyCollapsed
+        self.content = content()
+        _isCollapsed = State(initialValue: collapsible && initiallyCollapsed)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
+            header
+            if !collapsible || !isCollapsed {
+                content
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack(spacing: 6) {
             Text(label.uppercased())
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(Theme.textTertiary)
-                .padding(.horizontal, 10)
-                .padding(.top, 12)
-                .padding(.bottom, 4)
-            content
+            if collapsible {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(Theme.textTertiary)
+                    .rotationEffect(.degrees(isCollapsed ? -90 : 0))
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 12)
+        .padding(.bottom, 4)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard collapsible else { return }
+            withAnimation(.easeInOut(duration: 0.18)) { isCollapsed.toggle() }
         }
     }
 }

@@ -69,7 +69,7 @@ struct FalaiClient {
     /// Submit a generation. `edit == true` uses the /edit endpoint and requires
     /// `image_urls` to be non-empty. Returns the parsed response — call
     /// `downloadImage(url:)` to get the bytes for the first result.
-    func generate(_ request: GenerateRequest, edit: Bool) async throws -> GenerateResponse {
+    func generate(_ request: GenerateRequest, edit: Bool, label: String? = nil) async throws -> GenerateResponse {
         guard !apiKey.isEmpty else { throw ClientError.missingKey }
 
         let endpointString = edit
@@ -90,36 +90,69 @@ struct FalaiClient {
             throw ClientError.decode("encode failed: \(error.localizedDescription)")
         }
 
+        let logID = await AIRequestLog.shared.begin(
+            provider: .fal,
+            endpoint: endpointString,
+            model: Self.modelID,
+            label: label,
+            requestBody: AIRequestLog.prettyJSON(request)
+        )
+
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: urlRequest)
         } catch let err as URLError {
-            throw ClientError.network(err)
+            let clientErr = ClientError.network(err)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? err.localizedDescription)
+            throw clientErr
         }
 
         guard let http = response as? HTTPURLResponse else {
-            throw ClientError.decode("non-HTTP response")
+            let clientErr = ClientError.decode("non-HTTP response")
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "non-HTTP response")
+            throw clientErr
         }
 
         guard (200..<300).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? "<binary>"
-            throw ClientError.http(status: http.statusCode, body: body)
+            let bodyText = String(data: data, encoding: .utf8) ?? "<binary>"
+            let clientErr = ClientError.http(status: http.statusCode, body: bodyText)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "HTTP \(http.statusCode)")
+            throw clientErr
         }
 
         let decoded: GenerateResponse
         do {
             decoded = try JSONDecoder().decode(GenerateResponse.self, from: data)
         } catch {
-            throw ClientError.decode(error.localizedDescription)
+            let clientErr = ClientError.decode(error.localizedDescription)
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? error.localizedDescription)
+            throw clientErr
         }
 
-        guard !decoded.images.isEmpty else { throw ClientError.empty }
+        guard !decoded.images.isEmpty else {
+            let clientErr = ClientError.empty
+            await AIRequestLog.shared.fail(id: logID, error: clientErr.errorDescription ?? "empty")
+            throw clientErr
+        }
+
+        let first = decoded.images[0]
+        let dims: String = {
+            if let w = first.width, let h = first.height { return " · \(w)×\(h)" }
+            return ""
+        }()
+        let summary = "\(decoded.images.count) image\(decoded.images.count == 1 ? "" : "s")\(dims)"
+        await AIRequestLog.shared.succeed(
+            id: logID,
+            summary: summary,
+            body: AIRequestLog.prettyJSON(data: data)
+        )
+
         return decoded
     }
 
     /// Convenience: run a generation and return the bytes of the first result image.
-    func generateAndFetch(_ request: GenerateRequest, edit: Bool) async throws -> Data {
-        let response = try await generate(request, edit: edit)
+    func generateAndFetch(_ request: GenerateRequest, edit: Bool, label: String? = nil) async throws -> Data {
+        let response = try await generate(request, edit: edit, label: label)
         return try await downloadImage(url: response.images[0].url)
     }
 
